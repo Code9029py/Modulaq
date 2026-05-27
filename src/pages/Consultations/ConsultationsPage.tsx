@@ -13,8 +13,8 @@ export function ConsultationsPage({ initialType }: ConsultationsPageProps) {
       <SectionHeader
         eyebrow="Consultas"
         headingLevel="h1"
-        title="Un canal para ideas, reportes y propuestas"
-        description="Elegí el tipo de consulta y dejá preparado el mensaje. En esta V1 el formulario sigue siendo visual, sin envío real."
+        title="Un canal para ideas, reportes y feedback"
+        description="Elegí el tipo de consulta y prepará tu mensaje para enviarlo desde tu aplicación de correo."
       />
 
       <div className="mt-6">

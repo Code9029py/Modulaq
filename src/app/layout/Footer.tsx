@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CONTACT_EMAIL } from "../../config/contact";
 import { routePaths } from "../routes/routePaths";
 import { Container } from "../../shared/components/Container";
 import { siteConfig } from "../../shared/constants/site";
@@ -18,6 +19,9 @@ export function Footer() {
           <Link to={routePaths.consultations} className="hover:text-ink-900">
             Consultas
           </Link>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-ink-900">
+            {CONTACT_EMAIL}
+          </a>
         </div>
       </Container>
     </footer>

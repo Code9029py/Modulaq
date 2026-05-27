@@ -33,14 +33,14 @@ export function HomePage() {
           <div>
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-surface-200 bg-surface-50/80 px-3 py-2 text-sm font-semibold text-ink-700">
               <Blocks size={16} />
-              Ecosistema modular en V1
+              V1.1 beta
             </div>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-ink-900 lg:text-6xl">
               Modulaq
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-ink-500">
-              Microherramientas digitales simples, reutilizables y preparadas para crecer hacia código integrable,
-              documentación técnica y APIs futuras.
+              Modulaq es una plataforma frontend-only de microherramientas digitales modulares. Código integrable,
+              API y documentación forman parte de próximas etapas.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href={routePaths.tools}>
@@ -73,9 +73,10 @@ export function HomePage() {
               </div>
             </div>
             <div className="mt-4 rounded-lg border border-surface-200 bg-surface-50 p-4">
-              <p className="text-sm font-semibold text-ink-900">Principio de V1</p>
+              <p className="text-sm font-semibold text-ink-900">Procesamiento local</p>
               <p className="mt-2 text-sm leading-6 text-ink-500">
-                La plataforma primero: rutas, metadata, catálogo y placeholders antes de implementar lógica pesada.
+                Las herramientas actuales procesan los archivos directamente en tu navegador. En esta versión, los
+                archivos no se suben a servidores de Modulaq para ser procesados.
               </p>
             </div>
           </div>

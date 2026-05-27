@@ -18,6 +18,16 @@ npm run build
 npm run preview
 ```
 
+## Formulario de contacto
+
+La página `/consultas` puede enviar mensajes directamente mediante Web3Forms, sin backend propio. Para habilitarlo en desarrollo local, crea un archivo `.env.local` a partir de `.env.example`:
+
+```bash
+VITE_WEB3FORMS_ACCESS_KEY=tu_access_key_de_web3forms
+```
+
+En Cloudflare Pages, configura `VITE_WEB3FORMS_ACCESS_KEY` como variable de entorno del build. Si la variable no está definida, el formulario continúa funcionando mediante `mailto:contacto@modulaq.dev`.
+
 ## Herramientas disponibles
 
 - Limpiador de texto
