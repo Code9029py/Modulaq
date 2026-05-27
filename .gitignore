@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.npm-cache/
+.npmcache/
+*.log
+.tmp-*/
+*.tmp
+*.bak
+*.backup
+.env
+.env.*
+!.env.example
+.DS_Store
+*.local

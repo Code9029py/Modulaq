@@ -1,0 +1,25 @@
+import { Link } from "react-router-dom";
+import { routePaths } from "../routes/routePaths";
+import { Container } from "../../shared/components/Container";
+import { siteConfig } from "../../shared/constants/site";
+
+export function Footer() {
+  return (
+    <footer className="border-t border-surface-200/80 bg-surface-100/70">
+      <Container className="grid gap-6 py-8 text-sm text-ink-500 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div>
+          <p className="font-semibold text-ink-900">{siteConfig.name}</p>
+          <p>{siteConfig.description}</p>
+        </div>
+        <div className="flex flex-wrap gap-4">
+          <Link to={routePaths.tools} className="hover:text-ink-900">
+            Herramientas
+          </Link>
+          <Link to={routePaths.consultations} className="hover:text-ink-900">
+            Consultas
+          </Link>
+        </div>
+      </Container>
+    </footer>
+  );
+}
