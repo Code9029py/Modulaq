@@ -1,6 +1,7 @@
 import { ArrowLeft, Braces, FileText, Globe2, Server } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ClientOnly } from "vite-react-ssg";
 import { buildToolPath, routePaths } from "../../app/routes/routePaths";
 import { getCategoryLabel } from "../../config/categories";
 import { pricingLabels } from "../../config/pricing";
@@ -11,6 +12,7 @@ import type { ToolModeId } from "../../features/tools/types/tool.types";
 import { getToolBySlug } from "../../features/tools/utils/getToolBySlug";
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
+import { PageHead } from "../../shared/seo/PageHead";
 import { cn } from "../../shared/utils/cn";
 
 type DetailTab = {
@@ -56,6 +58,12 @@ export function ToolDetailPage() {
   if (!tool) {
     return (
       <Container className="py-16">
+        <PageHead
+          noindex
+          title="Herramienta no encontrada"
+          description="La herramienta solicitada no existe en Modulaq. Revisá el catálogo de microherramientas disponibles."
+          path="/herramientas"
+        />
         <div className="rounded-lg border border-surface-200 bg-surface-50/82 p-8 shadow-panel">
           <p className="text-sm font-semibold uppercase tracking-wide text-ink-700">Herramienta no encontrada</p>
           <h1 className="mt-3 text-3xl font-semibold text-ink-900">Esa herramienta todavía no existe</h1>
@@ -74,6 +82,11 @@ export function ToolDetailPage() {
 
   return (
     <Container className="py-5 md:py-6 lg:py-8">
+      <PageHead
+        title={tool.seo?.title ?? tool.name}
+        description={tool.seo?.description ?? tool.description}
+        path={buildToolPath(tool.slug)}
+      />
       <Link to={routePaths.tools} className="inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-ink-900">
         <ArrowLeft size={16} />
         Volver al catálogo
@@ -138,9 +151,13 @@ export function ToolDetailPage() {
         >
           {activeTab === "online" ? (
             ToolRenderer ? (
-              <Suspense fallback={<ToolLoadingPanel />}>
-                <ToolRenderer tool={tool} />
-              </Suspense>
+              <ClientOnly fallback={<ToolLoadingPanel />}>
+                {() => (
+                  <Suspense fallback={<ToolLoadingPanel />}>
+                    <ToolRenderer tool={tool} />
+                  </Suspense>
+                )}
+              </ClientOnly>
             ) : (
               <ComingSoonPanel title="Interfaz de herramienta pendiente" />
             )

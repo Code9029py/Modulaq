@@ -4,6 +4,7 @@ import { categories } from "../../config/categories";
 import { tools } from "../../features/tools/data/tools";
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
+import { PageHead } from "../../shared/seo/PageHead";
 
 const principles = [
   {
@@ -28,6 +29,12 @@ export function HomePage() {
 
   return (
     <>
+      <PageHead
+        bareTitle
+        title="Modulaq — Microherramientas digitales modulares"
+        description="Modulaq es una plataforma frontend-only de microherramientas digitales: unir y dividir PDFs, generar QR, limpiar texto y más, directo en tu navegador."
+        path="/"
+      />
       <section className="border-b border-surface-200/70">
         <Container className="grid gap-10 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-16">
           <div>

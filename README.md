@@ -47,6 +47,14 @@ En Cloudflare Pages, configura `VITE_WEB3FORMS_ACCESS_KEY` como variable de ento
 - Código integrable, API y documentación se muestran como capacidades planificadas, todavía no activas.
 - Los renderers de herramientas se cargan bajo demanda para mantener ligera la navegación inicial.
 
+## SEO y renderizado (V2.1)
+
+- El build hace prerender/SSG de cada ruta con `vite-react-ssg`: genera HTML estático por página (incluida una por herramienta) que luego hidrata como SPA.
+- Cada ruta define su `<head>` (title, description, canonical, Open Graph/Twitter) mediante `PageHead` (`src/shared/seo/PageHead.tsx`), alimentado por la metadata de la herramienta (`tool.seo` opcional).
+- Las herramientas interactivas se renderizan dentro de `ClientOnly`, por lo que no se ejecutan en el server (evita dependencias de navegador como pdf.js en el prerender).
+- `scripts/generate-sitemap.mjs` genera `dist/sitemap.xml` con las URLs canónicas tras el build. `public/robots.txt` apunta a él.
+- `/contacto` y `/solicitar-herramienta` canonicalizan a `/consultas` (se excluyen del sitemap). `/catalogo` redirige 301 a `/herramientas` vía `public/_redirects`.
+
 ## Procesamiento local y límites
 
 Los archivos se procesan en el navegador. Para reducir bloqueos en operaciones intensivas, la interfaz aplica límites preventivos cuando corresponde:

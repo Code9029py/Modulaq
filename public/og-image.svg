@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Modulaq">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1729" />
+      <stop offset="1" stop-color="#111c33" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <g transform="translate(96,150)">
+    <rect width="120" height="120" rx="26" fill="#0b1220" stroke="#1e293b" stroke-width="2" />
+    <rect x="26" y="26" width="30" height="30" rx="7" fill="#22d3ee" />
+    <rect x="64" y="26" width="30" height="30" rx="7" fill="#5eead4" />
+    <rect x="26" y="64" width="30" height="30" rx="7" fill="#a78bfa" />
+    <rect x="64" y="64" width="30" height="30" rx="7" fill="#e2e8f0" />
+  </g>
+  <text x="96" y="380" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="104" font-weight="700" fill="#f1f5f9">Modulaq</text>
+  <text x="98" y="452" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="40" font-weight="500" fill="#94a3b8">Microherramientas digitales modulares</text>
+  <text x="98" y="520" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="500" fill="#5eead4">PDF · Texto · Productividad · 100% en tu navegador</text>
+</svg>

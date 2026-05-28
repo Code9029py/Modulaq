@@ -29,6 +29,11 @@ export type ToolMode = {
   description: string;
 };
 
+export type ToolSeo = {
+  title?: string;
+  description?: string;
+};
+
 export type ToolMetadata = {
   id: string;
   name: string;
@@ -43,6 +48,7 @@ export type ToolMetadata = {
   requiresBackend: boolean;
   requiresAI: boolean;
   apiStatus: ToolApiStatus;
+  seo?: ToolSeo;
 };
 
 export type ToolFilters = {

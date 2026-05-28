@@ -18,6 +18,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Unir PDFs online gratis",
+      description:
+        "Combiná varios PDF en un solo documento, en el orden que quieras. Gratis, sin instalar nada y procesado en tu navegador: tus archivos no se suben.",
+    },
   },
   {
     id: "split-pdf",
@@ -33,6 +38,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Dividir PDF online gratis",
+      description:
+        "Separá un PDF por rangos o páginas individuales (1-3,5,8-10) y descargá el resultado. Gratis, sin instalar y 100% en tu navegador.",
+    },
   },
   {
     id: "image-to-pdf",
@@ -48,6 +58,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Convertir imágenes a PDF online",
+      description:
+        "Convertí imágenes PNG, JPG o WebP en un PDF ordenado. Gratis, sin marcas de agua y procesado localmente en tu navegador.",
+    },
   },
   {
     id: "pdf-to-images",
@@ -63,6 +78,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Convertir PDF a imágenes PNG",
+      description:
+        "Convertí las páginas de un PDF en imágenes PNG de alta calidad, listas para descargar. Gratis y en tu navegador, sin subir archivos.",
+    },
   },
   {
     id: "compress-pdf",
@@ -78,6 +98,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Comprimir PDF online gratis",
+      description:
+        "Reducí el tamaño de un PDF directamente en tu navegador, gratis y sin subir archivos. Resultados honestos según el contenido del documento.",
+    },
   },
   {
     id: "extract-pdf-text",
@@ -93,6 +118,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Extraer texto de un PDF",
+      description:
+        "Extraé el texto seleccionable de un PDF para copiarlo o descargarlo como TXT. Gratis, sin instalar y procesado localmente en tu navegador.",
+    },
   },
   {
     id: "pdf-page-counter",
@@ -108,6 +138,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Contar páginas de un PDF",
+      description:
+        "Conocé cuántas páginas tiene un PDF al instante. Gratis, sin instalar y sin subir el archivo: todo ocurre en tu navegador.",
+    },
   },
   {
     id: "reorder-pdf-pages",
@@ -123,6 +158,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Reordenar páginas de un PDF",
+      description:
+        "Cambiá el orden de las páginas de un PDF y descargá el documento reorganizado. Gratis y 100% en tu navegador, sin subir archivos.",
+    },
   },
   {
     id: "text-cleaner",
@@ -138,6 +178,11 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Limpiar y normalizar texto",
+      description:
+        "Limpiá espacios de más, saltos de línea y caracteres invisibles del texto pegado. Gratis, instantáneo y directo en tu navegador.",
+    },
   },
   {
     id: "qr-generator",
@@ -153,5 +198,10 @@ export const tools: ToolMetadata[] = [
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "planned",
+    seo: {
+      title: "Generador de códigos QR gratis",
+      description:
+        "Generá códigos QR para enlaces, texto, email o teléfono y descargalos en PNG. Gratis, sin límites molestos y en tu navegador.",
+    },
   },
 ];

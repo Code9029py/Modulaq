@@ -11,6 +11,7 @@ import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
 import { EmptyState } from "../../shared/components/EmptyState";
 import { SectionHeader } from "../../shared/components/SectionHeader";
+import { PageHead } from "../../shared/seo/PageHead";
 import { cn } from "../../shared/utils/cn";
 
 const defaultFilters: ToolFiltersType = {
@@ -46,6 +47,11 @@ export function ToolsCatalogPage() {
 
   return (
     <Container className="py-8 md:py-9 lg:py-10">
+      <PageHead
+        title="Herramientas online gratis"
+        description="Catálogo de microherramientas de Modulaq: PDF, texto y productividad. Todas funcionan online, gratis y directo en tu navegador."
+        path="/herramientas"
+      />
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <SectionHeader
           eyebrow="Catálogo"
