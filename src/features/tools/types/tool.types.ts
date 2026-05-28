@@ -44,6 +44,24 @@ export type ToolDoc = {
   technicalNotes?: string[];
 };
 
+export type CodeLanguage = "typescript" | "javascript" | "bash" | "html";
+
+export type CodeSnippet = {
+  id: string;
+  title: string;
+  description?: string;
+  language: CodeLanguage;
+  code: string;
+  dependencies?: string[];
+  usageNotes?: string[];
+  limitations?: string[];
+};
+
+export type ToolIntegrableCode = {
+  summary?: string;
+  snippets: CodeSnippet[];
+};
+
 export type ToolMetadata = {
   id: string;
   name: string;
@@ -60,6 +78,7 @@ export type ToolMetadata = {
   apiStatus: ToolApiStatus;
   seo?: ToolSeo;
   doc?: ToolDoc;
+  integrableCode?: ToolIntegrableCode;
 };
 
 export type ToolFilters = {

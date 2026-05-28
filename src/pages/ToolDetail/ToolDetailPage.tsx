@@ -6,6 +6,7 @@ import { buildToolPath, routePaths } from "../../app/routes/routePaths";
 import { getCategoryLabel } from "../../config/categories";
 import { pricingLabels } from "../../config/pricing";
 import { getPlannedToolModeLabel, getToolModeLabel } from "../../config/toolModes";
+import { CodeSnippetPanel } from "../../features/tools/components/CodeSnippetPanel";
 import { ToolDocPanel } from "../../features/tools/components/ToolDocPanel";
 import { ToolStatusBadge } from "../../features/tools/components/ToolStatusBadge";
 import { getToolRenderer } from "../../features/tools/renderers/toolRenderers";
@@ -81,6 +82,7 @@ export function ToolDetailPage() {
 
   const ToolRenderer = getToolRenderer(tool.id);
   const hasDoc = Boolean(tool.doc);
+  const hasIntegrableCode = Boolean(tool.integrableCode);
 
   return (
     <Container className="py-5 md:py-6 lg:py-8">
@@ -117,7 +119,10 @@ export function ToolDetailPage() {
           {detailTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            const isAvailable = tool.modes.includes(tab.id) || (tab.id === "documentation" && hasDoc);
+            const isAvailable =
+              tool.modes.includes(tab.id) ||
+              (tab.id === "documentation" && hasDoc) ||
+              (tab.id === "integrable-code" && hasIntegrableCode);
             const isPlanned = tool.plannedModes.includes(tab.id) && !isAvailable;
             const isDisabled = !isAvailable && !isPlanned;
             const label = isPlanned ? getPlannedToolModeLabel(tab.id) : getToolModeLabel(tab.id);
@@ -170,7 +175,11 @@ export function ToolDetailPage() {
             aria-labelledby="tool-tab-integrable-code"
             hidden={activeTab !== "integrable-code"}
           >
-            <ComingSoonPanel title="Código integrable: próximamente" />
+            {tool.integrableCode ? (
+              <CodeSnippetPanel data={tool.integrableCode} />
+            ) : (
+              <ComingSoonPanel title="Código integrable: próximamente" />
+            )}
           </div>
           <div id="tool-panel-api" role="tabpanel" aria-labelledby="tool-tab-api" hidden={activeTab !== "api"}>
             <ComingSoonPanel title="API: próximamente" />

@@ -439,6 +439,68 @@ export const tools: ToolMetadata[] = [
         "La lógica de limpieza vive en un módulo reutilizable y cada opción se aplica de forma independiente.",
       ],
     },
+    integrableCode: {
+      summary:
+        "La limpieza es una función pura sin dependencias: recibe el texto y un objeto de opciones y devuelve el texto normalizado. Copiá la función y usala en cualquier proyecto JS/TS.",
+      snippets: [
+        {
+          id: "text-cleaner-core",
+          title: "Función cleanText (sin dependencias)",
+          description:
+            "Normaliza saltos de línea, espacios múltiples, comillas tipográficas y caracteres invisibles. Cada limpieza se activa por opción.",
+          language: "typescript",
+          code: `type TextCleanerOptions = {
+  removeMultipleSpaces: boolean;
+  removeExtraLineBreaks: boolean;
+  trimEdges: boolean;
+  normalizeQuotes: boolean;
+  removeInvisibleCharacters: boolean;
+  collapseEmptyLines: boolean;
+};
+
+export function cleanText(input: string, options: TextCleanerOptions): string {
+  let output = input.replace(/\\r\\n?/g, "\\n");
+
+  if (options.removeInvisibleCharacters) {
+    output = output.replace(
+      /[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F\\u200B-\\u200D\\uFEFF]/g,
+      "",
+    );
+  }
+
+  if (options.normalizeQuotes) {
+    output = output.replace(/[‘’‚‛]/g, "'").replace(/[“”„‟]/g, '"');
+  }
+
+  if (options.removeExtraLineBreaks) {
+    output = output.replace(/[^\\S\\n]+\\n/g, "\\n").replace(/\\n[^\\S\\n]+/g, "\\n");
+  }
+
+  if (options.removeMultipleSpaces) {
+    output = output.replace(/[^\\S\\n]{2,}/g, " ");
+  }
+
+  if (options.collapseEmptyLines) {
+    output = output.replace(/\\n{3,}/g, "\\n\\n");
+  }
+
+  if (options.trimEdges) {
+    output = output.trim();
+  }
+
+  return output;
+}`,
+          usageNotes: [
+            "Pasá un objeto con todas las opciones en true para una limpieza completa, o desactivá las que no quieras.",
+            "La función no muta el input: devuelve un texto nuevo.",
+          ],
+          limitations: [
+            "Trabaja sobre strings; no abre ni lee archivos.",
+            "No corrige ortografía ni gramática, solo normaliza formato.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "qr-generator",
@@ -488,6 +550,52 @@ export const tools: ToolMetadata[] = [
       technicalNotes: [
         "Usa la librería qrcode en el navegador.",
         "El tamaño seleccionado corresponde al PNG exportado, no solo a la vista previa.",
+      ],
+    },
+    integrableCode: {
+      summary:
+        "La generación se apoya en la librería qrcode. Construí el valor según el tipo de contenido y obtené un PNG en base64 (data URL) listo para mostrar o descargar.",
+      snippets: [
+        {
+          id: "qr-generator-core",
+          title: "Generar un QR como data URL",
+          description:
+            "Arma el valor del QR según el tipo (texto, URL, email o teléfono) y devuelve un PNG en base64.",
+          language: "typescript",
+          code: `import QRCode from "qrcode";
+
+type QrContentType = "text" | "url" | "email" | "phone";
+
+function buildQrValue(contentType: QrContentType, input: string): string {
+  const trimmed = input.trim();
+  if (contentType === "email") return \`mailto:\${trimmed}\`;
+  if (contentType === "phone") return \`tel:\${trimmed.replace(/\\s+/g, "")}\`;
+  return trimmed;
+}
+
+export async function generateQrDataUrl(
+  contentType: QrContentType,
+  input: string,
+  size = 512,
+): Promise<string> {
+  const value = buildQrValue(contentType, input);
+  return QRCode.toDataURL(value, {
+    errorCorrectionLevel: "M",
+    margin: 2,
+    width: size,
+    color: { dark: "#13202b", light: "#f3f7fa" },
+  });
+}`,
+          dependencies: ["qrcode"],
+          usageNotes: [
+            "Instalá la dependencia: npm i qrcode (y npm i -D @types/qrcode si usás TypeScript).",
+            "El data URL se puede usar directo en el src de un <img> o convertir a Blob para descargar.",
+          ],
+          limitations: [
+            "Contenidos muy largos generan QR densos y difíciles de escanear.",
+            "Pensado para uso en navegador; en Node ajustá las opciones de salida.",
+          ],
+        },
       ],
     },
   },
