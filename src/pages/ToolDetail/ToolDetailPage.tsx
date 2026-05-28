@@ -6,6 +6,7 @@ import { buildToolPath, routePaths } from "../../app/routes/routePaths";
 import { getCategoryLabel } from "../../config/categories";
 import { pricingLabels } from "../../config/pricing";
 import { getPlannedToolModeLabel, getToolModeLabel } from "../../config/toolModes";
+import { ToolDocPanel } from "../../features/tools/components/ToolDocPanel";
 import { ToolStatusBadge } from "../../features/tools/components/ToolStatusBadge";
 import { getToolRenderer } from "../../features/tools/renderers/toolRenderers";
 import type { ToolModeId } from "../../features/tools/types/tool.types";
@@ -79,6 +80,7 @@ export function ToolDetailPage() {
   }
 
   const ToolRenderer = getToolRenderer(tool.id);
+  const hasDoc = Boolean(tool.doc);
 
   return (
     <Container className="py-5 md:py-6 lg:py-8">
@@ -115,8 +117,8 @@ export function ToolDetailPage() {
           {detailTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            const isAvailable = tool.modes.includes(tab.id);
-            const isPlanned = tool.plannedModes.includes(tab.id);
+            const isAvailable = tool.modes.includes(tab.id) || (tab.id === "documentation" && hasDoc);
+            const isPlanned = tool.plannedModes.includes(tab.id) && !isAvailable;
             const isDisabled = !isAvailable && !isPlanned;
             const label = isPlanned ? getPlannedToolModeLabel(tab.id) : getToolModeLabel(tab.id);
 
@@ -143,14 +145,14 @@ export function ToolDetailPage() {
           })}
         </div>
 
-        <div
-          id={`tool-panel-${activeTab}`}
-          aria-labelledby={`tool-tab-${activeTab}`}
-          className="p-3.5 md:p-4"
-          role="tabpanel"
-        >
-          {activeTab === "online" ? (
-            ToolRenderer ? (
+        <div className="p-3.5 md:p-4">
+          <div
+            id="tool-panel-online"
+            role="tabpanel"
+            aria-labelledby="tool-tab-online"
+            hidden={activeTab !== "online"}
+          >
+            {ToolRenderer ? (
               <ClientOnly fallback={<ToolLoadingPanel />}>
                 {() => (
                   <Suspense fallback={<ToolLoadingPanel />}>
@@ -160,11 +162,27 @@ export function ToolDetailPage() {
               </ClientOnly>
             ) : (
               <ComingSoonPanel title="Interfaz de herramienta pendiente" />
-            )
-          ) : null}
-          {activeTab === "integrable-code" ? <ComingSoonPanel title="Código integrable: próximamente" /> : null}
-          {activeTab === "api" ? <ComingSoonPanel title="API: próximamente" /> : null}
-          {activeTab === "documentation" ? <ComingSoonPanel title="Documentación: próximamente" /> : null}
+            )}
+          </div>
+          <div
+            id="tool-panel-integrable-code"
+            role="tabpanel"
+            aria-labelledby="tool-tab-integrable-code"
+            hidden={activeTab !== "integrable-code"}
+          >
+            <ComingSoonPanel title="Código integrable: próximamente" />
+          </div>
+          <div id="tool-panel-api" role="tabpanel" aria-labelledby="tool-tab-api" hidden={activeTab !== "api"}>
+            <ComingSoonPanel title="API: próximamente" />
+          </div>
+          <div
+            id="tool-panel-documentation"
+            role="tabpanel"
+            aria-labelledby="tool-tab-documentation"
+            hidden={activeTab !== "documentation"}
+          >
+            {tool.doc ? <ToolDocPanel doc={tool.doc} /> : <ComingSoonPanel title="Documentación: próximamente" />}
+          </div>
         </div>
       </section>
 

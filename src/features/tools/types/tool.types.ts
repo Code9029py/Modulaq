@@ -34,6 +34,16 @@ export type ToolSeo = {
   description?: string;
 };
 
+export type ToolDoc = {
+  summary: string;
+  howTo: string[];
+  useCases: string[];
+  limits?: string[];
+  privacy?: string;
+  commonErrors?: string[];
+  technicalNotes?: string[];
+};
+
 export type ToolMetadata = {
   id: string;
   name: string;
@@ -49,6 +59,7 @@ export type ToolMetadata = {
   requiresAI: boolean;
   apiStatus: ToolApiStatus;
   seo?: ToolSeo;
+  doc?: ToolDoc;
 };
 
 export type ToolFilters = {
