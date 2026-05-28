@@ -8,20 +8,7 @@ export type SplitPdfMetadata = {
   pageCount: number;
 };
 
-export type PageSelectionResult = {
-  error: string | null;
-  isOutOfOrder: boolean;
-  pages: number[];
-};
-
-export type PartsValidationResult = {
-  assignedPageCount: number;
-  error: string | null;
-  isValid: boolean;
-  missingPages: number[];
-  pagesByPart: number[][];
-  repeatedPages: number[];
-};
+export type { PageSelectionResult, PartsValidationResult } from "../../../shared/utils/pageRanges";
 
 export type SplitPdfResult = {
   bytes: ArrayBuffer;

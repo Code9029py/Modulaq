@@ -1,53 +1,14 @@
 import { PDFDocument } from "pdf-lib";
+import { buildDownloadFileName, getBaseFileName } from "../../../shared/utils/downloadFileName";
+import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { MergePdfFileMetadata, MergePdfOptions, MergePdfResult } from "./mergePdf.types";
+
+export { formatFileSize, isPdfFile, getBaseFileName };
 
 export const defaultOutputFileName = "pdfs-unidos";
 
-export function isPdfFile(file: File) {
-  return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-}
-
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  const kilobytes = bytes / 1024;
-
-  if (kilobytes < 1024) {
-    return `${kilobytes.toFixed(1)} KB`;
-  }
-
-  return `${(kilobytes / 1024).toFixed(2)} MB`;
-}
-
-export function getBaseFileName(fileName: string) {
-  const nameWithoutPath = fileName.split(/[/\\]/).pop() ?? fileName;
-  const extensionIndex = nameWithoutPath.lastIndexOf(".");
-
-  if (extensionIndex <= 0) {
-    return nameWithoutPath;
-  }
-
-  return nameWithoutPath.slice(0, extensionIndex);
-}
-
 export function sanitizePdfFileName(fileName: string) {
-  const trimmedName = fileName.trim();
-  const nameWithFallback = trimmedName.length > 0 ? trimmedName : defaultOutputFileName;
-  const withoutPdfExtension = nameWithFallback.replace(/\.pdf$/i, "");
-  const sanitizedBaseName = withoutPdfExtension
-    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
-    .replace(/\s+/g, " ")
-    .replace(/[. ]+$/g, "")
-    .trim();
-  const safeBaseName = sanitizedBaseName.length > 0 ? sanitizedBaseName : defaultOutputFileName;
-
-  return `${safeBaseName}.pdf`;
-}
-
-function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  return buildDownloadFileName(fileName, "pdf", defaultOutputFileName);
 }
 
 async function loadPdfDocument(file: File) {

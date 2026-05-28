@@ -2,6 +2,7 @@ import * as pdfjsLib from "pdfjs-dist";
 import type { PDFDocumentProxy, TextItem } from "pdfjs-dist/types/src/display/api";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
+import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
 import type {
   ExtractedPdfPage,
   ExtractPdfTextMetadata,
@@ -31,21 +32,7 @@ type TextLine = {
   items: PositionedTextItem[];
 };
 
-export function isPdfFile(file: File) {
-  return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-}
-
-export function formatFileSize(size: number) {
-  if (size < 1024) {
-    return `${size} B`;
-  }
-
-  if (size < 1024 * 1024) {
-    return `${(size / 1024).toFixed(1)} KB`;
-  }
-
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-}
+export { formatFileSize, isPdfFile };
 
 export function getSuggestedOutputBaseName(pdfFileName: string) {
   return getSuggestedDownloadBaseName(pdfFileName, defaultOutputBaseName);

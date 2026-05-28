@@ -1,23 +1,8 @@
 import { PDFDocument } from "pdf-lib";
+import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
 import type { PdfPageCountResult } from "./pdfPageCounter.types";
 
-export function isPdfFile(file: File) {
-  return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-}
-
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  const kilobytes = bytes / 1024;
-
-  if (kilobytes < 1024) {
-    return `${kilobytes.toFixed(1)} KB`;
-  }
-
-  return `${(kilobytes / 1024).toFixed(2)} MB`;
-}
+export { formatFileSize, isPdfFile };
 
 export async function countPdfPages(file: File): Promise<PdfPageCountResult> {
   if (!isPdfFile(file)) {

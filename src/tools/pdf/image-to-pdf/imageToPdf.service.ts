@@ -1,25 +1,15 @@
 import { PDFDocument, type PDFImage } from "pdf-lib";
+import { buildDownloadFileName, getBaseFileName } from "../../../shared/utils/downloadFileName";
+import { formatFileSize, toArrayBuffer } from "../../../shared/utils/file";
 import type { CreateImageToPdfOptions, ImageToPdfResult, SupportedImageMimeType } from "./imageToPdf.types";
+
+export { formatFileSize, getBaseFileName };
 
 const supportedImageTypes: SupportedImageMimeType[] = ["image/png", "image/jpeg", "image/webp"];
 export const defaultOutputFileName = "imagenes-a-pdf";
 const pageMargin = 36;
 const a4Portrait = [595.28, 841.89] as const;
 const a4Landscape = [841.89, 595.28] as const;
-
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  const kilobytes = bytes / 1024;
-
-  if (kilobytes < 1024) {
-    return `${kilobytes.toFixed(1)} KB`;
-  }
-
-  return `${(kilobytes / 1024).toFixed(2)} MB`;
-}
 
 export function getSupportedImageType(file: File): SupportedImageMimeType | null {
   if (supportedImageTypes.includes(file.type as SupportedImageMimeType)) {
@@ -47,33 +37,8 @@ export function isSupportedImageFile(file: File) {
   return getSupportedImageType(file) !== null;
 }
 
-export function getBaseFileName(fileName: string) {
-  const nameWithoutPath = fileName.split(/[/\\]/).pop() ?? fileName;
-  const extensionIndex = nameWithoutPath.lastIndexOf(".");
-
-  if (extensionIndex <= 0) {
-    return nameWithoutPath;
-  }
-
-  return nameWithoutPath.slice(0, extensionIndex);
-}
-
 export function sanitizePdfFileName(fileName: string) {
-  const trimmedName = fileName.trim();
-  const nameWithFallback = trimmedName.length > 0 ? trimmedName : defaultOutputFileName;
-  const withoutPdfExtension = nameWithFallback.replace(/\.pdf$/i, "");
-  const sanitizedBaseName = withoutPdfExtension
-    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
-    .replace(/\s+/g, " ")
-    .replace(/[. ]+$/g, "")
-    .trim();
-  const safeBaseName = sanitizedBaseName.length > 0 ? sanitizedBaseName : defaultOutputFileName;
-
-  return `${safeBaseName}.pdf`;
-}
-
-function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  return buildDownloadFileName(fileName, "pdf", defaultOutputFileName);
 }
 
 async function loadImage(file: File): Promise<HTMLImageElement> {

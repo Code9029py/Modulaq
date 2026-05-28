@@ -1,7 +1,10 @@
 import JSZip from "jszip";
 import { EncryptedPDFError, PDFDocument } from "pdf-lib";
 import { buildDownloadFileName, getSuggestedDownloadBaseName, sanitizeDownloadBaseName } from "../../../shared/utils/downloadFileName";
+import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { CompressPdfDownload, CompressPdfMetadata, CompressPdfResult } from "./compressPdf.types";
+
+export { formatFileSize, isPdfFile };
 
 export const defaultOutputBaseName = "pdf-comprimido";
 const minimumSignificantReductionBytes = 1024;
@@ -9,24 +12,6 @@ const minimumSignificantReductionPercentage = 1;
 const encryptedPdfMessage = "Este PDF está protegido o encriptado y no se puede comprimir desde esta herramienta.";
 const unreadablePdfMessage =
   "No se pudo procesar este PDF con la librería actual. Puede estar protegido, usar una estructura no compatible o estar incompleto.";
-
-export function isPdfFile(file: File) {
-  return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-}
-
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  const kilobytes = bytes / 1024;
-
-  if (kilobytes < 1024) {
-    return `${kilobytes.toFixed(1)} KB`;
-  }
-
-  return `${(kilobytes / 1024).toFixed(2)} MB`;
-}
 
 export function formatSizeDifference(bytes: number) {
   return bytes > 0 ? `-${formatFileSize(bytes)}` : "Sin reducción";
@@ -43,10 +28,6 @@ export function getDownloadFileName(outputBaseName: string, multiple: boolean, f
 function getCompressedEntryFileName(fileName: string) {
   const baseName = sanitizeDownloadBaseName(`${getSuggestedOutputBaseName(fileName)}-comprimido`, defaultOutputBaseName);
   return `${baseName}.pdf`;
-}
-
-function toArrayBuffer(bytes: Uint8Array) {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
 async function loadPdfDocument(bytes: ArrayBuffer) {

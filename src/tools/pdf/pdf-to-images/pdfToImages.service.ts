@@ -3,6 +3,7 @@ import * as pdfjsLib from "pdfjs-dist";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { buildDownloadFileName, getSuggestedDownloadBaseName, sanitizeDownloadBaseName } from "../../../shared/utils/downloadFileName";
+import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
 import type {
   PdfPageRangeResult,
   PdfToImagesMetadata,
@@ -16,23 +17,7 @@ const pdfReadErrorMessage = "No se pudo leer el PDF. Verificá que el archivo no
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
-export function isPdfFile(file: File) {
-  return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-}
-
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  const kilobytes = bytes / 1024;
-
-  if (kilobytes < 1024) {
-    return `${kilobytes.toFixed(1)} KB`;
-  }
-
-  return `${(kilobytes / 1024).toFixed(2)} MB`;
-}
+export { formatFileSize, isPdfFile };
 
 export function createAllPageNumbers(pageCount: number) {
   return Array.from({ length: pageCount }, (_, index) => index + 1);
@@ -97,10 +82,6 @@ export function parsePageRange(input: string, pageCount: number): PdfPageRangeRe
   }
 
   return { duplicatesRemoved, error: null, pages };
-}
-
-function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
 async function loadPdfDocument(file: File) {

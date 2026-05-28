@@ -1,26 +1,11 @@
 import { PDFDocument } from "pdf-lib";
 import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
+import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { ReorderPdfPagesMetadata, ReorderPdfPagesResult } from "./reorderPdfPages.types";
 
+export { formatFileSize, isPdfFile };
+
 export const defaultOutputBaseName = "pdf-reordenado";
-
-export function isPdfFile(file: File) {
-  return file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-}
-
-export function formatFileSize(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-
-  const kilobytes = bytes / 1024;
-
-  if (kilobytes < 1024) {
-    return `${kilobytes.toFixed(1)} KB`;
-  }
-
-  return `${(kilobytes / 1024).toFixed(2)} MB`;
-}
 
 export function createOriginalPageOrder(pageCount: number) {
   return Array.from({ length: pageCount }, (_, index) => index + 1);
@@ -36,10 +21,6 @@ export function getSuggestedOutputBaseName(fileName: string) {
 
 export function getOutputFileName(outputBaseName: string, fallbackBaseName = defaultOutputBaseName) {
   return buildDownloadFileName(outputBaseName, "pdf", fallbackBaseName);
-}
-
-function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
 async function loadPdfDocument(file: File) {
