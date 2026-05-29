@@ -52,6 +52,41 @@ export const tools: ToolMetadata[] = [
         "El documento final respeta el orden mostrado en la lista.",
       ],
     },
+    integrableCode: {
+      summary:
+        "Unir PDFs corre 100% en el navegador con pdf-lib: copiás las páginas de cada documento a uno nuevo. Instalá pdf-lib y reutilizá esta función.",
+      snippets: [
+        {
+          id: "merge-pdf-core",
+          title: "Unir varios PDFs en uno",
+          description: "Recibe un array de File en orden y devuelve los bytes del PDF combinado.",
+          language: "typescript",
+          code: `import { PDFDocument } from "pdf-lib";
+
+export async function mergePdfs(files: File[]): Promise<Uint8Array> {
+  const merged = await PDFDocument.create();
+
+  for (const file of files) {
+    const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+    const pages = await merged.copyPages(source, source.getPageIndices());
+    pages.forEach((page) => merged.addPage(page));
+  }
+
+  return merged.save();
+}`,
+          dependencies: ["pdf-lib"],
+          usageNotes: [
+            "El orden del array es el orden final de las páginas.",
+            "Para descargar, envolvé los bytes en un Blob de tipo application/pdf y usá URL.createObjectURL.",
+          ],
+          limitations: [
+            "Necesita al menos dos PDFs para que tenga sentido.",
+            "Un PDF protegido o encriptado puede no cargar; ignoreEncryption ayuda solo en algunos casos.",
+            "No combina formularios ni firmas digitales de forma especial.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "split-pdf",
@@ -105,6 +140,44 @@ export const tools: ToolMetadata[] = [
         "Cuando se generan varios archivos, se empaquetan en un único ZIP con nombres consistentes.",
       ],
     },
+    integrableCode: {
+      summary:
+        "Dividir corre con pdf-lib en el navegador. Esta versión extrae un rango de páginas a un PDF nuevo (la base para cualquier división). Instalá pdf-lib.",
+      snippets: [
+        {
+          id: "split-pdf-range",
+          title: "Extraer un rango de páginas a un PDF nuevo",
+          description: "Copia las páginas del rango inclusivo [from, to] (1-based) a un documento nuevo.",
+          language: "typescript",
+          code: `import { PDFDocument } from "pdf-lib";
+
+// Extrae un rango inclusivo (1-based) a un PDF nuevo. Ej: extractPageRange(file, 2, 5)
+export async function extractPageRange(file: File, from: number, to: number): Promise<Uint8Array> {
+  const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+  const result = await PDFDocument.create();
+
+  const indices: number[] = [];
+  for (let page = from; page <= to; page += 1) {
+    indices.push(page - 1);
+  }
+
+  const pages = await result.copyPages(source, indices);
+  pages.forEach((page) => result.addPage(page));
+  return result.save();
+}`,
+          dependencies: ["pdf-lib"],
+          usageNotes: [
+            "from y to son 1-based e inclusivos: extractPageRange(file, 2, 5) devuelve las páginas 2 a 5.",
+            "Para descargar, envolvé los bytes en un Blob de tipo application/pdf.",
+          ],
+          limitations: [
+            "Devuelve un único PDF. Para varias salidas en un ZIP, combiná esto con la librería jszip.",
+            "Validá que from y to estén dentro del total de páginas (source.getPageCount()).",
+            "Un PDF protegido o dañado puede no poder leerse.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "image-to-pdf",
@@ -152,6 +225,44 @@ export const tools: ToolMetadata[] = [
       technicalNotes: [
         "El procesamiento usa pdf-lib en el navegador.",
         "Cada imagen se ajusta a una página A4 según su orientación; los WebP se convierten a PNG internamente.",
+      ],
+    },
+    integrableCode: {
+      summary:
+        "Imagen a PDF usa pdf-lib para incrustar imágenes PNG/JPG, una por página. Instalá pdf-lib.",
+      snippets: [
+        {
+          id: "image-to-pdf-core",
+          title: "Crear un PDF desde imágenes PNG/JPG",
+          description: "Agrega cada imagen como una página del tamaño de la imagen y devuelve los bytes del PDF.",
+          language: "typescript",
+          code: `import { PDFDocument } from "pdf-lib";
+
+// Cada imagen (PNG o JPG) se agrega como una página del tamaño de la imagen.
+export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
+  const pdf = await PDFDocument.create();
+
+  for (const file of files) {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const isPng = file.type === "image/png" || file.name.toLowerCase().endsWith(".png");
+    const image = isPng ? await pdf.embedPng(bytes) : await pdf.embedJpg(bytes);
+    const page = pdf.addPage([image.width, image.height]);
+    page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+  }
+
+  return pdf.save();
+}`,
+          dependencies: ["pdf-lib"],
+          usageNotes: [
+            "Obtené los File desde un input de tipo file con accept de imágenes.",
+            "El orden del array es el orden de las páginas.",
+          ],
+          limitations: [
+            "Solo PNG y JPG. WebP no se incrusta directo en pdf-lib: convertilo antes a PNG con un canvas.",
+            "Cada página toma el tamaño en píxeles de la imagen; para un A4 fijo, calculá escala y centrado.",
+            "Una imagen dañada o de formato no soportado hará fallar embedPng/embedJpg.",
+          ],
+        },
       ],
     },
   },
@@ -343,6 +454,34 @@ export const tools: ToolMetadata[] = [
       ],
       technicalNotes: ["Usa pdf-lib para leer la cantidad de páginas del documento."],
     },
+    integrableCode: {
+      summary:
+        "Contar páginas es directo con pdf-lib: cargás el documento en memoria y leés getPageCount(). Corre 100% en el navegador; instalá pdf-lib.",
+      snippets: [
+        {
+          id: "pdf-page-counter-core",
+          title: "Contar páginas de un PDF",
+          description: "Carga un PDF en memoria y devuelve la cantidad de páginas.",
+          language: "typescript",
+          code: `import { PDFDocument } from "pdf-lib";
+
+export async function countPdfPages(file: File): Promise<number> {
+  const bytes = await file.arrayBuffer();
+  const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  return pdf.getPageCount();
+}`,
+          dependencies: ["pdf-lib"],
+          usageNotes: [
+            "Recibe un File del navegador (por ejemplo desde un input de tipo file).",
+            "Es asíncrona: usala con await o .then().",
+          ],
+          limitations: [
+            "Un PDF protegido o dañado puede no poder leerse.",
+            "Solo cuenta páginas; no extrae texto ni genera miniaturas.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "reorder-pdf-pages",
@@ -390,6 +529,37 @@ export const tools: ToolMetadata[] = [
       technicalNotes: [
         "Usa pdf-lib en el navegador.",
         "El documento resultante respeta el orden mostrado en la lista.",
+      ],
+    },
+    integrableCode: {
+      summary:
+        "Reordenar usa pdf-lib: copiás las páginas en el nuevo orden a un documento nuevo. Instalá pdf-lib.",
+      snippets: [
+        {
+          id: "reorder-pdf-core",
+          title: "Reordenar páginas con un array de orden",
+          description: "Recibe un array 1-based con todas las páginas en el nuevo orden y devuelve el PDF reorganizado.",
+          language: "typescript",
+          code: `import { PDFDocument } from "pdf-lib";
+
+// order: array 1-based con TODAS las páginas en el nuevo orden, p. ej. [3, 1, 2]
+export async function reorderPdfPages(file: File, order: number[]): Promise<Uint8Array> {
+  const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+  const result = await PDFDocument.create();
+  const pages = await result.copyPages(source, order.map((n) => n - 1));
+  pages.forEach((page) => result.addPage(page));
+  return result.save();
+}`,
+          dependencies: ["pdf-lib"],
+          usageNotes: [
+            "order debe incluir todas las páginas, cada una una sola vez. Para 3 páginas: [3, 1, 2].",
+            "Para descargar, envolvé los bytes en un Blob de tipo application/pdf.",
+          ],
+          limitations: [
+            "Si order no cubre todas las páginas o repite alguna, el resultado será incorrecto: validá antes.",
+            "Un PDF protegido o dañado puede no poder procesarse.",
+          ],
+        },
       ],
     },
   },
