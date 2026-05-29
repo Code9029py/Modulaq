@@ -41,10 +41,13 @@ En Cloudflare Pages, configura `VITE_WEB3FORMS_ACCESS_KEY` como variable de ento
 - Extraer texto de PDF
 - Comprimir PDF
 
-## Estado de V1.1
+## Estado de las herramientas
 
 - Las 10 herramientas están disponibles en modo online.
-- Código integrable, API y documentación se muestran como capacidades planificadas, todavía no activas.
+- **Documentación:** disponible e indexable (SSG) en las 10 herramientas.
+- **Código integrable:** disponible en 9 de las 10 herramientas. Comprimir PDF se mantiene sin código integrable a propósito, para no sugerir una compresión real que la herramienta no realiza.
+- **API:** se muestra como capacidad futura, todavía no activa.
+- **Favoritos e historial local:** el catálogo permite marcar favoritos y la Home muestra herramientas usadas recientemente, usando solo `localStorage` (sin cuenta ni backend).
 - Los renderers de herramientas se cargan bajo demanda para mantener ligera la navegación inicial.
 
 ## SEO y renderizado (V2.1)
