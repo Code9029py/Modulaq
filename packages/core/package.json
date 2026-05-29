@@ -19,6 +19,10 @@
       "types": "./dist/pdf/index.d.ts",
       "import": "./dist/pdf/index.js"
     },
+    "./qr": {
+      "types": "./dist/qr/index.d.ts",
+      "import": "./dist/qr/index.js"
+    },
     "./files": {
       "types": "./dist/files/index.d.ts",
       "import": "./dist/files/index.js"
@@ -33,6 +37,7 @@
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
-    "pdf-lib": "^1.17.1"
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4"
   }
 }

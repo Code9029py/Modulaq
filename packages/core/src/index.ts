@@ -3,5 +3,6 @@
 //   import { countPdfPages } from "@modulaq/core/pdf";
 export * from "./text/index";
 export * from "./pdf/index";
+export * from "./qr/index";
 export * from "./files/index";
 export * from "./ranges/index";
