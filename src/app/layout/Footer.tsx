@@ -10,9 +10,9 @@ export function Footer() {
       <Container className="grid gap-6 py-8 text-sm text-ink-500 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <p className="font-semibold text-ink-900">{siteConfig.name}</p>
-          <p>{siteConfig.description}</p>
+          <p>Microherramientas digitales gratis que funcionan en tu navegador.</p>
           <p className="mt-2 max-w-xl text-xs text-ink-500/80">
-            Usamos métricas agregadas y anónimas, sin cookies ni datos personales, para mejorar Modulaq.
+            Tus archivos se procesan en tu navegador. Usamos métricas anónimas y agregadas, sin cookies ni datos personales.
           </p>
         </div>
         <div className="flex flex-wrap gap-4">

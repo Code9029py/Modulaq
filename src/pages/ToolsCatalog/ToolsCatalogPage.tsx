@@ -63,7 +63,7 @@ export function ToolsCatalogPage() {
         <SectionHeader
           eyebrow="Catálogo"
           headingLevel="h1"
-          title="Herramientas modulares"
+          title="Herramientas online gratis"
           description="Explora las primeras herramientas de Modulaq. Buscá rápido y ajustá filtros solo cuando haga falta."
         />
         <div className="flex items-center gap-3 lg:hidden">
@@ -190,7 +190,6 @@ export function ToolsCatalogPage() {
                 {displayedTools.length} de {tools.length} herramientas
               </p>
             </div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-300">V1 modular</p>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">

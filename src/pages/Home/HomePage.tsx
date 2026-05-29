@@ -1,4 +1,4 @@
-import { ArrowRight, Blocks, Braces, Layers3, Zap } from "lucide-react";
+import { ArrowRight, Blocks, Braces, ShieldCheck, Zap } from "lucide-react";
 import { ClientOnly } from "vite-react-ssg";
 import { routePaths } from "../../app/routes/routePaths";
 import { categories } from "../../config/categories";
@@ -10,24 +10,24 @@ import { PageHead } from "../../shared/seo/PageHead";
 
 const principles = [
   {
-    icon: Layers3,
-    title: "Modular",
-    description: "Cada herramienta nace con una responsabilidad clara y una estructura reutilizable.",
-  },
-  {
-    icon: Zap,
-    title: "Rápido",
-    description: "La experiencia inicial prioriza utilidad directa, poca fricción y navegación simple.",
+    icon: ShieldCheck,
+    title: "Gratis y privado",
+    description: "Sin cuenta ni pagos. Tus archivos se procesan en tu navegador y no se suben.",
   },
   {
     icon: Braces,
-    title: "Integrable",
-    description: "La base queda preparada para código reutilizable, documentación y APIs futuras.",
+    title: "Documentado e integrable",
+    description: "Cada herramienta tiene documentación y, en muchas, código que copiás a tu proyecto.",
+  },
+  {
+    icon: Zap,
+    title: "Rápido y a tu medida",
+    description: "Carga liviana, favoritos y herramientas usadas recientemente para volver rápido.",
   },
 ];
 
 export function HomePage() {
-  const plannedToolsCount = tools.filter((tool) => tool.status === "planned").length;
+  const integrableToolsCount = tools.filter((tool) => tool.integrableCode).length;
 
   return (
     <>
@@ -42,22 +42,26 @@ export function HomePage() {
           <div>
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-surface-200 bg-surface-50/80 px-3 py-2 text-sm font-semibold text-ink-700">
               <Blocks size={16} />
-              V1.1 beta
+              Beta pública · {tools.length} herramientas
             </div>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-ink-900 lg:text-6xl">
               Modulaq
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-ink-500">
-              Modulaq es una plataforma frontend-only de microherramientas digitales modulares. Código integrable,
-              API y documentación forman parte de próximas etapas.
+            <p className="mt-4 max-w-2xl text-xl font-semibold text-ink-900 lg:text-2xl">
+              Microherramientas digitales que funcionan en tu navegador.
+            </p>
+            <p className="mt-4 max-w-2xl text-lg leading-8 text-ink-500">
+              {tools.length} herramientas gratis para PDF, texto y productividad. Tus archivos no se suben a ningún
+              servidor: todo el procesamiento ocurre en tu navegador. Cada herramienta incluye documentación y, en
+              muchas, código integrable para tu propio proyecto.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href={routePaths.tools}>
                 Explorar herramientas
                 <ArrowRight className="ml-2" size={17} />
               </Button>
-              <Button href={routePaths.requestTool} variant="secondary">
-                Solicitar herramienta
+              <Button href={routePaths.consultations} variant="secondary">
+                Enviar consulta o feedback
               </Button>
             </div>
           </div>
@@ -66,26 +70,25 @@ export function HomePage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-surface-100 p-4">
                 <span className="text-3xl font-semibold text-ink-900">{tools.length}</span>
-                <p className="mt-1 text-sm text-ink-500">herramientas iniciales</p>
+                <p className="mt-1 text-sm text-ink-500">herramientas gratis</p>
               </div>
               <div className="rounded-lg bg-surface-100 p-4">
                 <span className="text-3xl font-semibold text-ink-900">{categories.length}</span>
-                <p className="mt-1 text-sm text-ink-500">categorías base</p>
+                <p className="mt-1 text-sm text-ink-500">categorías</p>
               </div>
               <div className="rounded-lg bg-surface-100 p-4">
-                <span className="text-3xl font-semibold text-ink-900">{plannedToolsCount}</span>
-                <p className="mt-1 text-sm text-ink-500">herramientas planificadas</p>
+                <span className="text-3xl font-semibold text-ink-900">{integrableToolsCount}</span>
+                <p className="mt-1 text-sm text-ink-500">con código integrable</p>
               </div>
               <div className="rounded-lg bg-ink-900 p-4 text-surface-50">
                 <span className="text-3xl font-semibold">0</span>
-                <p className="mt-1 text-sm text-surface-200">backends creados</p>
+                <p className="mt-1 text-sm text-surface-200">archivos subidos</p>
               </div>
             </div>
             <div className="mt-4 rounded-lg border border-surface-200 bg-surface-50 p-4">
               <p className="text-sm font-semibold text-ink-900">Procesamiento local</p>
               <p className="mt-2 text-sm leading-6 text-ink-500">
-                Las herramientas actuales procesan los archivos directamente en tu navegador. En esta versión, los
-                archivos no se suben a servidores de Modulaq para ser procesados.
+                Tus archivos se procesan directamente en tu navegador. No se suben a ningún servidor de Modulaq.
               </p>
             </div>
           </div>
@@ -98,13 +101,14 @@ export function HomePage() {
         <Container className="py-12">
           <div className="w-full">
             <p className="mb-1.5 text-sm font-semibold uppercase tracking-wide text-ink-700">
-              Base fundacional
+              Por qué Modulaq
             </p>
             <h2 className="text-2xl font-semibold text-ink-900 md:text-3xl">
-              Diseñada para crecer sin volverse pesada
+              Útil, privado y listo para integrar
             </h2>
-            <p className="mt-2 w-full text-base leading-7 text-ink-500 xl:whitespace-nowrap">
-              La primera versión establece el sistema visual, la navegación y la arquitectura de catálogo para que cada herramienta futura encaje en el mismo ecosistema.
+            <p className="mt-2 w-full text-base leading-7 text-ink-500">
+              Cada herramienta resuelve una tarea concreta, funciona sin instalar nada y guarda tus favoritos y
+              recientes para volver rápido.
             </p>
           </div>
 

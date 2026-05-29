@@ -26,18 +26,22 @@ type DetailTab = {
 
 const detailTabs: DetailTab[] = [
   { id: "online", icon: Globe2 },
+  { id: "documentation", icon: FileText },
   { id: "integrable-code", icon: Braces },
   { id: "api", icon: Server },
-  { id: "documentation", icon: FileText },
 ];
 
-function ComingSoonPanel({ title }: { title: string }) {
+function ComingSoonPanel({
+  title,
+  description = "Próximamente: este apartado quedará disponible cuando la herramienta avance de fase.",
+}: {
+  title: string;
+  description?: string;
+}) {
   return (
     <div className="rounded-lg border border-dashed border-surface-200 bg-surface-100/70 p-6 text-center">
       <p className="text-sm font-semibold text-ink-900">{title}</p>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-500">
-        Próximamente: este apartado quedará disponible cuando la herramienta avance de fase.
-      </p>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-500">{description}</p>
     </div>
   );
 }
@@ -192,7 +196,10 @@ export function ToolDetailPage() {
             )}
           </div>
           <div id="tool-panel-api" role="tabpanel" aria-labelledby="tool-tab-api" hidden={activeTab !== "api"}>
-            <ComingSoonPanel title="API: próximamente" />
+            <ComingSoonPanel
+              title="API: próximamente"
+              description="Un endpoint para usar esta herramienta desde tu backend; todavía no está disponible. Mientras tanto, el Código integrable corre en tu navegador, sin servidor."
+            />
           </div>
           <div
             id="tool-panel-documentation"
