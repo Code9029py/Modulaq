@@ -315,6 +315,57 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         "Cuando se generan varias imágenes, se empaquetan en un único ZIP.",
       ],
     },
+    integrableCode: {
+      summary:
+        "PDF a imágenes usa pdfjs-dist + canvas en el navegador. El snippet incluye la configuración del worker para Vite; en las notas están las alternativas (workerPort y CDN).",
+      snippets: [
+        {
+          id: "pdf-to-images-core",
+          title: "Renderizar una página de PDF a PNG",
+          description: "Renderiza una página a un data URL PNG, con escala configurable. Solo navegador (usa canvas).",
+          language: "typescript",
+          code: `import * as pdfjsLib from "pdfjs-dist";
+import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+
+// pageNumber es 1-based; scale controla la resolución (2 aprox. alta calidad).
+export async function renderPdfPageToPng(file: File, pageNumber: number, scale = 2): Promise<string> {
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({ data }).promise;
+  const page = await pdf.getPage(pageNumber);
+
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("No se pudo obtener el contexto 2D del canvas.");
+  }
+
+  canvas.width = Math.ceil(viewport.width);
+  canvas.height = Math.ceil(viewport.height);
+
+  await page.render({ canvas, canvasContext: context, viewport }).promise;
+  await pdf.destroy();
+
+  return canvas.toDataURL("image/png");
+}`,
+          dependencies: ["pdfjs-dist"],
+          usageNotes: [
+            "La config de worker de arriba es para Vite (import con ?url).",
+            "Alternativa con bundler genérico (sin Vite): GlobalWorkerOptions.workerPort = new Worker(new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url), { type: 'module' }).",
+            "Alternativa CDN: GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/<VERSION>/pdf.worker.min.mjs'.",
+            "Para JPEG: canvas.toDataURL('image/jpeg', 0.92). Para varias páginas, iterá de 1 a pdf.numPages.",
+          ],
+          limitations: [
+            "Solo navegador: depende de document.createElement('canvas'); no corre en Node sin polyfills.",
+            "Un scale alto sube la resolución y el costo: con páginas grandes puede consumir mucha memoria.",
+            "JPEG, multipágina y empaquetado en ZIP (con jszip) quedan como extensiones fuera de este snippet.",
+            "La versión del worker debe coincidir con la versión de pdfjs-dist instalada.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "compress-pdf",
@@ -411,6 +462,54 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       technicalNotes: [
         "Usa pdf.js para leer el contenido de texto.",
         "Detecta si el documento parece escaneado y avisa cuando hay símbolos problemáticos.",
+      ],
+    },
+    integrableCode: {
+      summary:
+        "Extraer texto usa pdfjs-dist en el navegador. El snippet incluye la configuración del worker para Vite; en las notas están las alternativas (workerPort y CDN).",
+      snippets: [
+        {
+          id: "extract-pdf-text-core",
+          title: "Extraer texto seleccionable de un PDF",
+          description: "Devuelve el texto por página y unido. Orientado a Vite + navegador moderno.",
+          language: "typescript",
+          code: `import * as pdfjsLib from "pdfjs-dist";
+import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+
+export async function extractPdfText(file: File): Promise<{ pages: string[]; text: string }> {
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({ data }).promise;
+  const pages: string[] = [];
+
+  for (let n = 1; n <= pdf.numPages; n += 1) {
+    const page = await pdf.getPage(n);
+    const content = await page.getTextContent();
+    const pageText = content.items
+      .map((item) => ("str" in item ? item.str : ""))
+      .join(" ")
+      .replace(/\\s+/g, " ")
+      .trim();
+    pages.push(pageText);
+  }
+
+  await pdf.destroy();
+  return { pages, text: pages.join("\\n\\n") };
+}`,
+          dependencies: ["pdfjs-dist"],
+          usageNotes: [
+            "La config de worker de arriba es para Vite (import con ?url).",
+            "Alternativa con bundler genérico (sin Vite): GlobalWorkerOptions.workerPort = new Worker(new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url), { type: 'module' }).",
+            "Alternativa CDN: GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/<VERSION>/pdf.worker.min.mjs'.",
+            "Usá result.pages para el texto por página o result.text para el texto unido.",
+          ],
+          limitations: [
+            "No hace OCR: solo extrae texto ya seleccionable. Un PDF escaneado (imágenes) puede devolver vacío.",
+            "El orden y el espaciado son aproximados (sin reconstrucción de columnas ni saltos de línea de layout).",
+            "La versión del worker debe coincidir con la versión de pdfjs-dist instalada.",
+          ],
+        },
       ],
     },
   },
