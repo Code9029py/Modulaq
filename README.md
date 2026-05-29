@@ -1,4 +1,4 @@
-# Modulaq V1.1
+# Modulaq V2.0
 
 Modulaq es una plataforma frontend-only de microherramientas modulares. Las herramientas se ejecutan localmente en el navegador y no requieren backend para las funciones disponibles en V1.1.
 
