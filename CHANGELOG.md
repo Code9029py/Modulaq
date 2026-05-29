@@ -72,12 +72,15 @@ presentación pública.
 ## Backlog (post-2.0.0)
 
 ### Pre-V3 (preparación, sin cambiar arquitectura)
-- **Redirección `www.modulaq.dev` → `modulaq.dev`** (canonicalización de dominio
-  en Cloudflare).
-- **Google Search Console:** alta del dominio, verificación y envío del
-  `sitemap.xml`.
-- **Página `/privacidad`:** consolidar en una ruta propia lo que hoy vive en
-  Footer + Home (procesamiento local, analítica anónima, contacto).
+- ✅ **Redirección `www.modulaq.dev` → `modulaq.dev`** (301 en Cloudflare,
+  preservando path y query).
+- ✅ **Google Search Console:** dominio dado de alta y `sitemap.xml` enviado
+  (13 URLs descubiertas en su momento; ahora 14 con `/privacidad`).
+- ✅ **Página `/privacidad`:** ruta estática (SSG) con `PageHead` propio y enlace
+  en el Footer. Explica procesamiento local, favoritos/historial en
+  `localStorage`, consultas vía Web3Forms, analítica anónima de Cloudflare,
+  naturaleza documental del código integrable, límites y contacto. Tono claro y
+  no legalista. Sin dependencias ni backend.
 - **V2.5B — Eventos personalizados:** implementar la arquitectura ya aprobada si
   surge una pregunta concreta de producto.
 

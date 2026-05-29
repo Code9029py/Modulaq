@@ -22,6 +22,9 @@ export function Footer() {
           <Link to={routePaths.consultations} className="hover:text-ink-900">
             Consultas
           </Link>
+          <Link to={routePaths.privacy} className="hover:text-ink-900">
+            Privacidad
+          </Link>
           <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-ink-900">
             {CONTACT_EMAIL}
           </a>

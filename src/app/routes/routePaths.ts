@@ -5,6 +5,7 @@ export const routePaths = {
   consultations: "/consultas",
   requestTool: "/solicitar-herramienta",
   contact: "/contacto",
+  privacy: "/privacidad",
 };
 
 export function buildToolPath(slug: string) {
