@@ -1,0 +1,38 @@
+{
+  "name": "@modulaq/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Modulaq core SDK — microherramientas reutilizables browser-first (V3.0 alpha, uso interno).",
+  "type": "module",
+  "sideEffects": false,
+  "files": ["dist", "README.md"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./text": {
+      "types": "./dist/text/index.d.ts",
+      "import": "./dist/text/index.js"
+    },
+    "./pdf": {
+      "types": "./dist/pdf/index.d.ts",
+      "import": "./dist/pdf/index.js"
+    },
+    "./files": {
+      "types": "./dist/files/index.d.ts",
+      "import": "./dist/files/index.js"
+    },
+    "./ranges": {
+      "types": "./dist/ranges/index.d.ts",
+      "import": "./dist/ranges/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "pdf-lib": "^1.17.1"
+  }
+}

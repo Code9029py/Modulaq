@@ -1,4 +1,6 @@
-import { PDFDocument } from "pdf-lib";
+// Adaptador delgado sobre @modulaq/core/pdf.
+// Preserva la API histórica (countPdfPages devuelve { fileName, fileSize, pageCount }).
+import { countPdfPages as coreCountPdfPages } from "@modulaq/core/pdf";
 import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
 import type { PdfPageCountResult } from "./pdfPageCounter.types";
 
@@ -10,15 +12,11 @@ export async function countPdfPages(file: File): Promise<PdfPageCountResult> {
   }
 
   try {
-    const fileBuffer = await file.arrayBuffer();
-    const pdfDocument = await PDFDocument.load(fileBuffer, {
-      ignoreEncryption: true,
-    });
-
+    const pageCount = await coreCountPdfPages(file);
     return {
       fileName: file.name,
       fileSize: file.size,
-      pageCount: pdfDocument.getPageCount(),
+      pageCount,
     };
   } catch {
     throw new Error("No se pudo leer el PDF. Puede estar corrupto, protegido o incompleto.");
