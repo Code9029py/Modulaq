@@ -1,6 +1,8 @@
 import { ArrowRight, Blocks, Braces, Layers3, Zap } from "lucide-react";
+import { ClientOnly } from "vite-react-ssg";
 import { routePaths } from "../../app/routes/routePaths";
 import { categories } from "../../config/categories";
+import { RecentToolsSection } from "../../features/tools/components/RecentToolsSection";
 import { tools } from "../../features/tools/data/tools";
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
@@ -89,6 +91,8 @@ export function HomePage() {
           </div>
         </Container>
       </section>
+
+      <ClientOnly>{() => <RecentToolsSection />}</ClientOnly>
 
       <section>
         <Container className="py-12">

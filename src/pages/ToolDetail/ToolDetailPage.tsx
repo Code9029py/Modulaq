@@ -1,5 +1,5 @@
 import { ArrowLeft, Braces, FileText, Globe2, Server } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ClientOnly } from "vite-react-ssg";
 import { buildToolPath, routePaths } from "../../app/routes/routePaths";
@@ -7,7 +7,9 @@ import { getCategoryLabel } from "../../config/categories";
 import { pricingLabels } from "../../config/pricing";
 import { getPlannedToolModeLabel, getToolModeLabel } from "../../config/toolModes";
 import { CodeSnippetPanel } from "../../features/tools/components/CodeSnippetPanel";
+import { FavoriteToggleButton } from "../../features/tools/components/FavoriteToggleButton";
 import { ToolDocPanel } from "../../features/tools/components/ToolDocPanel";
+import { useRecentTools } from "../../features/tools/context/ToolPrefsProvider";
 import { ToolStatusBadge } from "../../features/tools/components/ToolStatusBadge";
 import { getToolRenderer } from "../../features/tools/renderers/toolRenderers";
 import type { ToolModeId } from "../../features/tools/types/tool.types";
@@ -56,6 +58,13 @@ export function ToolDetailPage() {
   const { slug } = useParams();
   const tool = getToolBySlug(slug);
   const [activeTab, setActiveTab] = useState<ToolModeId>("online");
+  const { recordVisit, hydrated } = useRecentTools();
+
+  useEffect(() => {
+    if (tool && hydrated) {
+      recordVisit(tool.id);
+    }
+  }, [tool, hydrated, recordVisit]);
 
   if (!tool) {
     return (
@@ -110,6 +119,7 @@ export function ToolDetailPage() {
             <span className="rounded-md border border-surface-200 bg-surface-100/80 px-2.5 py-1 text-xs font-semibold text-ink-700">
               {pricingLabels[tool.pricing]}
             </span>
+            <FavoriteToggleButton toolId={tool.id} toolName={tool.name} />
           </div>
         </div>
       </section>

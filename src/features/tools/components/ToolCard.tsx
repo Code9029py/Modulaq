@@ -4,6 +4,7 @@ import { buildToolPath } from "../../../app/routes/routePaths";
 import { getCategoryLabel } from "../../../config/categories";
 import { pricingLabels } from "../../../config/pricing";
 import type { ToolCategoryId, ToolMetadata } from "../types/tool.types";
+import { FavoriteToggleButton } from "./FavoriteToggleButton";
 import { ToolStatusBadge } from "./ToolStatusBadge";
 
 const categoryIcons: Record<ToolCategoryId, typeof FileText> = {
@@ -34,7 +35,10 @@ export function ToolCard({ tool }: { tool: ToolMetadata }) {
         <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-surface-200 bg-surface-100 text-accent-teal">
           <Icon size={18} />
         </div>
-        <ToolStatusBadge status={tool.status} />
+        <div className="flex items-center gap-1.5">
+          <ToolStatusBadge status={tool.status} />
+          <FavoriteToggleButton toolId={tool.id} toolName={tool.name} />
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
