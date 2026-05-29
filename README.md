@@ -73,3 +73,14 @@ Configuración recomendada:
 - Directorio de salida: `dist`
 
 El proyecto usa `BrowserRouter`. El archivo `public/_redirects` incluye el fallback SPA necesario para que rutas directas como `/herramientas/comprimir-pdf` resuelvan a `index.html` en Cloudflare Pages.
+
+## Analytics (V2.5)
+
+Modulaq usa **Cloudflare Web Analytics**, una solución de métricas liviana y *privacy-first*.
+
+- **Activación:** se habilita desde el dashboard de Cloudflare → proyecto de Pages → *Web Analytics*. Cloudflare inyecta el beacon automáticamente en el edge: **no requiere cambios de código**, ni dependencias, ni variables de entorno, y no afecta el SSG.
+- **Qué se mide:** vistas y visitas por ruta (de ahí, las herramientas más visitadas en `/herramientas/<slug>`), tráfico general (referrers, país, dispositivo, navegador) y Core Web Vitals (LCP, INP, CLS). Todo agregado, sin perfiles de usuario.
+- **Qué NO se mide:** datos personales, archivos cargados, nombres de archivos, contenido de PDFs/textos, emails ni mensajes de consultas. Cloudflare Web Analytics solo observa la URL y métricas de rendimiento; el contenido de las herramientas nunca sale del navegador.
+- **Privacidad:** sin cookies, sin fingerprinting y sin almacenamiento en el cliente. No requiere banner de consentimiento.
+- **Costo:** 0 (incluido en Cloudflare).
+- **Eventos personalizados:** no se miden todavía. Cloudflare Web Analytics no soporta eventos arbitrarios; quedan planificados para una futura **V2.5B** (por ejemplo con Cloudflare Workers + Analytics Engine u otra solución *first-party*).

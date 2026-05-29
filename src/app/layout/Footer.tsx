@@ -11,6 +11,9 @@ export function Footer() {
         <div>
           <p className="font-semibold text-ink-900">{siteConfig.name}</p>
           <p>{siteConfig.description}</p>
+          <p className="mt-2 max-w-xl text-xs text-ink-500/80">
+            Usamos métricas agregadas y anónimas, sin cookies ni datos personales, para mejorar Modulaq.
+          </p>
         </div>
         <div className="flex flex-wrap gap-4">
           <Link to={routePaths.tools} className="hover:text-ink-900">
