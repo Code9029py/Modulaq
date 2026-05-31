@@ -1,6 +1,10 @@
 import * as pdfjsLib from "pdfjs-dist";
 import type { PDFDocumentProxy, TextItem } from "pdfjs-dist/types/src/display/api";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import {
+  configurePdfWorker,
+  extractPdfText as coreExtractPdfText,
+} from "@modulaq/core/pdf-render";
 import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
 import type {
@@ -11,7 +15,11 @@ import type {
   ExtractPdfTextResult,
 } from "./extractPdfText.types";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+// Configurar el worker de pdfjs-dist una sola vez al cargar el módulo.
+// El adapter sigue usando pdfjsLib directamente para la rama de "layout
+// aproximado" (no migrada al SDK en V3.1), así que ambos consumidores
+// comparten esta misma configuración del singleton GlobalWorkerOptions.
+configurePdfWorker(pdfWorkerUrl);
 
 const readPdfErrorMessage = "No se pudo leer el PDF. Verificá que el archivo no esté dañado o protegido.";
 const minimumSelectableCharacters = 3;
@@ -189,9 +197,33 @@ function countProblematicSymbols(text: string) {
   return Array.from(text.matchAll(suspiciousSymbolPattern)).length;
 }
 
-export async function extractPdfText(
+function buildExtractResult(
+  pages: ExtractedPdfPage[],
+  pageCount: number,
   file: File,
-  options: ExtractPdfTextOptions,
+): ExtractPdfTextResult {
+  const text = formatPageText(pages);
+  const pagesWithText = pages.filter((page) => page.text.length > 0).length;
+  const selectableText = pages.map((page) => page.text).join("").replace(/\s/g, "");
+  const problematicSymbolCount = countProblematicSymbols(selectableText);
+  const hasSelectableText = selectableText.length >= minimumSelectableCharacters;
+  const suspiciousSymbolRatio = selectableText.length === 0 ? 0 : problematicSymbolCount / selectableText.length;
+
+  return {
+    text,
+    fileName: getTextFileName(getSuggestedOutputBaseName(file.name)),
+    pageCount,
+    pagesWithText,
+    hasSelectableText,
+    likelyScanned: !hasSelectableText,
+    hasProblematicSymbols:
+      problematicSymbolCount >= 3 || (problematicSymbolCount > 0 && suspiciousSymbolRatio >= 0.02),
+    problematicSymbolCount,
+  };
+}
+
+async function extractWithLayout(
+  file: File,
   onProgress?: (progress: ExtractPdfTextProgress) => void,
 ): Promise<ExtractPdfTextResult> {
   const pdf = await loadPdfDocument(file);
@@ -203,33 +235,41 @@ export async function extractPdfText(
       const page = await pdf.getPage(pageNumber);
       const content = await page.getTextContent();
       const textItems = getTextItems(content.items);
-
-      pages.push({
-        pageNumber,
-        text: options.preserveApproximateLineBreaks ? getLayoutPageText(textItems) : getContinuousPageText(textItems),
-      });
+      pages.push({ pageNumber, text: getLayoutPageText(textItems) });
     }
-
-    const text = formatPageText(pages);
-    const pagesWithText = pages.filter((page) => page.text.length > 0).length;
-    const selectableText = pages.map((page) => page.text).join("").replace(/\s/g, "");
-    const problematicSymbolCount = countProblematicSymbols(selectableText);
-    const hasSelectableText = selectableText.length >= minimumSelectableCharacters;
-    const suspiciousSymbolRatio = selectableText.length === 0 ? 0 : problematicSymbolCount / selectableText.length;
-
-    return {
-      text,
-      fileName: getTextFileName(getSuggestedOutputBaseName(file.name)),
-      pageCount: pdf.numPages,
-      pagesWithText,
-      hasSelectableText,
-      likelyScanned: !hasSelectableText,
-      hasProblematicSymbols: problematicSymbolCount >= 3 || (problematicSymbolCount > 0 && suspiciousSymbolRatio >= 0.02),
-      problematicSymbolCount,
-    };
+    return buildExtractResult(pages, pdf.numPages, file);
   } catch {
     throw new Error("No se pudo extraer el texto del PDF.");
   } finally {
     await pdf.destroy();
   }
+}
+
+async function extractSimple(
+  file: File,
+  onProgress?: (progress: ExtractPdfTextProgress) => void,
+): Promise<ExtractPdfTextResult> {
+  try {
+    onProgress?.({ current: 0, total: 1 });
+    const { pages: rawPages } = await coreExtractPdfText(file);
+    const pages: ExtractedPdfPage[] = rawPages.map((pageText, index) => ({
+      pageNumber: index + 1,
+      text: pageText,
+    }));
+    onProgress?.({ current: pages.length, total: pages.length });
+    return buildExtractResult(pages, pages.length, file);
+  } catch {
+    throw new Error("No se pudo extraer el texto del PDF.");
+  }
+}
+
+export async function extractPdfText(
+  file: File,
+  options: ExtractPdfTextOptions,
+  onProgress?: (progress: ExtractPdfTextProgress) => void,
+): Promise<ExtractPdfTextResult> {
+  if (options.preserveApproximateLineBreaks) {
+    return extractWithLayout(file, onProgress);
+  }
+  return extractSimple(file, onProgress);
 }
