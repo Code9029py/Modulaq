@@ -1,4 +1,9 @@
-import { PDFDocument } from "pdf-lib";
+// Adaptador delgado sobre @modulaq/core/pdf.
+// Preserva la API histórica del service de Reordenar páginas PDF.
+import {
+  countPdfPages as coreCountPdfPages,
+  reorderPdfPages as coreReorderPdfPages,
+} from "@modulaq/core/pdf";
 import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { ReorderPdfPagesMetadata, ReorderPdfPagesResult } from "./reorderPdfPages.types";
@@ -23,28 +28,21 @@ export function getOutputFileName(outputBaseName: string, fallbackBaseName = def
   return buildDownloadFileName(outputBaseName, "pdf", fallbackBaseName);
 }
 
-async function loadPdfDocument(file: File) {
-  if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
-  }
-
+async function readPageCount(file: File): Promise<number> {
   try {
-    return await PDFDocument.load(await file.arrayBuffer(), {
-      ignoreEncryption: true,
-    });
+    return await coreCountPdfPages(file);
   } catch {
     throw new Error("No se pudo leer el PDF. Puede estar dañado, protegido o incompleto.");
   }
 }
 
 export async function readPdfMetadata(file: File): Promise<ReorderPdfPagesMetadata> {
-  const pdfDocument = await loadPdfDocument(file);
+  if (!isPdfFile(file)) {
+    throw new Error("Seleccioná un archivo PDF válido.");
+  }
 
-  return {
-    fileName: file.name,
-    fileSize: file.size,
-    pageCount: pdfDocument.getPageCount(),
-  };
+  const pageCount = await readPageCount(file);
+  return { fileName: file.name, fileSize: file.size, pageCount };
 }
 
 function validatePageOrder(pageOrder: number[], pageCount: number) {
@@ -65,25 +63,23 @@ export async function reorderPdfPages(
   pageOrder: number[],
   outputBaseName: string,
 ): Promise<ReorderPdfPagesResult> {
-  const sourceDocument = await loadPdfDocument(file);
-  const pageCount = sourceDocument.getPageCount();
+  if (!isPdfFile(file)) {
+    throw new Error("Seleccioná un archivo PDF válido.");
+  }
+
+  const pageCount = await readPageCount(file);
   validatePageOrder(pageOrder, pageCount);
 
+  let bytes: Uint8Array;
   try {
-    const resultDocument = await PDFDocument.create();
-    const pages = await resultDocument.copyPages(
-      sourceDocument,
-      pageOrder.map((pageNumber) => pageNumber - 1),
-    );
-
-    pages.forEach((page) => resultDocument.addPage(page));
-
-    return {
-      bytes: toArrayBuffer(await resultDocument.save()),
-      fileName: getOutputFileName(outputBaseName, getSuggestedOutputBaseName(file.name)),
-      pageCount,
-    };
+    bytes = await coreReorderPdfPages(file, pageOrder);
   } catch {
     throw new Error("No se pudo crear el PDF reordenado. Probá nuevamente con otro archivo.");
   }
+
+  return {
+    bytes: toArrayBuffer(bytes),
+    fileName: getOutputFileName(outputBaseName, getSuggestedOutputBaseName(file.name)),
+    pageCount,
+  };
 }

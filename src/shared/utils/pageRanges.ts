@@ -1,8 +1,9 @@
-export type PageSelectionResult = {
-  error: string | null;
-  isOutOfOrder: boolean;
-  pages: number[];
-};
+// `parsePageSelection` y `PageSelectionResult` viven en @modulaq/core/ranges.
+// Acá se re-exportan para que los services no migrados y los Tool components
+// que importan desde este archivo sigan funcionando sin cambios.
+export { parsePageSelection } from "@modulaq/core/ranges";
+export type { PageSelectionResult } from "@modulaq/core/ranges";
+import type { PageSelectionResult } from "@modulaq/core/ranges";
 
 export type PartsValidationResult = {
   assignedPageCount: number;
@@ -140,10 +141,6 @@ function parsePages(
     isOutOfOrder: isOutOfOrder(pages),
     pages,
   };
-}
-
-export function parsePageSelection(input: string, totalPages: number): PageSelectionResult {
-  return parsePages(input, totalPages);
 }
 
 export function validateParts(parts: string[], totalPages: number): PartsValidationResult {

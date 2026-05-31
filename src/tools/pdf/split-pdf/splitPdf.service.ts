@@ -1,8 +1,13 @@
 import JSZip from "jszip";
 import { PDFDocument } from "pdf-lib";
+import {
+  countPdfPages as coreCountPdfPages,
+  extractPdfPages as coreExtractPdfPages,
+} from "@modulaq/core/pdf";
+import { parsePageSelection } from "@modulaq/core/ranges";
 import { getBaseFileName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
-import { parsePageSelection, validateParts } from "../../../shared/utils/pageRanges";
+import { validateParts } from "../../../shared/utils/pageRanges";
 import type { SplitPdfMetadata, SplitPdfResult } from "./splitPdf.types";
 
 export { getBaseFileName, formatFileSize, isPdfFile, parsePageSelection, validateParts };
@@ -90,16 +95,34 @@ export async function extractSelectedPages(
   pageSelection: string,
   outputBaseName: string,
 ): Promise<SplitPdfResult> {
-  const sourceDocument = await loadPdfDocument(file);
-  const selection = parsePageSelection(pageSelection, sourceDocument.getPageCount());
-  const fallbackBaseName = getSuggestedOutputBaseName(file.name);
+  if (!isPdfFile(file)) {
+    throw new Error("Seleccioná un archivo PDF válido.");
+  }
+
+  let pageCount: number;
+  try {
+    pageCount = await coreCountPdfPages(file);
+  } catch {
+    throw new Error("No se pudo leer el PDF. Puede estar dañado, protegido o incompleto.");
+  }
+
+  const selection = parsePageSelection(pageSelection, pageCount);
 
   if (selection.error) {
     throw new Error(selection.error);
   }
 
+  const fallbackBaseName = getSuggestedOutputBaseName(file.name);
+
+  let bytes: Uint8Array;
+  try {
+    bytes = await coreExtractPdfPages(file, selection.pages);
+  } catch {
+    throw new Error("No se pudo leer el PDF. Puede estar dañado, protegido o incompleto.");
+  }
+
   return {
-    bytes: toArrayBuffer(await createPdfFromPages(sourceDocument, selection.pages)),
+    bytes: toArrayBuffer(bytes),
     fileName: buildOutputFileName(outputBaseName, "pdf", fallbackBaseName),
     mimeType: "application/pdf",
     outputCount: 1,

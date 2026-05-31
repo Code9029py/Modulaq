@@ -1,33 +1,26 @@
-export type DownloadExtension = "pdf" | "png" | "txt" | "zip";
+// Capa de compatibilidad sobre @modulaq/core/files.
+// Los nombres históricos de la app se mantienen para no obligar a los services
+// no migrados (compress-pdf, extract-pdf-text, pdf-to-images) y a los Tool components
+// a cambiar sus imports.
+//
+// La lógica vive en el SDK; este archivo expone alias estables.
+import {
+  ensureFileExtension,
+  getBaseFileName,
+  sanitizeFileName,
+} from "@modulaq/core/files";
 
-const knownExtensionPattern = /\.(pdf|png|txt|zip)$/i;
-const reservedFileNamePattern = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+export { getBaseFileName };
+export type { DownloadExtension } from "@modulaq/core/files";
 
-export function getBaseFileName(fileName: string) {
-  const nameWithoutPath = fileName.split(/[/\\]/).pop() ?? fileName;
-  const extensionIndex = nameWithoutPath.lastIndexOf(".");
+export const sanitizeDownloadBaseName = sanitizeFileName;
+export const buildDownloadFileName = ensureFileExtension;
 
-  return extensionIndex > 0 ? nameWithoutPath.slice(0, extensionIndex) : nameWithoutPath;
-}
-
-export function sanitizeDownloadBaseName(input: string, fallbackBaseName: string) {
-  const cleanName = (value: string) =>
-    value
-      .trim()
-      .replace(knownExtensionPattern, "")
-      .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
-      .replace(/\s+/g, " ")
-      .replace(/[. ]+$/g, "")
-      .trim();
-  const sanitizedName = cleanName(input) || cleanName(fallbackBaseName) || "archivo";
-
-  return reservedFileNamePattern.test(sanitizedName) ? `${sanitizedName}-archivo` : sanitizedName;
-}
-
+/**
+ * Sugiere un nombre de salida a partir del nombre original del archivo.
+ * No está en el SDK porque es una conveniencia específica de las herramientas
+ * de Modulaq Web (compone `getBaseFileName` + `sanitizeFileName`).
+ */
 export function getSuggestedDownloadBaseName(fileName: string, fallbackBaseName: string) {
-  return sanitizeDownloadBaseName(getBaseFileName(fileName), fallbackBaseName);
-}
-
-export function buildDownloadFileName(input: string, extension: DownloadExtension, fallbackBaseName: string) {
-  return `${sanitizeDownloadBaseName(input, fallbackBaseName)}.${extension}`;
+  return sanitizeFileName(getBaseFileName(fileName), fallbackBaseName);
 }
