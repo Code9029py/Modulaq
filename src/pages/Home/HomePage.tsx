@@ -12,7 +12,7 @@ const principles = [
   {
     icon: ShieldCheck,
     title: "Gratis y privado",
-    description: "Sin cuenta ni pagos. Tus archivos se procesan en tu navegador y no se suben.",
+    description: "Sin cuenta ni pagos. En las herramientas de archivos, el procesamiento ocurre en tu navegador.",
   },
   {
     icon: Braces,
@@ -33,8 +33,8 @@ export function HomePage() {
     <>
       <PageHead
         bareTitle
-        title="Modulaq — Microherramientas digitales modulares"
-        description="Modulaq es una plataforma frontend-only de microherramientas digitales: unir y dividir PDFs, generar QR, limpiar texto y más, directo en tu navegador."
+        title="Modulaq - Herramientas PDF, QR y texto en tu navegador"
+        description="Modulaq ofrece herramientas gratuitas para PDF, QR y texto. Funcionan en tu navegador, sin cuenta y sin subir tus archivos."
         path="/"
       />
       <section className="border-b border-surface-200/70">
@@ -51,9 +51,9 @@ export function HomePage() {
               Microherramientas digitales que funcionan en tu navegador.
             </p>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-ink-500">
-              {tools.length} herramientas gratis para PDF, texto y productividad. Tus archivos no se suben a ningún
-              servidor: todo el procesamiento ocurre en tu navegador. Cada herramienta incluye documentación y, en
-              muchas, código integrable para tu propio proyecto.
+              {tools.length} herramientas gratis para PDF, QR y texto. Funcionan en tu navegador, sin cuenta y sin
+              instalar nada. En las herramientas de archivos, el procesamiento ocurre localmente y no subimos esos
+              archivos a Modulaq.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href={routePaths.tools}>
@@ -88,7 +88,8 @@ export function HomePage() {
             <div className="mt-4 rounded-lg border border-surface-200 bg-surface-50 p-4">
               <p className="text-sm font-semibold text-ink-900">Procesamiento local</p>
               <p className="mt-2 text-sm leading-6 text-ink-500">
-                Tus archivos se procesan directamente en tu navegador. No se suben a ningún servidor de Modulaq.
+                En las herramientas de archivos, el procesamiento ocurre en tu navegador; no subimos esos archivos a
+                Modulaq.
               </p>
             </div>
           </div>

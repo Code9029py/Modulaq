@@ -1,4 +1,4 @@
-import { ArrowLeft, Braces, FileText, Globe2, Server } from "lucide-react";
+import { ArrowLeft, ArrowRight, Braces, FileText, Globe2, Server } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ClientOnly } from "vite-react-ssg";
@@ -12,7 +12,7 @@ import { ToolDocPanel } from "../../features/tools/components/ToolDocPanel";
 import { useRecentTools } from "../../features/tools/context/ToolPrefsProvider";
 import { ToolStatusBadge } from "../../features/tools/components/ToolStatusBadge";
 import { getToolRenderer } from "../../features/tools/renderers/toolRenderers";
-import type { ToolModeId } from "../../features/tools/types/tool.types";
+import type { ToolMetadata, ToolModeId } from "../../features/tools/types/tool.types";
 import { getToolBySlug } from "../../features/tools/utils/getToolBySlug";
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
@@ -30,6 +30,32 @@ const detailTabs: DetailTab[] = [
   { id: "integrable-code", icon: Braces },
   { id: "api", icon: Server },
 ];
+
+const fileProcessingNotice =
+  "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq.";
+
+const toolIntroNotices: Record<string, string> = {
+  "merge-pdf": fileProcessingNotice,
+  "split-pdf": fileProcessingNotice,
+  "image-to-pdf": fileProcessingNotice,
+  "pdf-to-images": fileProcessingNotice,
+  "compress-pdf":
+    "Esta herramienta intenta optimizar la estructura del PDF en tu navegador. No recomprime imágenes ni garantiza reducción. El resultado depende del contenido del archivo.",
+  "extract-pdf-text": fileProcessingNotice,
+  "pdf-page-counter": fileProcessingNotice,
+  "reorder-pdf-pages": fileProcessingNotice,
+};
+
+const relatedToolSlugs: Record<string, string[]> = {
+  "merge-pdf": ["dividir-pdf", "reordenar-paginas-pdf"],
+  "split-pdf": ["unir-pdfs", "reordenar-paginas-pdf"],
+  "reorder-pdf-pages": ["unir-pdfs", "dividir-pdf"],
+  "image-to-pdf": ["unir-pdfs"],
+};
+
+function isToolMetadata(tool: ToolMetadata | undefined): tool is ToolMetadata {
+  return Boolean(tool);
+}
 
 function ComingSoonPanel({
   title,
@@ -96,6 +122,8 @@ export function ToolDetailPage() {
   const ToolRenderer = getToolRenderer(tool.id);
   const hasDoc = Boolean(tool.doc);
   const hasIntegrableCode = Boolean(tool.integrableCode);
+  const introNotice = toolIntroNotices[tool.id];
+  const relatedTools = (relatedToolSlugs[tool.id] ?? []).map((relatedSlug) => getToolBySlug(relatedSlug)).filter(isToolMetadata);
 
   return (
     <Container className="py-5 md:py-6 lg:py-8">
@@ -114,6 +142,11 @@ export function ToolDetailPage() {
           <div>
             <h1 className="text-2xl font-semibold leading-tight text-ink-900 md:text-3xl">{tool.name}</h1>
             <p className="mt-1.5 max-w-4xl text-sm leading-6 text-ink-500 md:text-base md:leading-7">{tool.description}</p>
+            {introNotice ? (
+              <p className="mt-2 max-w-4xl rounded-md border border-surface-200 bg-surface-100/70 px-3 py-2 text-sm leading-6 text-ink-700">
+                {introNotice}
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2 lg:justify-end">
             <ToolStatusBadge status={tool.status} />
@@ -211,6 +244,24 @@ export function ToolDetailPage() {
           </div>
         </div>
       </section>
+
+      {relatedTools.length > 0 ? (
+        <section className="mt-3 rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-sm">
+          <p className="text-sm font-semibold text-ink-900">Herramientas relacionadas</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {relatedTools.map((relatedTool) => (
+              <Link
+                key={relatedTool.id}
+                to={buildToolPath(relatedTool.slug)}
+                className="inline-flex min-h-9 items-center gap-2 rounded-md border border-surface-200 bg-surface-100/75 px-3 py-2 text-sm font-semibold text-ink-700 transition hover:bg-surface-200 hover:text-ink-900"
+              >
+                {relatedTool.name}
+                <ArrowRight size={15} />
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <details className="mt-6 rounded-lg border border-surface-200 bg-surface-50/82 shadow-sm">
         <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-ink-900 marker:text-accent-teal">

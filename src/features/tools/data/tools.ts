@@ -19,9 +19,9 @@ export const tools: ToolMetadata[] = [
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Unir PDFs online gratis",
+      title: "Unir PDFs online gratis sin subir archivos",
       description:
-        "Combiná varios PDF en un solo documento, en el orden que quieras. Gratis, sin instalar nada y procesado en tu navegador: tus archivos no se suben.",
+        "Combiná varios PDFs en un solo documento y ordenalos como quieras. El procesamiento ocurre en tu navegador; no subimos tus archivos a Modulaq.",
     },
     doc: {
       summary:
@@ -42,7 +42,7 @@ export const tools: ToolMetadata[] = [
         "Cada archivo admite hasta 50 MB y el conjunto, hasta 100 MB en total.",
       ],
       privacy:
-        "Los PDF se combinan en tu navegador. Los archivos no se suben a ningún servidor de Modulaq.",
+        "El procesamiento de estos archivos ocurre en tu navegador; no los subimos a Modulaq para unirlos.",
       commonErrors: [
         "Algún archivo no es un PDF válido.",
         "Un PDF protegido o dañado puede no poder leerse para unirse.",
@@ -54,7 +54,7 @@ export const tools: ToolMetadata[] = [
     },
     integrableCode: {
       summary:
-        "Unir PDFs corre 100% en el navegador con pdf-lib: copiás las páginas de cada documento a uno nuevo. Instalá pdf-lib y reutilizá esta función.",
+        "Unir PDFs corre en el navegador con pdf-lib: copiás las páginas de cada documento a uno nuevo. Instalá pdf-lib y reutilizá esta función.",
       snippets: [
         {
           id: "merge-pdf-core",
@@ -103,9 +103,9 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Dividir PDF online gratis",
+      title: "Dividir PDF online gratis sin subir archivos",
       description:
-        "Separá un PDF por rangos o páginas individuales (1-3,5,8-10) y descargá el resultado. Gratis, sin instalar y 100% en tu navegador.",
+        "Separá un PDF por rangos o páginas individuales y descargá el resultado. El procesamiento del archivo ocurre en tu navegador.",
     },
     doc: {
       summary:
@@ -129,7 +129,7 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
         "Las páginas se numeran desde 1 y los rangos incluyen los extremos.",
       ],
       privacy:
-        "El PDF se procesa directamente en tu navegador. El archivo no se sube a ningún servidor de Modulaq.",
+        "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para dividirlo.",
       commonErrors: [
         "Rango invertido como 3-1: la página inicial no puede ser mayor que la final.",
         "Páginas fuera de rango: revisá que existan en el documento.",
@@ -194,9 +194,9 @@ export async function extractPageRange(file: File, from: number, to: number): Pr
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Convertir imágenes a PDF online",
+      title: "Convertir imágenes a PDF sin subir archivos",
       description:
-        "Convertí imágenes PNG, JPG o WebP en un PDF ordenado. Gratis, sin marcas de agua y procesado localmente en tu navegador.",
+        "Convertí imágenes PNG, JPG o WebP en un PDF ordenado. Gratis, sin marcas de agua y con procesamiento en tu navegador.",
     },
     doc: {
       summary:
@@ -217,7 +217,7 @@ export async function extractPageRange(file: File, from: number, to: number): Pr
         "Hasta 30 imágenes y 100 MB en total; cada imagen, hasta 15 MB.",
       ],
       privacy:
-        "Las imágenes se procesan en tu navegador. No se suben a ningún servidor de Modulaq.",
+        "El procesamiento de estas imágenes ocurre en tu navegador; no las subimos a Modulaq para crear el PDF.",
       commonErrors: [
         "Formato de imagen no soportado.",
         "Una imagen dañada que no se puede leer.",
@@ -281,9 +281,9 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Convertir PDF a imágenes PNG",
+      title: "Convertir PDF a imágenes PNG online",
       description:
-        "Convertí las páginas de un PDF en imágenes PNG de alta calidad, listas para descargar. Gratis y en tu navegador, sin subir archivos.",
+        "Convertí páginas de un PDF en imágenes PNG descargables. El renderizado ocurre en tu navegador.",
     },
     doc: {
       summary:
@@ -305,7 +305,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         "Las páginas se numeran desde 1 y los rangos incluyen los extremos.",
       ],
       privacy:
-        "El PDF se procesa en tu navegador. El archivo no se sube a ningún servidor de Modulaq.",
+        "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para convertirlo en imágenes.",
       commonErrors: [
         "Páginas fuera de rango: revisá que existan en el documento.",
         "PDF protegido o dañado: puede no poder renderizarse.",
@@ -384,7 +384,7 @@ export async function renderPdfPageToPng(file: File, pageNumber: number, scale =
     seo: {
       title: "Comprimir PDF online gratis",
       description:
-        "Reducí el tamaño de un PDF directamente en tu navegador, gratis y sin subir archivos. Resultados honestos según el contenido del documento.",
+        "Intenta optimizar un PDF directamente en tu navegador y muestra el resultado real. La reducción depende del contenido del archivo.",
     },
     doc: {
       summary:
@@ -405,7 +405,7 @@ export async function renderPdfPageToPng(file: File, pageNumber: number, scale =
         "La reducción depende del contenido: un PDF ya optimizado o con muchas imágenes puede bajar poco o nada. En ese caso se conserva el original.",
       ],
       privacy:
-        "Los PDF se procesan en tu navegador. No se suben a ningún servidor de Modulaq.",
+        "La optimización se intenta en tu navegador. No recomprime imágenes ni garantiza reducción; el resultado depende de la estructura del PDF.",
       commonErrors: [
         "Un PDF protegido o encriptado no se puede comprimir desde la herramienta.",
         "Algunos PDF con estructuras poco comunes pueden no ser compatibles.",
@@ -431,9 +431,9 @@ export async function renderPdfPageToPng(file: File, pageNumber: number, scale =
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Extraer texto de un PDF",
+      title: "Extraer texto de PDF online sin subir archivos",
       description:
-        "Extraé el texto seleccionable de un PDF para copiarlo o descargarlo como TXT. Gratis, sin instalar y procesado localmente en tu navegador.",
+        "Extraé texto seleccionable de un PDF para copiarlo o descargarlo como TXT. El procesamiento ocurre en tu navegador.",
     },
     doc: {
       summary:
@@ -454,7 +454,7 @@ export async function renderPdfPageToPng(file: File, pageNumber: number, scale =
         "Tamaño máximo del PDF: 50 MB.",
       ],
       privacy:
-        "El PDF se procesa en tu navegador. El archivo no se sube a ningún servidor de Modulaq.",
+        "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para extraer texto.",
       commonErrors: [
         "El PDF parece escaneado y no tiene texto seleccionable.",
         "Aparecen símbolos extraños cuando el PDF usa fuentes no estándar.",
@@ -528,9 +528,9 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Contar páginas de un PDF",
+      title: "Contar páginas de un PDF online",
       description:
-        "Conocé cuántas páginas tiene un PDF al instante. Gratis, sin instalar y sin subir el archivo: todo ocurre en tu navegador.",
+        "Conocé cuántas páginas tiene un PDF al instante. La lectura del archivo ocurre en tu navegador.",
     },
     doc: {
       summary:
@@ -546,7 +546,7 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
       ],
       limits: ["Tamaño máximo del PDF: 50 MB."],
       privacy:
-        "El PDF se lee en tu navegador. El archivo no se sube a ningún servidor de Modulaq.",
+        "La lectura de este archivo ocurre en tu navegador; no lo subimos a Modulaq para contar sus páginas.",
       commonErrors: [
         "El archivo no es un PDF válido.",
         "Un PDF protegido o dañado puede no poder leerse.",
@@ -555,7 +555,7 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
     },
     integrableCode: {
       summary:
-        "Contar páginas es directo con pdf-lib: cargás el documento en memoria y leés getPageCount(). Corre 100% en el navegador; instalá pdf-lib.",
+        "Contar páginas es directo con pdf-lib: cargás el documento en memoria y leés getPageCount(). Corre en el navegador; instalá pdf-lib.",
       snippets: [
         {
           id: "pdf-page-counter-core",
@@ -597,9 +597,9 @@ export async function countPdfPages(file: File): Promise<number> {
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Reordenar páginas de un PDF",
+      title: "Reordenar páginas PDF online gratis",
       description:
-        "Cambiá el orden de las páginas de un PDF y descargá el documento reorganizado. Gratis y 100% en tu navegador, sin subir archivos.",
+        "Cambiá el orden de las páginas de un PDF y descargá el documento reorganizado. Funciona directamente en tu navegador.",
     },
     doc: {
       summary:
@@ -620,7 +620,7 @@ export async function countPdfPages(file: File): Promise<number> {
         "En esta versión el reordenamiento se hace con botones de subir/bajar (sin miniaturas ni arrastrar y soltar).",
       ],
       privacy:
-        "El PDF se procesa en tu navegador. El archivo no se sube a ningún servidor de Modulaq.",
+        "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para reordenarlo.",
       commonErrors: [
         "Un PDF protegido o dañado puede no poder procesarse.",
         "Un orden inválido se valida y avisa antes de generar el archivo.",
@@ -677,9 +677,9 @@ export async function reorderPdfPages(file: File, order: number[]): Promise<Uint
     requiresAI: false,
     apiStatus: "planned",
     seo: {
-      title: "Limpiar y normalizar texto",
+      title: "Limpiar y normalizar texto gratis",
       description:
-        "Limpiá espacios de más, saltos de línea y caracteres invisibles del texto pegado. Gratis, instantáneo y directo en tu navegador.",
+        "Limpiá espacios, saltos de línea, comillas raras y caracteres invisibles. Gratis, sin instalar nada.",
     },
     doc: {
       summary:
@@ -700,7 +700,7 @@ export async function reorderPdfPages(file: File, order: number[]): Promise<Uint
         "Si no seleccionás ninguna limpieza, el texto queda igual.",
       ],
       privacy:
-        "El texto se procesa en tu navegador y no sale de tu equipo: no se envía a ningún servidor.",
+        "La limpieza del texto ocurre en tu navegador.",
       commonErrors: [
         "Esperar un cambio sin haber activado ninguna opción de limpieza.",
       ],
@@ -788,7 +788,7 @@ export function cleanText(input: string, options: TextCleanerOptions): string {
     seo: {
       title: "Generador de códigos QR gratis",
       description:
-        "Generá códigos QR para enlaces, texto, email o teléfono y descargalos en PNG. Gratis, sin límites molestos y en tu navegador.",
+        "Generá códigos QR para enlaces, texto, email o teléfono. Descargá en PNG, sin cuenta.",
     },
     doc: {
       summary:
@@ -811,7 +811,7 @@ export function cleanText(input: string, options: TextCleanerOptions): string {
         "El tamaño personalizado se admite dentro de límites razonables.",
       ],
       privacy:
-        "El código QR se genera localmente en tu navegador. El contenido no se envía a ningún servidor.",
+        "El código QR se genera en tu navegador.",
       commonErrors: [
         "Email o URL con formato inválido: la validación visual te avisa antes de generar.",
         "Contenido demasiado largo: el QR resultante puede no ser legible por las cámaras.",

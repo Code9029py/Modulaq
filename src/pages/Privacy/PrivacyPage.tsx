@@ -43,8 +43,8 @@ export function PrivacyPage() {
 
         <PrivacySection title="Procesamiento local de archivos">
           <p>
-            Los PDFs, imágenes y textos que usás en las herramientas se procesan localmente, dentro de tu navegador.
-            No se suben a servidores de Modulaq para ser procesados.
+            En las herramientas de archivos disponibles, el procesamiento ocurre dentro de tu navegador cuando la
+            herramienta lo permite. No subimos esos archivos a Modulaq para realizar esas operaciones.
           </p>
           <p>
             Para procesar esos archivos, algunas herramientas usan librerías de código abierto que se ejecutan también

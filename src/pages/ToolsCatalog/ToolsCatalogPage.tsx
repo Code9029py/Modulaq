@@ -55,16 +55,16 @@ export function ToolsCatalogPage() {
   return (
     <Container className="py-8 md:py-9 lg:py-10">
       <PageHead
-        title="Herramientas online gratis"
-        description="Catálogo de microherramientas de Modulaq: PDF, texto y productividad. Todas funcionan online, gratis y directo en tu navegador."
+        title="Herramientas PDF, QR y texto gratis"
+        description="Explora herramientas gratuitas de Modulaq para PDF, QR y texto. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada."
         path="/herramientas"
       />
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <SectionHeader
           eyebrow="Catálogo"
           headingLevel="h1"
-          title="Herramientas online gratis"
-          description="Explora las primeras herramientas de Modulaq. Buscá rápido y ajustá filtros solo cuando haga falta."
+          title="Herramientas PDF, QR y texto gratis"
+          description="Explora las primeras herramientas de Modulaq. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada."
         />
         <div className="flex items-center gap-3 lg:hidden">
           <Button

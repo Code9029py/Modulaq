@@ -12,7 +12,7 @@ export function Footer() {
           <p className="font-semibold text-ink-900">{siteConfig.name}</p>
           <p>Microherramientas digitales gratis que funcionan en tu navegador.</p>
           <p className="mt-2 max-w-xl text-xs text-ink-500/80">
-            Tus archivos se procesan en tu navegador. Usamos métricas anónimas y agregadas, sin cookies ni datos personales.
+            En las herramientas de archivos, el procesamiento ocurre en tu navegador. Usamos métricas anónimas y agregadas, sin cookies ni datos personales.
           </p>
         </div>
         <div className="flex flex-wrap gap-4">
