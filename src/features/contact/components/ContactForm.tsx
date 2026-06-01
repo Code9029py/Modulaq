@@ -93,7 +93,7 @@ const copyByType: Record<
 };
 
 const inputClassName =
-  "min-h-11 rounded-md border border-surface-200 bg-surface-50/80 px-3 font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15";
+  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/20";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -222,26 +222,29 @@ export function ContactForm({ initialType }: ContactFormProps) {
   };
 
   return (
-    <div className={cn("grid gap-5", isDesktopTypeListOpen ? "lg:grid-cols-[230px_1fr]" : "lg:grid-cols-1")}>
+    <div className={cn("grid gap-5", isDesktopTypeListOpen ? "lg:grid-cols-[240px_1fr]" : "lg:grid-cols-1")}>
       {isDesktopTypeListOpen ? (
-        <aside className="hidden rounded-lg border border-surface-200 bg-surface-50/82 shadow-panel lg:block">
-          <button
-            className="flex min-h-12 w-full items-center justify-center border-b border-surface-200 px-3 text-sm font-semibold text-ink-700 transition hover:bg-surface-100"
-            type="button"
-            onClick={() => setIsDesktopTypeListOpen(false)}
-          >
-            Reducir tipos
-            <ArrowLeft className="ml-2" size={16} />
-          </button>
+        <aside className="hidden overflow-hidden rounded-2xl border border-surface-200/80 bg-surface-50/90 shadow-panel ring-1 ring-surface-50/80 backdrop-blur lg:block">
+          <div className="flex min-h-12 items-center justify-between gap-3 border-b border-surface-200/80 bg-surface-50/70 px-4">
+            <p className="text-sm font-semibold text-ink-900">Tipo de mensaje</p>
+            <button
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-700 transition hover:text-ink-900"
+              type="button"
+              onClick={() => setIsDesktopTypeListOpen(false)}
+            >
+              Ocultar
+              <ArrowLeft size={15} />
+            </button>
+          </div>
           <div className="grid gap-2 p-3">
             {contactTypeOptions.map((option) => (
               <button
                 key={option.value}
                 className={cn(
-                  "rounded-md px-3 py-2 text-left text-sm font-semibold transition",
+                  "rounded-lg border px-3 py-2.5 text-left text-sm font-semibold shadow-sm transition",
                   contactType === option.value
-                    ? "bg-ink-900 text-surface-50 shadow-sm"
-                    : "text-ink-700 hover:bg-surface-100 hover:text-ink-900",
+                    ? "border-ink-900 bg-ink-900 text-surface-50"
+                    : "border-transparent bg-transparent text-ink-700 hover:border-surface-200/80 hover:bg-surface-50 hover:text-ink-900",
                 )}
                 type="button"
                 disabled={isSubmitting}
@@ -257,16 +260,21 @@ export function ContactForm({ initialType }: ContactFormProps) {
         </aside>
       ) : (
         <div className="hidden lg:block">
-          <Button type="button" variant="secondary" onClick={() => setIsDesktopTypeListOpen(true)}>
-            Expandir tipos
+          <Button
+            type="button"
+            variant="secondary"
+            className="shadow-sm hover:shadow-panel"
+            onClick={() => setIsDesktopTypeListOpen(true)}
+          >
+            Mostrar opciones
             <ArrowRight className="ml-2" size={16} />
           </Button>
         </div>
       )}
 
       <div className="grid gap-5">
-        <div className="rounded-lg border border-surface-200 bg-surface-50/82 p-3 shadow-sm lg:hidden">
-          <p className="mb-3 text-sm font-semibold text-ink-900">Tipo de consulta</p>
+        <div className="rounded-2xl border border-surface-200/80 bg-surface-50/90 p-3 shadow-panel ring-1 ring-surface-50/80 lg:hidden">
+          <p className="mb-3 text-sm font-semibold text-ink-900">Tipo de mensaje</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {contactTypeOptions.map((option) => (
               <button
@@ -275,7 +283,7 @@ export function ContactForm({ initialType }: ContactFormProps) {
                   "rounded-md border px-3 py-2 text-left text-sm font-semibold transition",
                   contactType === option.value
                     ? "border-ink-900 bg-ink-900 text-surface-50"
-                    : "border-surface-200 bg-surface-100/70 text-ink-700",
+                    : "border-surface-200/80 bg-surface-50/80 text-ink-700 hover:bg-surface-100/70",
                 )}
                 type="button"
                 disabled={isSubmitting}
@@ -292,7 +300,7 @@ export function ContactForm({ initialType }: ContactFormProps) {
 
         <form
           aria-busy={isSubmitting}
-          className="grid gap-5 rounded-lg border border-surface-200 bg-surface-50/82 p-5 shadow-panel lg:grid-cols-2"
+          className="grid gap-5 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-5 shadow-panel ring-1 ring-surface-50/80 backdrop-blur lg:grid-cols-2"
           noValidate
           onSubmit={handleSubmit}
         >
@@ -375,14 +383,28 @@ export function ContactForm({ initialType }: ContactFormProps) {
             ) : null}
           </label>
           <div className="lg:col-span-2">
-            <Button disabled={isSubmitting} type="submit">
+            <Button disabled={isSubmitting} type="submit" className="shadow-soft hover:-translate-y-0.5 hover:shadow-panel">
               <Send className="mr-2" size={17} />
               {submissionStatus === "submitting" ? "Enviando..." : hasDirectSubmission ? "Enviar consulta" : "Abrir correo"}
             </Button>
             <p className="mt-3 text-sm leading-6 text-ink-500">
-              {hasDirectSubmission
-                ? `Al enviar, Web3Forms transmitirá tu mensaje a ${CONTACT_EMAIL}. Modulaq no almacena este mensaje en un servidor propio en esta versión.`
-                : "El envío directo no está configurado en este entorno. Al continuar, se abrirá tu aplicación de correo para completar el envío."}
+              {hasDirectSubmission ? (
+                <>
+                  Tu mensaje se enviará a{" "}
+                  <a className="font-medium text-ink-700 underline underline-offset-2 hover:text-ink-900" href={`mailto:${CONTACT_EMAIL}`}>
+                    {CONTACT_EMAIL}
+                  </a>
+                  . Si dejás tu email, responderemos a la brevedad posible.
+                </>
+              ) : (
+                <>
+                  Se abrirá tu aplicación de correo para enviar el mensaje a{" "}
+                  <a className="font-medium text-ink-700 underline underline-offset-2 hover:text-ink-900" href={`mailto:${CONTACT_EMAIL}`}>
+                    {CONTACT_EMAIL}
+                  </a>
+                  .
+                </>
+              )}
             </p>
             {submissionStatus === "success" ? (
               <p aria-live="polite" className="mt-4 rounded-md border border-accent-teal/25 bg-accent-teal/10 px-3 py-2 text-sm text-ink-700" role="status">

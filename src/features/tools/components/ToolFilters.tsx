@@ -11,7 +11,7 @@ type ToolFiltersProps = {
 };
 
 const controlClassName =
-  "min-h-11 rounded-md border border-surface-200 bg-surface-50/80 px-3 text-sm font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15";
+  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/20";
 
 const statusLabels: Record<ToolStatus, string> = {
   active: "Activa",
