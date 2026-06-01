@@ -1,3 +1,10 @@
 export { configurePdfWorker } from "./configurePdfWorker";
 export { extractPdfText } from "./extractPdfText";
-export type { PdfInput, ExtractedPdfText } from "./types";
+export { pdfToImages } from "./pdfToImages";
+export type {
+  PdfInput,
+  ExtractedPdfText,
+  PdfImageFormat,
+  PdfToImagesOptions,
+  PdfPageImage,
+} from "./types";
