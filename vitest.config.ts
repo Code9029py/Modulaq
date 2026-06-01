@@ -3,24 +3,22 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const sdkSubpath = (name: string) => resolve(here, "packages/core/src", name, "index.ts");
+const src = (sub: string) => resolve(here, "packages/core/src", sub, "index.ts");
 
 export default defineConfig({
-  // Redirigimos @modulaq/core/* a los archivos SOURCE del workspace para que
-  // los tests no dependan de `dist/`. El package.json del SDK declara `exports`
-  // apuntando a `dist/`, lo cual es correcto en producción/consumo real, pero
-  // obligaría a buildear el SDK antes de cada `vitest run`. Con estos alias,
-  // Vitest siempre lee TypeScript fuente vía esbuild (también más rápido).
   resolve: {
-    alias: {
-      "@modulaq/core/text": sdkSubpath("text"),
-      "@modulaq/core/qr": sdkSubpath("qr"),
-      "@modulaq/core/pdf": sdkSubpath("pdf"),
-      "@modulaq/core/pdf-render": sdkSubpath("pdf-render"),
-      "@modulaq/core/files": sdkSubpath("files"),
-      "@modulaq/core/ranges": sdkSubpath("ranges"),
-      "@modulaq/core": resolve(here, "packages/core/src/index.ts"),
-    },
+    // Forma array + RegExp con anclas exactas (^...$): cada alias matchea solo el
+    // specifier exacto, evitando colisiones por prefix-match (p. ej. que
+    // "@modulaq/core/pdf" capture "@modulaq/core/pdf-render").
+    alias: [
+      { find: /^@modulaq\/core\/text$/, replacement: src("text") },
+      { find: /^@modulaq\/core\/qr$/, replacement: src("qr") },
+      { find: /^@modulaq\/core\/pdf-render$/, replacement: src("pdf-render") },
+      { find: /^@modulaq\/core\/pdf$/, replacement: src("pdf") },
+      { find: /^@modulaq\/core\/files$/, replacement: src("files") },
+      { find: /^@modulaq\/core\/ranges$/, replacement: src("ranges") },
+      { find: /^@modulaq\/core$/, replacement: resolve(here, "packages/core/src/index.ts") },
+    ],
   },
   test: {
     environment: "node",
@@ -33,6 +31,14 @@ export default defineConfig({
       "**/dist/**",
       "**/.vite-react-ssg-temp/**",
     ],
+    // Force Vitest to procesar @modulaq/core* vía el resolver de Vite (donde
+    // los alias actúan), en lugar de delegar al resolver de Node que respeta
+    // `package.json#exports` y apunta a `dist/` inexistente en CI limpio.
+    server: {
+      deps: {
+        inline: [/^@modulaq\/core(\/.*)?$/],
+      },
+    },
     // Imports explícitos en cada test (`import { describe, it, expect } from "vitest"`).
     globals: false,
     // Reporter resumido para CI-friendliness; `default` muestra detalles en local.
