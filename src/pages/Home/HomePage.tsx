@@ -6,6 +6,7 @@ import { RecentToolsSection } from "../../features/tools/components/RecentToolsS
 import { tools } from "../../features/tools/data/tools";
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
+import { HeroBadge } from "../../shared/components/HeroBadge";
 import { PageHead } from "../../shared/seo/PageHead";
 
 const principles = [
@@ -49,10 +50,9 @@ export function HomePage() {
         />
         <Container className="relative grid gap-12 py-16 md:py-20 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:py-24">
           <div className="lg:py-6">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-surface-200/80 bg-surface-50/80 px-3 py-1.5 text-sm font-semibold text-ink-700 shadow-sm backdrop-blur">
-              <Sparkles size={15} />
+            <HeroBadge icon={Sparkles} className="mb-5">
               Beta pública · {tools.length} herramientas
-            </div>
+            </HeroBadge>
             <h1 className="max-w-3xl text-5xl font-semibold leading-none text-ink-900 md:text-6xl lg:text-7xl">
               Modulaq
             </h1>
@@ -64,15 +64,11 @@ export function HomePage() {
               resultados listos para descargar.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button href={routePaths.tools} className="shadow-soft hover:-translate-y-0.5 hover:shadow-panel">
+              <Button href={routePaths.tools}>
                 Explorar herramientas
                 <ArrowRight className="ml-2" size={17} />
               </Button>
-              <Button
-                href={routePaths.consultations}
-                variant="secondary"
-                className="hover:-translate-y-0.5 hover:shadow-panel"
-              >
+              <Button href={routePaths.consultations} variant="secondary">
                 Enviar consulta o feedback
               </Button>
             </div>

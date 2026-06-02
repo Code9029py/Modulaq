@@ -12,7 +12,11 @@ import { filterTools, getAvailableModeIds, getVisibleCategoryIds, getVisibleStat
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
 import { EmptyState } from "../../shared/components/EmptyState";
+import { HeroBadge } from "../../shared/components/HeroBadge";
+import { HeroPanel } from "../../shared/components/HeroPanel";
+import { PageBackdrop } from "../../shared/components/PageBackdrop";
 import { PageHead } from "../../shared/seo/PageHead";
+import { inputClassName } from "../../shared/styles/inputClassName";
 import { cn } from "../../shared/utils/cn";
 
 const defaultFilters: ToolFiltersType = {
@@ -53,51 +57,40 @@ export function ToolsCatalogPage() {
 
   return (
     <section className="relative overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-56 bg-[radial-gradient(ellipse_at_top,rgba(22,174,189,0.1),transparent_68%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_84%_8%,rgba(98,184,146,0.045),transparent_38rem)]"
-      />
+      <PageBackdrop tone="cyan-mint" />
       <Container className="relative py-10 md:py-12">
         <PageHead
           title="Herramientas PDF, QR y texto gratis"
           description="Explora herramientas gratuitas de Modulaq para PDF, QR y texto. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada."
           path="/herramientas"
         />
-        <section className="relative overflow-hidden rounded-2xl border border-surface-200/70 bg-gradient-to-br from-surface-50/90 via-surface-50/75 to-surface-100/55 p-5 shadow-soft ring-1 ring-surface-50/80 backdrop-blur md:p-6">
-          <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-cyan/35 to-transparent" />
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-4xl">
-            <p className="mb-2 inline-flex items-center gap-2 rounded-md border border-surface-200/80 bg-surface-50/80 px-3 py-1.5 text-sm font-semibold uppercase tracking-wide text-ink-700 shadow-sm">
-              <LayoutGrid size={15} />
-              Catálogo
-            </p>
-            <h1 className="text-3xl font-semibold leading-tight text-ink-900 md:text-4xl">
-              Herramientas PDF, QR y texto gratis
-            </h1>
-            <p className="mt-3 max-w-5xl text-base leading-7 text-ink-500">
-              Explora las primeras herramientas de Modulaq. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada.
-            </p>
+        <HeroPanel>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-4xl">
+              <HeroBadge icon={LayoutGrid}>Catálogo</HeroBadge>
+              <h1 className="text-3xl font-semibold leading-tight text-ink-900 md:text-4xl">
+                Herramientas PDF, QR y texto gratis
+              </h1>
+              <p className="mt-3 max-w-5xl text-base leading-7 text-ink-500">
+                Explora las primeras herramientas de Modulaq. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 lg:hidden">
+              <Button
+                aria-controls="compact-tool-filters"
+                aria-expanded={isMobileFiltersOpen}
+                type="button"
+                variant="secondary"
+                className="gap-2"
+                onClick={() => setIsMobileFiltersOpen((value) => !value)}
+              >
+                <SlidersHorizontal size={16} />
+                Filtros
+              </Button>
+              <span className="text-sm font-medium text-ink-500">{displayedTools.length} herramientas</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3 lg:hidden">
-            <Button
-              aria-controls="compact-tool-filters"
-              aria-expanded={isMobileFiltersOpen}
-              type="button"
-              variant="secondary"
-              className="gap-2 shadow-sm hover:shadow-panel"
-              onClick={() => setIsMobileFiltersOpen((value) => !value)}
-            >
-              <SlidersHorizontal size={16} />
-              Filtros
-            </Button>
-            <span className="text-sm font-medium text-ink-500">{displayedTools.length} herramientas</span>
-          </div>
-        </div>
-        </section>
+        </HeroPanel>
 
         <div className="mt-5 rounded-2xl border border-surface-200/75 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <label className="grid gap-2 text-sm font-semibold text-ink-700">
@@ -105,7 +98,7 @@ export function ToolsCatalogPage() {
           <span className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" size={18} />
             <input
-              className="min-h-12 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 py-2 pl-10 pr-3 text-base font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/20"
+              className={cn(inputClassName, "min-h-12 w-full py-2 pl-10 pr-3 text-base")}
               placeholder="Buscar por nombre, descripción o etiqueta..."
               value={filters.search}
               onChange={(event) => setFilters({ ...filters, search: event.target.value })}
@@ -200,7 +193,6 @@ export function ToolsCatalogPage() {
                 <Button
                   type="button"
                   variant="secondary"
-                  className="shadow-sm hover:shadow-panel"
                   onClick={() => setIsDesktopSidebarOpen(true)}
                 >
                   Expandir filtros

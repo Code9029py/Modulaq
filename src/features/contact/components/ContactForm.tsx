@@ -10,6 +10,8 @@ import {
   type ContactType,
 } from "../../../config/contact";
 import { Button } from "../../../shared/components/Button";
+import { TextLink } from "../../../shared/components/TextLink";
+import { inputClassName } from "../../../shared/styles/inputClassName";
 import { cn } from "../../../shared/utils/cn";
 
 export type { ContactType } from "../../../config/contact";
@@ -91,9 +93,6 @@ const copyByType: Record<
     messagePlaceholder: "Contanos qué funcionó bien o qué podríamos ajustar...",
   },
 };
-
-const inputClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/20";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -260,12 +259,7 @@ export function ContactForm({ initialType }: ContactFormProps) {
         </aside>
       ) : (
         <div className="hidden lg:block">
-          <Button
-            type="button"
-            variant="secondary"
-            className="shadow-sm hover:shadow-panel"
-            onClick={() => setIsDesktopTypeListOpen(true)}
-          >
+          <Button type="button" variant="secondary" onClick={() => setIsDesktopTypeListOpen(true)}>
             Mostrar opciones
             <ArrowRight className="ml-2" size={16} />
           </Button>
@@ -383,7 +377,7 @@ export function ContactForm({ initialType }: ContactFormProps) {
             ) : null}
           </label>
           <div className="lg:col-span-2">
-            <Button disabled={isSubmitting} type="submit" className="shadow-soft hover:-translate-y-0.5 hover:shadow-panel">
+            <Button disabled={isSubmitting} type="submit">
               <Send className="mr-2" size={17} />
               {submissionStatus === "submitting" ? "Enviando..." : hasDirectSubmission ? "Enviar consulta" : "Abrir correo"}
             </Button>
@@ -391,18 +385,13 @@ export function ContactForm({ initialType }: ContactFormProps) {
               {hasDirectSubmission ? (
                 <>
                   Tu mensaje se enviará a{" "}
-                  <a className="font-medium text-ink-700 underline underline-offset-2 hover:text-ink-900" href={`mailto:${CONTACT_EMAIL}`}>
-                    {CONTACT_EMAIL}
-                  </a>
-                  . Si dejás tu email, responderemos a la brevedad posible.
+                  <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>. Si dejás tu email,
+                  responderemos a la brevedad posible.
                 </>
               ) : (
                 <>
                   Se abrirá tu aplicación de correo para enviar el mensaje a{" "}
-                  <a className="font-medium text-ink-700 underline underline-offset-2 hover:text-ink-900" href={`mailto:${CONTACT_EMAIL}`}>
-                    {CONTACT_EMAIL}
-                  </a>
-                  .
+                  <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>.
                 </>
               )}
             </p>

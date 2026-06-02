@@ -1,3 +1,4 @@
+import { inputClassName } from "../../../shared/styles/inputClassName";
 import { cn } from "../../../shared/utils/cn";
 import type { ToolCategory, ToolFilters as ToolFiltersType, ToolMode, ToolStatus } from "../types/tool.types";
 
@@ -10,8 +11,7 @@ type ToolFiltersProps = {
   statuses: ToolStatus[];
 };
 
-const controlClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/20";
+const controlClassName = inputClassName;
 
 const statusLabels: Record<ToolStatus, string> = {
   active: "Activa",

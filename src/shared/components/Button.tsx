@@ -16,8 +16,10 @@ type ButtonProps = {
 };
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-ink-900 text-surface-50 shadow-panel hover:bg-ink-700",
-  secondary: "border border-surface-200 bg-surface-50/80 text-ink-900 shadow-sm hover:border-accent-cyan/45 hover:bg-surface-100",
+  primary:
+    "bg-ink-900 text-surface-50 shadow-panel hover:-translate-y-0.5 hover:bg-ink-700 hover:shadow-soft motion-reduce:hover:translate-y-0",
+  secondary:
+    "border border-surface-200/80 bg-surface-50/80 text-ink-900 shadow-sm hover:-translate-y-0.5 hover:border-accent-cyan/45 hover:bg-surface-100 hover:shadow-panel motion-reduce:hover:translate-y-0",
   ghost: "text-ink-700 hover:bg-surface-100 hover:text-ink-900",
 };
 

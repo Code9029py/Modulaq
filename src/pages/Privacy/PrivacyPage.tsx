@@ -3,6 +3,10 @@ import type { LucideIcon } from "lucide-react";
 import { AlertTriangle, BarChart3, Code2, Cookie, HardDrive, MessageSquare, ShieldCheck } from "lucide-react";
 import { CONTACT_EMAIL } from "../../config/contact";
 import { Container } from "../../shared/components/Container";
+import { HeroBadge } from "../../shared/components/HeroBadge";
+import { HeroPanel } from "../../shared/components/HeroPanel";
+import { PageBackdrop } from "../../shared/components/PageBackdrop";
+import { TextLink } from "../../shared/components/TextLink";
 import { PageHead } from "../../shared/seo/PageHead";
 
 function SummaryItem({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
@@ -52,18 +56,7 @@ function DetailCard({ icon: Icon, title, children }: { icon: LucideIcon; title: 
 export function PrivacyPage() {
   return (
     <section className="relative overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_top,rgba(22,174,189,0.12),transparent_68%)]"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_82%_8%,rgba(116,103,201,0.06),transparent_38rem)]"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(189,206,219,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(189,206,219,0.04)_1px,transparent_1px)] bg-[size:88px_88px] [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.38),transparent_72%)]"
-      />
+      <PageBackdrop tone="cyan-violet" />
       <Container className="relative py-10 md:py-12">
         <PageHead
           title="Privacidad"
@@ -71,19 +64,15 @@ export function PrivacyPage() {
           path="/privacidad"
         />
 
-        <section className="relative overflow-hidden rounded-2xl border border-surface-200/70 bg-gradient-to-br from-surface-50/90 via-surface-50/75 to-surface-100/60 p-5 shadow-soft ring-1 ring-surface-50/80 backdrop-blur md:p-6">
-          <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-cyan/40 to-transparent" />
-          <p className="mb-2 inline-flex items-center gap-2 rounded-md border border-surface-200/80 bg-surface-50/80 px-3 py-1.5 text-sm font-semibold uppercase tracking-wide text-ink-700 shadow-sm">
-            <ShieldCheck size={15} />
-            Privacidad
-          </p>
+        <HeroPanel>
+          <HeroBadge icon={ShieldCheck}>Privacidad</HeroBadge>
           <h1 className="max-w-4xl text-3xl font-semibold leading-tight text-ink-900 md:text-4xl">
             Privacidad en Modulaq
           </h1>
           <p className="mt-3 max-w-4xl text-base leading-7 text-ink-500">
             Información clara sobre procesamiento local, analítica, consultas y datos guardados en tu navegador.
           </p>
-        </section>
+        </HeroPanel>
 
         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <SummaryItem icon={HardDrive} title="Archivos en tu navegador">
@@ -142,10 +131,7 @@ export function PrivacyPage() {
               </p>
               <p>
                 Usá ese canal solo para lo que quieras compartir con nosotros. También podés escribirnos a{" "}
-                <a className="font-medium text-ink-700 underline underline-offset-2 hover:text-ink-900" href={`mailto:${CONTACT_EMAIL}`}>
-                  {CONTACT_EMAIL}
-                </a>
-                .
+                <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>.
               </p>
             </DetailCard>
 
