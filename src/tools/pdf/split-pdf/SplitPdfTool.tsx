@@ -22,7 +22,7 @@ import type { SplitPdfMetadata, SplitPdfMode, SplitPdfStatus } from "./splitPdf.
 
 const acceptedPdfTypes = "application/pdf,.pdf";
 const inputClassName =
-  "min-h-11 rounded-md border border-surface-200 bg-surface-50/75 px-3 text-sm font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15";
+  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 const extractPagesHelp =
   "Podés escribir páginas individuales o rangos. Ejemplos: 1, 2-5, 1,3,5, 1,3-5,7. Usá comas para separar.";
 const partsHelp =
@@ -248,7 +248,7 @@ export function SplitPdfTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.94fr)_minmax(310px,0.54fr)]">
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Archivo y división</h3>
@@ -262,7 +262,7 @@ export function SplitPdfTool() {
               "grid min-h-40 place-items-center rounded-lg border border-dashed p-5 text-center transition",
               isDragging
                 ? "border-accent-cyan bg-accent-cyan/10"
-                : "border-surface-300 bg-surface-100/70 hover:border-accent-cyan/55 hover:bg-surface-100",
+                : "border-surface-200/80 bg-surface-50/80 hover:border-accent-cyan/55 hover:bg-surface-50",
             )}
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -303,7 +303,7 @@ export function SplitPdfTool() {
           />
 
           {metadata ? (
-            <div className="rounded-lg border border-surface-200 bg-surface-100/65 p-3">
+            <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <p className="truncate text-sm font-semibold text-ink-900">{metadata.fileName}</p>
               <p className="mt-1 text-xs text-ink-500">
                 {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? "página" : "páginas"}
@@ -323,7 +323,7 @@ export function SplitPdfTool() {
                     "rounded-md border p-3 text-left transition",
                     mode === modeId
                       ? "border-accent-cyan/45 bg-accent-cyan/10"
-                      : "border-surface-200 bg-surface-100/60 hover:border-accent-cyan/35",
+                      : "border-surface-200/80 bg-surface-50/80 hover:border-accent-cyan/35",
                     modeId === "parts" && partsModeUnavailable && "cursor-not-allowed opacity-50",
                   )}
                   onClick={() => selectMode(modeId)}
@@ -333,7 +333,7 @@ export function SplitPdfTool() {
                 </button>
               ))}
             </div>
-            <p className="rounded-md border border-surface-200 bg-surface-100/55 px-3 py-2 text-sm leading-6 text-ink-500">
+            <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm leading-6 text-ink-500 shadow-sm">
               {mode === "individual-pages" && metadata?.pageCount === 1
                 ? "Se creará un PDF individual con la única página del documento."
                 : modeContent[mode].description}
@@ -342,7 +342,7 @@ export function SplitPdfTool() {
           </div>
 
           {mode === "extract-pages" ? (
-            <div className="grid gap-2 rounded-lg border border-surface-200 bg-surface-100/65 p-3">
+            <div className="grid gap-2 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <div className="flex items-center gap-2">
                 <label htmlFor="split-pdf-page-selection" className="text-sm font-semibold text-ink-700">
                   Páginas a extraer
@@ -371,7 +371,7 @@ export function SplitPdfTool() {
           ) : null}
 
           {mode === "parts" ? (
-            <div className="grid gap-3 rounded-lg border border-surface-200 bg-surface-100/65 p-3">
+            <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <label className="grid gap-1.5 text-sm font-semibold text-ink-700 sm:max-w-48">
                 Cantidad de partes
                 <select
@@ -432,13 +432,13 @@ export function SplitPdfTool() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
           <p className="mt-1 text-xs leading-5 text-ink-500">Los archivos se procesan localmente. No se suben a servidores.</p>
         </div>
 
-        <div className="mt-5 grid gap-3 rounded-lg border border-surface-200 bg-surface-100/70 p-4">
+        <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
             <p className="text-sm font-semibold text-ink-700">Total de páginas</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{metadata?.pageCount ?? 0}</p>
@@ -446,11 +446,11 @@ export function SplitPdfTool() {
           </div>
 
           <dl className="grid gap-3 text-sm">
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">Modo seleccionado</dt>
               <dd className="mt-1 font-semibold text-ink-900">{modeContent[mode].label}</dd>
             </div>
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">
                 <label htmlFor="split-pdf-output-name">Nombre de salida</label>
               </dt>
@@ -472,7 +472,7 @@ export function SplitPdfTool() {
                 {outputNameError ? <span role="alert" className="mt-2 block text-sm text-ink-700">{outputNameError}</span> : null}
               </dd>
             </div>
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">Descarga final</dt>
               <dd className="mt-1 break-all font-semibold text-ink-900">{outputFileName ?? "Nombre de salida inválido"}</dd>
               <dd className="mt-1 text-xs text-ink-500">{outputExtension === "pdf" ? "Archivo PDF" : "Archivo ZIP"}</dd>
@@ -483,7 +483,7 @@ export function SplitPdfTool() {
             <p
               aria-live="polite"
               role="status"
-              className="flex items-center gap-2 rounded-md border border-surface-200 bg-surface-50/75 px-3 py-2 text-sm text-ink-600"
+              className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm"
             >
               <Loader2 className="animate-spin text-accent-teal" size={16} />
               {status === "reading" ? "Leyendo PDF..." : "Preparando descarga..."}
@@ -499,7 +499,7 @@ export function SplitPdfTool() {
           ) : null}
 
           {!metadata && status === "idle" ? (
-            <p className="rounded-md border border-surface-200 bg-surface-50/75 px-3 py-2 text-sm text-ink-600">
+            <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               Seleccioná un PDF para habilitar la división.
             </p>
           ) : null}

@@ -21,7 +21,7 @@ export function FavoriteToolsSection() {
   }
 
   return (
-    <section className="mt-5 rounded-lg border border-surface-200 bg-surface-50/84 p-4 shadow-panel">
+    <section className="mt-5 rounded-xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
       <div className="mb-3 flex items-center gap-2">
         <Star size={16} className="fill-current text-accent-teal" />
         <h2 className="text-sm font-semibold text-ink-900">Tus favoritos</h2>
@@ -31,7 +31,7 @@ export function FavoriteToolsSection() {
           <Link
             key={tool.id}
             to={buildToolPath(tool.slug)}
-            className="group flex items-center justify-between gap-2 rounded-lg border border-surface-200 bg-surface-100/60 px-4 py-3 text-sm font-semibold text-ink-900 transition hover:border-accent-cyan/45 hover:shadow-sm"
+            className="group flex items-center justify-between gap-2 rounded-xl border border-surface-200/80 bg-surface-50/95 px-4 py-3 text-sm font-semibold text-ink-900 shadow-sm transition hover:-translate-y-0.5 hover:border-accent-cyan/40 hover:shadow-panel"
           >
             <span className="truncate">{tool.name}</span>
             <ArrowRight size={16} className="shrink-0 text-ink-300 transition group-hover:text-accent-teal" />

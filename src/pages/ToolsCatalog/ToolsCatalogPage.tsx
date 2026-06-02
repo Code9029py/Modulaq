@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Search, SlidersHorizontal, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, LayoutGrid, Search, SlidersHorizontal, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 import { categories } from "../../config/categories";
 import { toolModes } from "../../config/toolModes";
@@ -12,8 +12,11 @@ import { filterTools, getAvailableModeIds, getVisibleCategoryIds, getVisibleStat
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
 import { EmptyState } from "../../shared/components/EmptyState";
-import { SectionHeader } from "../../shared/components/SectionHeader";
+import { HeroBadge } from "../../shared/components/HeroBadge";
+import { HeroPanel } from "../../shared/components/HeroPanel";
+import { PageBackdrop } from "../../shared/components/PageBackdrop";
 import { PageHead } from "../../shared/seo/PageHead";
+import { inputClassName } from "../../shared/styles/inputClassName";
 import { cn } from "../../shared/utils/cn";
 
 const defaultFilters: ToolFiltersType = {
@@ -53,61 +56,68 @@ export function ToolsCatalogPage() {
   };
 
   return (
-    <Container className="py-8 md:py-9 lg:py-10">
-      <PageHead
-        title="Herramientas online gratis"
-        description="Catálogo de microherramientas de Modulaq: PDF, texto y productividad. Todas funcionan online, gratis y directo en tu navegador."
-        path="/herramientas"
-      />
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <SectionHeader
-          eyebrow="Catálogo"
-          headingLevel="h1"
-          title="Herramientas online gratis"
-          description="Explora las primeras herramientas de Modulaq. Buscá rápido y ajustá filtros solo cuando haga falta."
+    <section className="relative overflow-hidden">
+      <PageBackdrop tone="cyan-mint" />
+      <Container className="relative py-10 md:py-12">
+        <PageHead
+          title="Herramientas PDF, QR y texto gratis"
+          description="Explora herramientas gratuitas de Modulaq para PDF, QR y texto. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada."
+          path="/herramientas"
         />
-        <div className="flex items-center gap-3 lg:hidden">
-          <Button
-            aria-controls="compact-tool-filters"
-            aria-expanded={isMobileFiltersOpen}
-            type="button"
-            variant="secondary"
-            className="gap-2"
-            onClick={() => setIsMobileFiltersOpen((value) => !value)}
-          >
-            <SlidersHorizontal size={16} />
-            Filtros
-          </Button>
-          <span className="text-sm font-medium text-ink-500">{displayedTools.length} herramientas</span>
-        </div>
-      </div>
+        <HeroPanel>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-4xl">
+              <HeroBadge icon={LayoutGrid}>Catálogo</HeroBadge>
+              <h1 className="text-3xl font-semibold leading-tight text-ink-900 md:text-4xl">
+                Herramientas PDF, QR y texto gratis
+              </h1>
+              <p className="mt-3 max-w-5xl text-base leading-7 text-ink-500">
+                Explora las primeras herramientas de Modulaq. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 lg:hidden">
+              <Button
+                aria-controls="compact-tool-filters"
+                aria-expanded={isMobileFiltersOpen}
+                type="button"
+                variant="secondary"
+                className="gap-2"
+                onClick={() => setIsMobileFiltersOpen((value) => !value)}
+              >
+                <SlidersHorizontal size={16} />
+                Filtros
+              </Button>
+              <span className="text-sm font-medium text-ink-500">{displayedTools.length} herramientas</span>
+            </div>
+          </div>
+        </HeroPanel>
 
-      <div className="mt-5 rounded-lg border border-surface-200 bg-surface-50/84 p-3 shadow-panel">
+        <div className="mt-5 rounded-2xl border border-surface-200/75 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <label className="grid gap-2 text-sm font-semibold text-ink-700">
           Buscar herramienta
           <span className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" size={18} />
             <input
-              className="min-h-12 w-full rounded-md border border-surface-200 bg-surface-100/70 py-2 pl-10 pr-3 text-base font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15"
+              className={cn(inputClassName, "min-h-12 w-full py-2 pl-10 pr-3 text-base")}
               placeholder="Buscar por nombre, descripción o etiqueta..."
               value={filters.search}
               onChange={(event) => setFilters({ ...filters, search: event.target.value })}
             />
           </span>
         </label>
-      </div>
+        </div>
 
-      {showFavoritesControls ? (
+        {showFavoritesControls ? (
         <div className="mt-4">
           <button
             type="button"
             aria-pressed={onlyFavorites}
             onClick={() => setOnlyFavorites((value) => !value)}
             className={cn(
-              "inline-flex min-h-10 items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25",
+              "inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25",
               onlyFavorites
-                ? "border-accent-cyan/45 bg-accent-cyan/10 text-accent-teal"
-                : "border-surface-200 bg-surface-50 text-ink-700 hover:bg-surface-100 hover:text-ink-900",
+                ? "border-accent-cyan/40 bg-accent-cyan/10 text-accent-teal"
+                : "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/30 hover:bg-surface-50 hover:text-ink-900",
             )}
           >
             <Star size={16} className={cn(onlyFavorites && "fill-current")} />
@@ -115,12 +125,12 @@ export function ToolsCatalogPage() {
             <span className="text-xs font-medium text-ink-500">({favoriteIds.length})</span>
           </button>
         </div>
-      ) : null}
+        ) : null}
 
-      {showFavoritesControls && !onlyFavorites ? <FavoriteToolsSection /> : null}
+        {showFavoritesControls && !onlyFavorites ? <FavoriteToolsSection /> : null}
 
-      {isMobileFiltersOpen ? (
-        <section id="compact-tool-filters" className="mt-4 rounded-lg border border-surface-200 bg-surface-50/84 p-4 shadow-panel lg:hidden">
+        {isMobileFiltersOpen ? (
+        <section id="compact-tool-filters" className="mt-4 rounded-xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 lg:hidden">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-ink-900">Filtrar catálogo</h2>
             {hasActiveFilters ? (
@@ -137,9 +147,9 @@ export function ToolsCatalogPage() {
             statuses={visibleStatuses}
           />
         </section>
-      ) : null}
+        ) : null}
 
-      <div
+        <div
         className={cn(
           "mt-6 grid gap-6",
           isDesktopSidebarOpen ? "lg:grid-cols-[218px_1fr]" : "lg:grid-cols-1",
@@ -147,9 +157,9 @@ export function ToolsCatalogPage() {
       >
         {isDesktopSidebarOpen ? (
           <aside className="hidden lg:block">
-            <div className="sticky top-24 rounded-lg border border-surface-200 bg-surface-50/84 shadow-panel">
+            <div className="sticky top-24 overflow-hidden rounded-xl border border-surface-200/80 bg-surface-50/90 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
               <button
-                className="flex min-h-12 w-full items-center justify-center border-b border-surface-200 px-3 text-sm font-semibold text-ink-700 transition hover:bg-surface-100"
+                className="flex min-h-12 w-full items-center justify-center border-b border-surface-200/80 bg-surface-50/70 px-3 text-sm font-semibold text-ink-700 transition hover:bg-surface-100/80"
                 type="button"
                 onClick={() => setIsDesktopSidebarOpen(false)}
               >
@@ -157,14 +167,13 @@ export function ToolsCatalogPage() {
                 <ArrowLeft className="ml-2" size={16} />
               </button>
               <div className="p-4">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <h2 className="text-sm font-semibold text-ink-900">Filtros</h2>
-                  {hasActiveFilters ? (
+                {hasActiveFilters ? (
+                  <div className="mb-4 flex justify-end">
                     <button className="text-xs font-semibold text-ink-700 hover:text-ink-900" type="button" onClick={resetFilters}>
-                      Limpiar
+                      Limpiar filtros
                     </button>
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
                 <ToolFilters
                   categories={visibleCategories}
                   filters={filters}
@@ -181,7 +190,11 @@ export function ToolsCatalogPage() {
           <div className="mb-4 hidden items-center justify-between gap-3 lg:flex">
             <div className="flex items-center gap-3">
               {!isDesktopSidebarOpen ? (
-                <Button type="button" variant="secondary" onClick={() => setIsDesktopSidebarOpen(true)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setIsDesktopSidebarOpen(true)}
+                >
                   Expandir filtros
                   <ArrowRight className="ml-2" size={16} />
                 </Button>
@@ -192,7 +205,7 @@ export function ToolsCatalogPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
             {displayedTools.map((tool) => (
               <ToolCard key={tool.id} tool={tool} />
             ))}
@@ -211,7 +224,8 @@ export function ToolsCatalogPage() {
             </div>
           ) : null}
         </section>
-      </div>
-    </Container>
+        </div>
+      </Container>
+    </section>
   );
 }

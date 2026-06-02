@@ -17,10 +17,12 @@ export function RecentToolsSection() {
   }
 
   return (
-    <section className="border-b border-surface-200/70">
-      <Container className="py-8">
-        <div className="mb-4 flex items-center gap-2">
-          <History size={18} className="text-accent-teal" />
+    <section className="border-y border-surface-200/40 bg-gradient-to-r from-surface-50/30 via-surface-50/10 to-surface-50/30">
+      <Container className="py-10">
+        <div className="mb-5 flex items-center gap-2">
+          <span className="grid h-8 w-8 place-items-center rounded-md bg-accent-cyan/10 text-accent-teal">
+            <History size={18} />
+          </span>
           <h2 className="text-lg font-semibold text-ink-900">Usadas recientemente</h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -28,7 +30,7 @@ export function RecentToolsSection() {
             <Link
               key={tool.id}
               to={buildToolPath(tool.slug)}
-              className="group flex items-center justify-between gap-2 rounded-lg border border-surface-200 bg-surface-50/82 px-4 py-3 text-sm font-semibold text-ink-900 transition hover:border-accent-cyan/45 hover:shadow-sm"
+              className="group flex items-center justify-between gap-2 rounded-xl border border-surface-200/90 bg-surface-50/95 px-4 py-3 text-sm font-semibold text-ink-900 shadow-panel ring-1 ring-surface-50/80 transition hover:-translate-y-0.5 hover:border-accent-cyan/40 hover:bg-surface-50 hover:shadow-soft"
             >
               <span className="truncate">{tool.name}</span>
               <ArrowRight size={16} className="shrink-0 text-ink-300 transition group-hover:text-accent-teal" />

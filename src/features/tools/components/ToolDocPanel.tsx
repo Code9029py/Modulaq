@@ -13,7 +13,7 @@ type DocSectionProps = {
 
 function DocSection({ icon: Icon, title, children }: DocSectionProps) {
   return (
-    <section className="rounded-lg border border-surface-200 bg-surface-50/70 p-4">
+    <section className="rounded-xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/45 p-4 shadow-sm ring-1 ring-surface-50/80">
       <h3 className="flex items-center gap-2 text-sm font-semibold text-ink-900">
         <Icon size={16} className="text-accent-teal" />
         {title}

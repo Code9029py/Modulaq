@@ -44,7 +44,7 @@ const optionItems: Array<{
 ];
 
 const textareaClassName =
-  "min-h-72 w-full flex-1 resize-y rounded-lg border border-surface-200 bg-surface-100/70 px-4 py-3 text-sm leading-6 text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15";
+  "min-h-72 w-full flex-1 resize-y rounded-xl border border-surface-200/90 bg-surface-50/95 px-4 py-3 text-sm leading-6 text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 const defaultOutputBaseName = "texto-limpio";
 
 function OptionsList({
@@ -59,7 +59,7 @@ function OptionsList({
       {optionItems.map((option) => (
         <label
           key={option.id}
-          className="grid cursor-pointer grid-cols-[auto_1fr] gap-3 rounded-md border border-surface-200 bg-surface-50/70 p-3 transition hover:border-accent-cyan/50"
+          className="grid cursor-pointer grid-cols-[auto_1fr] gap-3 rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm transition hover:border-accent-cyan/50 hover:bg-surface-50"
         >
           <input
             className="mt-1 h-4 w-4 accent-accent-cyan"
@@ -81,7 +81,7 @@ function StatCard({ label, before, after }: { label: string; before: number; aft
   const delta = after - before;
 
   return (
-    <div className="rounded-lg border border-surface-200 bg-surface-100/70 p-4">
+    <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{label}</p>
         <p className={cn("text-xs font-semibold", delta === 0 ? "text-ink-500" : "text-ink-700")}>
@@ -118,6 +118,7 @@ export function TextCleanerTool() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
   const [isOptionsOpen, setIsOptionsOpen] = useState(true);
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
+  const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [outputFileName, setOutputFileName] = useState(defaultOutputBaseName);
 
   const result = useMemo(() => cleanText(input, options), [input, options]);
@@ -183,19 +184,19 @@ export function TextCleanerTool() {
       </div>
 
       <div className={cn("grid gap-5", isOptionsOpen ? "lg:grid-cols-[1fr_300px]" : "lg:grid-cols-1")}>
-        <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+        <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
           <div className="grid gap-4 xl:grid-cols-2">
-            <article className="flex min-h-[27rem] flex-col gap-3">
-              <div className="min-h-[5.75rem]">
+            <article className="grid gap-3">
+              <div className="xl:min-h-[5.75rem]">
                 <div>
                   <h3 className="text-sm font-semibold text-ink-900">Texto original</h3>
                   <p className="mt-1 text-xs leading-5 text-ink-500">Pega un texto para empezar.</p>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 flex min-h-10 flex-wrap items-center gap-2">
                   <Button
                     type="button"
                     variant="ghost"
-                    className="gap-2 px-3"
+                    className="gap-2 whitespace-nowrap px-3"
                     onClick={clearAll}
                     disabled={!input && outputFileName === defaultOutputBaseName}
                   >
@@ -205,7 +206,7 @@ export function TextCleanerTool() {
                 </div>
               </div>
               <textarea
-                className={textareaClassName}
+                className={cn(textareaClassName, "min-h-[30rem]")}
                 placeholder="Pega aquí texto con espacios de más, comillas tipográficas o líneas vacías..."
                 value={input}
                 onChange={(event) => {
@@ -215,39 +216,50 @@ export function TextCleanerTool() {
               />
             </article>
 
-            <article className="flex min-h-[27rem] flex-col gap-3">
-              <div className="min-h-[5.75rem]">
+            <article className="grid gap-3">
+              <div className="xl:min-h-[5.75rem]">
                 <div>
                   <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
                   <p className="mt-1 text-xs leading-5 text-ink-500">Se actualiza automáticamente.</p>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Button type="button" variant="secondary" className="gap-2 px-3" onClick={copyResult} disabled={!hasOutput}>
+                <div className="mt-3 flex min-h-10 flex-wrap items-center gap-2">
+                  <Button type="button" variant="secondary" className="shrink-0 gap-2 whitespace-nowrap px-3" onClick={copyResult} disabled={!hasOutput}>
                     <Clipboard size={16} />
                     {copyStatus === "copied" ? "Copiado" : "Copiar"}
                   </Button>
-                  <Button type="button" variant="secondary" className="gap-2 px-3" onClick={downloadResult} disabled={!hasOutput}>
-                    <Download size={16} />
-                    Descargar TXT
-                  </Button>
-                  <Button type="button" variant="secondary" className="gap-2 px-3" onClick={useOutputAsInput} disabled={!hasOutput}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="shrink-0 gap-2 whitespace-nowrap px-3"
+                    onClick={useOutputAsInput}
+                    disabled={!hasOutput}
+                  >
                     <ArrowDownUp size={16} />
                     Usar como entrada
                   </Button>
                 </div>
               </div>
-              <textarea className={textareaClassName} readOnly placeholder="El resultado aparecerá aquí." value={result.output} />
-              <label className="grid gap-1.5 rounded-md border border-surface-200 bg-surface-100/70 p-3 text-sm font-semibold text-ink-700">
-                Nombre del archivo
+              <textarea className={cn(textareaClassName, "min-h-[30rem]")} readOnly placeholder="El resultado aparecerá aquí." value={result.output} />
+            </article>
+          </div>
+
+          <div className="mt-4">
+            <label className="grid gap-2 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm font-semibold text-ink-700 shadow-sm">
+              <span>Nombre del archivo</span>
+              <span className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                 <input
-                  className="min-h-11 w-full rounded-md border border-surface-200 bg-surface-50/75 px-3 text-sm font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15"
+                  className="min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
                   value={outputFileName}
                   placeholder={defaultOutputBaseName}
                   onChange={(event) => setOutputFileName(event.target.value)}
                 />
-                <span className="break-all text-xs font-normal leading-5 text-ink-500">Se descargará como {finalOutputFileName}</span>
-              </label>
-            </article>
+                <Button type="button" variant="secondary" className="w-full gap-2 px-3 sm:w-auto" onClick={downloadResult} disabled={!hasOutput}>
+                  <Download size={16} />
+                  Descargar TXT
+                </Button>
+              </span>
+              <span className="break-all text-xs font-normal leading-5 text-ink-500">Se descargará como {finalOutputFileName}</span>
+            </label>
           </div>
 
           {copyStatus === "error" ? (
@@ -258,7 +270,7 @@ export function TextCleanerTool() {
         </section>
 
         {isOptionsOpen ? (
-          <aside className="hidden rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel lg:block">
+          <aside className="hidden rounded-2xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur lg:block">
             <div className="mb-4">
               <h3 className="text-sm font-semibold text-ink-900">Opciones de limpieza</h3>
               <p className="mt-1 text-xs text-ink-500">{activeOptionsCount}/6 activas</p>
@@ -268,7 +280,7 @@ export function TextCleanerTool() {
         ) : null}
       </div>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 shadow-sm lg:hidden">
+      <section className="rounded-2xl border border-surface-200/80 bg-surface-50/90 shadow-sm ring-1 ring-surface-50/80 backdrop-blur lg:hidden">
         <button
           className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-ink-900"
           type="button"
@@ -281,18 +293,30 @@ export function TextCleanerTool() {
           <span className="text-xs font-semibold text-ink-500">{activeOptionsCount}/6 activas</span>
         </button>
         {isMobileOptionsOpen ? (
-          <div className="border-t border-surface-200 p-3">
+          <div className="border-t border-surface-200/80 p-3">
             <OptionsList options={options} updateOption={updateOption} />
           </div>
         ) : null}
       </section>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-sm">
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink-900">
-          <RotateCcw size={16} />
-          Estadísticas
-        </div>
-        <StatsGrid before={result.before} after={result.after} />
+      <section className="overflow-hidden rounded-2xl border border-surface-200/80 bg-surface-50/90 shadow-sm ring-1 ring-surface-50/80 backdrop-blur">
+        <button
+          className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-ink-900 transition hover:bg-surface-100/70"
+          type="button"
+          aria-expanded={isStatsOpen}
+          onClick={() => setIsStatsOpen((value) => !value)}
+        >
+          <span className="inline-flex items-center gap-2">
+            <RotateCcw size={16} />
+            Estadísticas
+          </span>
+          {isStatsOpen ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+        </button>
+        {isStatsOpen ? (
+          <div className="border-t border-surface-200/80 p-4">
+            <StatsGrid before={result.before} after={result.after} />
+          </div>
+        ) : null}
       </section>
     </div>
   );
