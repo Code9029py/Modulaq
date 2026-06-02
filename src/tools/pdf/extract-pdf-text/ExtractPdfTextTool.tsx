@@ -145,7 +145,7 @@ export function ExtractPdfTextTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(295px,0.56fr)_minmax(0,1fr)]">
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Archivo PDF</h3>
@@ -157,7 +157,7 @@ export function ExtractPdfTextTool() {
               "grid min-h-40 place-items-center rounded-lg border border-dashed p-5 text-center transition",
               isDragging
                 ? "border-accent-cyan bg-accent-cyan/10"
-                : "border-surface-300 bg-surface-100/70 hover:border-accent-cyan/55 hover:bg-surface-100",
+                : "border-surface-200/80 bg-surface-50/80 hover:border-accent-cyan/55 hover:bg-surface-50",
             )}
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -199,7 +199,7 @@ export function ExtractPdfTextTool() {
           />
 
           {metadata ? (
-            <div className="rounded-lg border border-surface-200 bg-surface-100/65 p-3">
+            <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <p className="truncate text-sm font-semibold text-ink-900">{metadata.fileName}</p>
               <p className="mt-1 text-xs text-ink-500">
                 {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? "página" : "páginas"}
@@ -209,7 +209,7 @@ export function ExtractPdfTextTool() {
 
           <label
             className={cn(
-              "flex items-start gap-3 rounded-lg border border-surface-200 bg-surface-100/65 p-3 text-sm text-ink-700",
+              "flex items-start gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm text-ink-700 shadow-sm",
               isBusy ? "cursor-not-allowed opacity-65" : "cursor-pointer",
             )}
           >
@@ -238,7 +238,7 @@ export function ExtractPdfTextTool() {
             <p
               aria-live="polite"
               role="status"
-              className="flex items-center gap-2 rounded-md border border-surface-200 bg-surface-100/70 px-3 py-2 text-sm text-ink-600"
+              className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm"
             >
               <Loader2 className="animate-spin text-accent-teal" size={16} />
               {status === "reading"
@@ -270,7 +270,7 @@ export function ExtractPdfTextTool() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Texto extraído</h3>
@@ -309,10 +309,10 @@ export function ExtractPdfTextTool() {
           <p aria-live="polite" role="status" className="mt-4 rounded-md border border-accent-teal/25 bg-accent-teal/10 px-3 py-2 text-sm text-ink-700">{feedback}</p>
         ) : null}
 
-        <label className="mt-4 grid gap-1.5 rounded-md border border-surface-200 bg-surface-100/65 p-3 text-sm font-semibold text-ink-700">
+        <label className="mt-4 grid gap-1.5 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm font-semibold text-ink-700 shadow-sm">
           Nombre del archivo
           <input
-            className="min-h-11 w-full rounded-md border border-surface-200 bg-surface-50/75 px-3 text-sm font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15"
+            className="min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
             value={outputFileName}
             placeholder={defaultOutputBaseName}
             onChange={(event) => {
@@ -326,7 +326,7 @@ export function ExtractPdfTextTool() {
 
         <textarea
           aria-label="Texto extraído del PDF"
-          className="mt-4 h-[29rem] w-full resize-y rounded-lg border border-surface-200 bg-surface-100/65 p-4 text-sm leading-6 text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15"
+          className="mt-4 h-[29rem] w-full resize-y rounded-xl border border-surface-200/90 bg-surface-50/95 p-4 text-sm leading-6 text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
           placeholder="Cargá un PDF y elegí Extraer texto."
           readOnly
           value={result?.text ?? ""}

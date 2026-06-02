@@ -60,7 +60,7 @@ export function PdfPageCounterTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(300px,0.58fr)]">
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Archivo PDF</h3>
@@ -74,7 +74,7 @@ export function PdfPageCounterTool() {
               "grid min-h-64 place-items-center rounded-lg border border-dashed p-6 text-center transition",
               isDragging
                 ? "border-accent-cyan bg-accent-cyan/10"
-                : "border-surface-300 bg-surface-100/70 hover:border-accent-cyan/55 hover:bg-surface-100",
+                : "border-surface-200/80 bg-surface-50/80 hover:border-accent-cyan/55 hover:bg-surface-50",
             )}
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -126,13 +126,13 @@ export function PdfPageCounterTool() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
           <p className="mt-1 text-xs leading-5 text-ink-500">Conteo local, rápido y sin backend.</p>
         </div>
 
-        <div className="mt-5 grid min-h-64 place-items-center rounded-lg border border-surface-200 bg-surface-100/70 p-5">
+        <div className="mt-5 grid min-h-64 place-items-center rounded-xl border border-surface-200/80 bg-surface-50/80 p-5 shadow-sm">
           {status === "processing" ? (
             <div className="text-center">
               <Loader2 className="mx-auto animate-spin text-accent-teal" size={30} />
@@ -150,11 +150,11 @@ export function PdfPageCounterTool() {
               </div>
 
               <dl className="mt-4 grid gap-3 text-sm">
-                <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+                <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
                   <dt className="text-ink-500">Archivo</dt>
                   <dd className="mt-1 break-all font-semibold text-ink-900">{result.fileName}</dd>
                 </div>
-                <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+                <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
                   <dt className="text-ink-500">Tamaño</dt>
                   <dd className="mt-1 font-semibold text-ink-900">{formatFileSize(result.fileSize)}</dd>
                 </div>

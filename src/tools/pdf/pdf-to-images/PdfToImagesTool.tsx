@@ -18,7 +18,7 @@ import type { PdfToImagesMetadata, PdfToImagesMode, PdfToImagesProgress, PdfToIm
 
 const acceptedPdfTypes = "application/pdf,.pdf";
 const inputClassName =
-  "min-h-11 rounded-md border border-surface-200 bg-surface-50/75 px-3 text-sm font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15";
+  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 const pageRangeHelp =
   "Podés indicar páginas individuales o rangos. Ejemplos: 1,2,3 o 1-3,5,8-10. Los rangos son inclusivos.";
 
@@ -166,7 +166,7 @@ export function PdfToImagesTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.94fr)_minmax(310px,0.54fr)]">
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Archivo y configuración</h3>
@@ -180,7 +180,7 @@ export function PdfToImagesTool() {
               "grid min-h-40 place-items-center rounded-lg border border-dashed p-5 text-center transition",
               isDragging
                 ? "border-accent-cyan bg-accent-cyan/10"
-                : "border-surface-300 bg-surface-100/70 hover:border-accent-cyan/55 hover:bg-surface-100",
+                : "border-surface-200/80 bg-surface-50/80 hover:border-accent-cyan/55 hover:bg-surface-50",
             )}
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -223,7 +223,7 @@ export function PdfToImagesTool() {
           />
 
           {metadata ? (
-            <div className="rounded-lg border border-surface-200 bg-surface-100/65 p-3">
+            <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <p className="truncate text-sm font-semibold text-ink-900">{metadata.fileName}</p>
               <p className="mt-1 text-xs text-ink-500">
                 {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? "página" : "páginas"}
@@ -231,7 +231,7 @@ export function PdfToImagesTool() {
             </div>
           ) : null}
 
-          <div className="grid gap-3 rounded-lg border border-surface-200 bg-surface-100/65 p-3">
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Páginas a convertir</p>
             <div className="grid gap-2 sm:grid-cols-2">
               <button
@@ -240,7 +240,7 @@ export function PdfToImagesTool() {
                   "rounded-md border p-3 text-left transition",
                   mode === "all-pages"
                     ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200 bg-surface-50/75 hover:border-accent-cyan/35",
+                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
                 )}
                 onClick={() => {
                   setMode("all-pages");
@@ -256,7 +256,7 @@ export function PdfToImagesTool() {
                   "rounded-md border p-3 text-left transition",
                   mode === "page-range"
                     ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200 bg-surface-50/75 hover:border-accent-cyan/35",
+                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
                 )}
                 onClick={() => {
                   setMode("page-range");
@@ -297,13 +297,13 @@ export function PdfToImagesTool() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
           <p className="mt-1 text-xs leading-5 text-ink-500">Cada página se exporta como imagen PNG.</p>
         </div>
 
-        <div className="mt-5 grid gap-3 rounded-lg border border-surface-200 bg-surface-100/70 p-4">
+        <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
             <p className="text-sm font-semibold text-ink-700">Imágenes a generar</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{imageCount}</p>
@@ -311,7 +311,7 @@ export function PdfToImagesTool() {
           </div>
 
           <dl className="grid gap-3 text-sm">
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">
                 <label htmlFor="pdf-to-images-output-name">Nombre del archivo</label>
               </dt>
@@ -330,7 +330,7 @@ export function PdfToImagesTool() {
                 <span className="mt-2 block break-all text-xs text-ink-500">Se descargará como {finalOutputFileName}</span>
               </dd>
             </div>
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">Archivo de descarga</dt>
               <dd className="mt-1 font-semibold text-ink-900">{outputType}</dd>
               <dd className="mt-1 text-xs text-ink-500">Las imágenes internas se generan en PNG.</dd>
@@ -341,7 +341,7 @@ export function PdfToImagesTool() {
             <p
               aria-live="polite"
               role="status"
-              className="flex items-center gap-2 rounded-md border border-surface-200 bg-surface-50/75 px-3 py-2 text-sm text-ink-600"
+              className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm"
             >
               <Loader2 className="animate-spin text-accent-teal" size={16} />
               {status === "reading"
@@ -359,7 +359,7 @@ export function PdfToImagesTool() {
           ) : null}
 
           {!metadata && status === "idle" ? (
-            <p className="rounded-md border border-surface-200 bg-surface-50/75 px-3 py-2 text-sm text-ink-600">
+            <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               Seleccioná un PDF para habilitar la conversión.
             </p>
           ) : null}

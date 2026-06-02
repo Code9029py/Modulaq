@@ -21,7 +21,7 @@ const sizeOptions: Array<{ label: string; value: QrSize }> = [
 ];
 
 const inputClassName =
-  "min-h-12 rounded-md border border-surface-200 bg-surface-100/70 px-3 text-sm font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15";
+  "min-h-12 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 const defaultOutputBaseName = "qr";
 
 export function QrGeneratorTool() {
@@ -112,7 +112,7 @@ export function QrGeneratorTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(320px,0.65fr)]">
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-5">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Contenido del QR</h3>
@@ -194,7 +194,7 @@ export function QrGeneratorTool() {
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
             {copy.label}
             <textarea
-              className="min-h-44 resize-y rounded-lg border border-surface-200 bg-surface-100/70 px-4 py-3 text-sm font-normal leading-6 text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15"
+              className="min-h-44 resize-y rounded-xl border border-surface-200/90 bg-surface-50/95 px-4 py-3 text-sm font-normal leading-6 text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
               placeholder={copy.placeholder}
               value={input}
               onChange={(event) => {
@@ -208,7 +208,7 @@ export function QrGeneratorTool() {
           <div
             className={cn(
               "rounded-lg border px-4 py-3 text-sm leading-6",
-              validation.isWarning ? "border-accent-violet/35 bg-accent-violet/8 text-ink-700" : "border-surface-200 bg-surface-100/60 text-ink-500",
+              validation.isWarning ? "border-accent-violet/35 bg-accent-violet/8 text-ink-700" : "border-surface-200/80 bg-surface-50/80 text-ink-500",
             )}
           >
             {validation.message ?? copy.help}
@@ -237,7 +237,7 @@ export function QrGeneratorTool() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Vista previa</h3>
@@ -262,10 +262,10 @@ export function QrGeneratorTool() {
             : "Tamaño de salida: ingresá un valor válido para generar el PNG."}
         </p>
 
-        <label className="mt-4 grid gap-1.5 rounded-md border border-surface-200 bg-surface-100/70 p-3 text-sm font-semibold text-ink-700">
+        <label className="mt-4 grid gap-1.5 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm font-semibold text-ink-700 shadow-sm">
           Nombre del archivo
           <input
-            className={cn(inputClassName, "w-full bg-surface-50/75")}
+            className={cn(inputClassName, "w-full")}
             value={outputFileName}
             placeholder={defaultOutputBaseName}
             onChange={(event) => setOutputFileName(event.target.value)}
@@ -273,11 +273,11 @@ export function QrGeneratorTool() {
           <span className="break-all text-xs font-normal leading-5 text-ink-500">Se descargará como {finalOutputFileName}</span>
         </label>
 
-        <div className="mt-5 grid min-h-80 place-items-center rounded-lg border border-surface-200 bg-surface-100/70 p-5">
+        <div className="mt-5 grid min-h-80 place-items-center rounded-xl border border-surface-200/80 bg-surface-50/80 p-5 shadow-sm">
           {qrResult && !isGenerating ? (
             <img
               alt="Vista previa del código QR generado"
-              className="h-auto max-h-[352px] w-full max-w-[352px] rounded-md border border-surface-200 bg-surface-50 p-2 shadow-sm"
+              className="h-auto max-h-[352px] w-full max-w-[352px] rounded-lg border border-surface-200/80 bg-surface-50 p-2 shadow-sm"
               src={qrResult.dataUrl}
             />
           ) : (

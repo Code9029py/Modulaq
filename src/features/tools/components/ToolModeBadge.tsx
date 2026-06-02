@@ -3,7 +3,7 @@ import type { ToolModeId } from "../types/tool.types";
 
 export function ToolModeBadge({ mode }: { mode: ToolModeId }) {
   return (
-    <span className="inline-flex rounded-md border border-surface-200 bg-surface-100/80 px-2.5 py-1 text-xs font-semibold text-ink-700">
+    <span className="inline-flex rounded-md border border-surface-200/80 bg-surface-50/90 px-2.5 py-1 text-xs font-semibold text-ink-700 shadow-sm">
       {getToolModeLabel(mode)}
     </span>
   );

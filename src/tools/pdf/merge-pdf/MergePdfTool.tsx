@@ -16,7 +16,7 @@ import type { MergePdfItem, MergePdfStatus } from "./mergePdf.types";
 
 const acceptedPdfTypes = "application/pdf,.pdf";
 const inputClassName =
-  "min-h-11 rounded-md border border-surface-200 bg-surface-50/75 px-3 text-sm font-normal text-ink-900 outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:ring-2 focus:ring-accent-cyan/15";
+  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 function createItemId(file: File) {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -238,7 +238,7 @@ export function MergePdfTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.98fr)_minmax(310px,0.5fr)]">
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Archivos PDF</h3>
@@ -252,7 +252,7 @@ export function MergePdfTool() {
               "grid min-h-52 place-items-center rounded-lg border border-dashed p-6 text-center transition",
               isDragging
                 ? "border-accent-cyan bg-accent-cyan/10"
-                : "border-surface-300 bg-surface-100/70 hover:border-accent-cyan/55 hover:bg-surface-100",
+                : "border-surface-200/80 bg-surface-50/80 hover:border-accent-cyan/55 hover:bg-surface-50",
             )}
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -319,8 +319,8 @@ export function MergePdfTool() {
                   <li
                     key={item.id}
                     className={cn(
-                      "grid gap-3 rounded-lg border bg-surface-100/72 p-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center xl:grid-cols-[auto_minmax(0,1fr)_auto]",
-                      item.status === "error" ? "border-accent-violet/25" : "border-surface-200",
+                      "grid gap-3 rounded-xl border bg-surface-50/80 p-3 shadow-sm sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center xl:grid-cols-[auto_minmax(0,1fr)_auto]",
+                      item.status === "error" ? "border-accent-violet/25" : "border-surface-200/80",
                     )}
                   >
                     <span className="w-fit rounded-md border border-accent-cyan/25 bg-accent-cyan/10 px-2.5 py-1 text-xs font-semibold text-ink-700">
@@ -364,7 +364,7 @@ export function MergePdfTool() {
               </ul>
             </div>
           ) : (
-            <div className="rounded-lg border border-surface-200 bg-surface-100/60 p-4">
+            <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
               <div className="flex gap-3">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-surface-200 bg-surface-50 text-accent-teal">
                   <FileText size={20} />
@@ -381,13 +381,13 @@ export function MergePdfTool() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-panel">
+      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">PDF final</h3>
           <p className="mt-1 text-xs leading-5 text-ink-500">Los archivos se unirán en el orden mostrado.</p>
         </div>
 
-        <div className="mt-5 grid gap-3 rounded-lg border border-surface-200 bg-surface-100/70 p-4">
+        <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
             <p className="text-sm font-semibold text-ink-700">Archivos listos</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{items.length}</p>
@@ -395,15 +395,15 @@ export function MergePdfTool() {
           </div>
 
           <dl className="grid gap-3 text-sm">
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">Páginas aproximadas</dt>
               <dd className="mt-1 font-semibold text-ink-900">{pageSummary}</dd>
             </div>
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">Tamaño total</dt>
               <dd className="mt-1 font-semibold text-ink-900">{formatFileSize(totalSize)}</dd>
             </div>
-            <div className="rounded-md border border-surface-200 bg-surface-50/70 p-3">
+            <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">
                 <label htmlFor="merge-pdf-output-name">Nombre de descarga</label>
               </dt>
@@ -433,13 +433,13 @@ export function MergePdfTool() {
           ) : null}
 
           {items.length === 1 ? (
-            <p className="rounded-md border border-surface-200 bg-surface-50/75 px-3 py-2 text-sm text-ink-600">
+            <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               Agregá otro PDF para habilitar la unión.
             </p>
           ) : null}
 
           {status === "processing" ? (
-            <p className="flex items-center gap-2 rounded-md border border-surface-200 bg-surface-50/75 px-3 py-2 text-sm text-ink-600">
+            <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
               Uniendo PDFs...
             </p>

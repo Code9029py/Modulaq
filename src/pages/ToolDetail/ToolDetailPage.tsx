@@ -16,6 +16,10 @@ import type { ToolMetadata, ToolModeId } from "../../features/tools/types/tool.t
 import { getToolBySlug } from "../../features/tools/utils/getToolBySlug";
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
+import { HeroBadge } from "../../shared/components/HeroBadge";
+import { HeroPanel } from "../../shared/components/HeroPanel";
+import { PageBackdrop } from "../../shared/components/PageBackdrop";
+import { Tag } from "../../shared/components/Tag";
 import { PageHead } from "../../shared/seo/PageHead";
 import { cn } from "../../shared/utils/cn";
 
@@ -65,7 +69,7 @@ function ComingSoonPanel({
   description?: string;
 }) {
   return (
-    <div className="rounded-lg border border-dashed border-surface-200 bg-surface-100/70 p-6 text-center">
+    <div className="rounded-2xl border border-dashed border-surface-200/80 bg-surface-50/90 p-6 text-center shadow-sm ring-1 ring-surface-50/80 backdrop-blur">
       <p className="text-sm font-semibold text-ink-900">{title}</p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-500">{description}</p>
     </div>
@@ -76,7 +80,7 @@ function ToolLoadingPanel() {
   return (
     <div
       aria-live="polite"
-      className="rounded-lg border border-surface-200 bg-surface-100/70 p-6 text-center text-sm font-semibold text-ink-700"
+      className="rounded-2xl border border-surface-200/80 bg-surface-50/90 p-6 text-center text-sm font-semibold text-ink-700 shadow-sm ring-1 ring-surface-50/80 backdrop-blur"
       role="status"
     >
       Cargando herramienta...
@@ -98,24 +102,27 @@ export function ToolDetailPage() {
 
   if (!tool) {
     return (
-      <Container className="py-16">
-        <PageHead
-          noindex
-          title="Herramienta no encontrada"
-          description="La herramienta solicitada no existe en Modulaq. Revisá el catálogo de microherramientas disponibles."
-          path="/herramientas"
-        />
-        <div className="rounded-lg border border-surface-200 bg-surface-50/82 p-8 shadow-panel">
-          <p className="text-sm font-semibold uppercase tracking-wide text-ink-700">Herramienta no encontrada</p>
-          <h1 className="mt-3 text-3xl font-semibold text-ink-900">Esa herramienta todavía no existe</h1>
-          <p className="mt-3 max-w-xl text-ink-500">
-            Revisa el catálogo o solicita una nueva herramienta para futuras versiones de Modulaq.
-          </p>
-          <div className="mt-6">
-            <Button href={routePaths.tools}>Volver al catálogo</Button>
-          </div>
-        </div>
-      </Container>
+      <section className="relative overflow-hidden">
+        <PageBackdrop tone="cyan-violet" />
+        <Container className="relative py-16">
+          <PageHead
+            noindex
+            title="Herramienta no encontrada"
+            description="La herramienta solicitada no existe en Modulaq. Revisá el catálogo de microherramientas disponibles."
+            path="/herramientas"
+          />
+          <HeroPanel className="p-8 md:p-8">
+            <HeroBadge icon={FileText}>Herramienta no encontrada</HeroBadge>
+            <h1 className="mt-3 text-3xl font-semibold text-ink-900">Esa herramienta todavía no existe</h1>
+            <p className="mt-3 max-w-xl text-ink-500">
+              Revisa el catálogo o solicita una nueva herramienta para futuras versiones de Modulaq.
+            </p>
+            <div className="mt-6">
+              <Button href={routePaths.tools}>Volver al catálogo</Button>
+            </div>
+          </HeroPanel>
+        </Container>
+      </section>
     );
   }
 
@@ -126,43 +133,41 @@ export function ToolDetailPage() {
   const relatedTools = (relatedToolSlugs[tool.id] ?? []).map((relatedSlug) => getToolBySlug(relatedSlug)).filter(isToolMetadata);
 
   return (
-    <Container className="py-5 md:py-6 lg:py-8">
-      <PageHead
-        title={tool.seo?.title ?? tool.name}
-        description={tool.seo?.description ?? tool.description}
-        path={buildToolPath(tool.slug)}
-      />
-      <Link to={routePaths.tools} className="inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-ink-900">
-        <ArrowLeft size={16} />
-        Volver al catálogo
-      </Link>
+    <section className="relative overflow-hidden">
+      <PageBackdrop tone="cyan-violet" />
+      <Container className="relative py-5 md:py-6 lg:py-8">
+        <PageHead
+          title={tool.seo?.title ?? tool.name}
+          description={tool.seo?.description ?? tool.description}
+          path={buildToolPath(tool.slug)}
+        />
+        <Link to={routePaths.tools} className="inline-flex items-center gap-2 text-sm font-semibold text-ink-700 hover:text-ink-900">
+          <ArrowLeft size={16} />
+          Volver al catálogo
+        </Link>
 
-      <section className="mt-2.5 rounded-lg border border-surface-200 bg-surface-50/82 p-3.5 shadow-panel">
+      <HeroPanel className="mt-2.5 p-4 md:p-5">
         <div className="grid gap-2.5 lg:grid-cols-[1fr_auto] lg:items-start">
           <div>
             <h1 className="text-2xl font-semibold leading-tight text-ink-900 md:text-3xl">{tool.name}</h1>
             <p className="mt-1.5 max-w-4xl text-sm leading-6 text-ink-500 md:text-base md:leading-7">{tool.description}</p>
             {introNotice ? (
-              <p className="mt-2 max-w-4xl rounded-md border border-surface-200 bg-surface-100/70 px-3 py-2 text-sm leading-6 text-ink-700">
+              <p className="mt-2 max-w-4xl rounded-lg border border-accent-cyan/20 bg-accent-cyan/10 px-3 py-2 text-sm leading-6 text-ink-700">
                 {introNotice}
               </p>
             ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2 lg:justify-end">
             <ToolStatusBadge status={tool.status} />
-            <span className="rounded-md border border-surface-200 bg-surface-100/80 px-2.5 py-1 text-xs font-semibold text-ink-700">
-              {getCategoryLabel(tool.category)}
-            </span>
-            <span className="rounded-md border border-surface-200 bg-surface-100/80 px-2.5 py-1 text-xs font-semibold text-ink-700">
-              {pricingLabels[tool.pricing]}
-            </span>
+            <Tag>{getCategoryLabel(tool.category)}</Tag>
+            <Tag>{pricingLabels[tool.pricing]}</Tag>
             <FavoriteToggleButton toolId={tool.id} toolName={tool.name} />
           </div>
         </div>
-      </section>
+      </HeroPanel>
 
-      <section className="mt-3 rounded-lg border border-surface-200 bg-surface-50/82 shadow-panel">
-        <div role="tablist" aria-label="Secciones de la herramienta" className="grid grid-cols-2 gap-2 border-b border-surface-200 p-2.5 lg:flex">
+      <section className="mt-3 overflow-hidden rounded-2xl border border-surface-200/80 bg-surface-50/90 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+        <div role="tablist" aria-label="Secciones de la herramienta" className="grid grid-cols-2 gap-2 border-b border-surface-200/80 bg-surface-50/65 p-2.5 lg:flex">
           {detailTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -181,8 +186,10 @@ export function ToolDetailPage() {
                 aria-controls={`tool-panel-${tab.id}`}
                 aria-selected={isActive}
                 className={cn(
-                  "inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition",
-                  isActive ? "bg-ink-900 text-surface-50 shadow-sm" : "text-ink-700 hover:bg-surface-100 hover:text-ink-900",
+                  "inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25",
+                  isActive
+                    ? "border-ink-900 bg-ink-900 text-surface-50"
+                    : "border-transparent bg-transparent text-ink-700 hover:border-surface-200/80 hover:bg-surface-50 hover:text-ink-900",
                   isDisabled && "cursor-not-allowed opacity-45",
                 )}
                 type="button"
@@ -246,14 +253,14 @@ export function ToolDetailPage() {
       </section>
 
       {relatedTools.length > 0 ? (
-        <section className="mt-3 rounded-lg border border-surface-200 bg-surface-50/82 p-4 shadow-sm">
+        <section className="mt-3 rounded-2xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
           <p className="text-sm font-semibold text-ink-900">Herramientas relacionadas</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {relatedTools.map((relatedTool) => (
               <Link
                 key={relatedTool.id}
                 to={buildToolPath(relatedTool.slug)}
-                className="inline-flex min-h-9 items-center gap-2 rounded-md border border-surface-200 bg-surface-100/75 px-3 py-2 text-sm font-semibold text-ink-700 transition hover:bg-surface-200 hover:text-ink-900"
+                className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm font-semibold text-ink-700 shadow-sm transition hover:border-accent-cyan/35 hover:bg-surface-50 hover:text-ink-900"
               >
                 {relatedTool.name}
                 <ArrowRight size={15} />
@@ -263,11 +270,11 @@ export function ToolDetailPage() {
         </section>
       ) : null}
 
-      <details className="mt-6 rounded-lg border border-surface-200 bg-surface-50/82 shadow-sm">
+      <details className="mt-6 rounded-2xl border border-surface-200/80 bg-surface-50/90 shadow-sm ring-1 ring-surface-50/80 backdrop-blur">
         <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-ink-900 marker:text-accent-teal">
           Detalles técnicos
         </summary>
-        <dl className="grid gap-3 border-t border-surface-200 px-5 py-4 text-sm md:grid-cols-2 lg:grid-cols-5">
+        <dl className="grid gap-3 border-t border-surface-200/80 px-5 py-4 text-sm md:grid-cols-2 lg:grid-cols-5">
           <div>
             <dt className="text-ink-500">ID</dt>
             <dd className="mt-1 font-semibold text-ink-900">{tool.id}</dd>
@@ -291,5 +298,6 @@ export function ToolDetailPage() {
         </dl>
       </details>
     </Container>
+    </section>
   );
 }
