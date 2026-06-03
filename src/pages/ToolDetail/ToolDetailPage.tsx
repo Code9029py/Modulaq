@@ -35,21 +35,6 @@ const detailTabs: DetailTab[] = [
   { id: "api", icon: Server },
 ];
 
-const fileProcessingNotice =
-  "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq.";
-
-const toolIntroNotices: Record<string, string> = {
-  "merge-pdf": fileProcessingNotice,
-  "split-pdf": fileProcessingNotice,
-  "image-to-pdf": fileProcessingNotice,
-  "pdf-to-images": fileProcessingNotice,
-  "compress-pdf":
-    "Esta herramienta intenta optimizar la estructura del PDF en tu navegador. No recomprime imágenes ni garantiza reducción. El resultado depende del contenido del archivo.",
-  "extract-pdf-text": fileProcessingNotice,
-  "pdf-page-counter": fileProcessingNotice,
-  "reorder-pdf-pages": fileProcessingNotice,
-};
-
 const relatedToolSlugs: Record<string, string[]> = {
   "merge-pdf": ["dividir-pdf", "reordenar-paginas-pdf"],
   "split-pdf": ["unir-pdfs", "reordenar-paginas-pdf"],
@@ -129,7 +114,6 @@ export function ToolDetailPage() {
   const ToolRenderer = getToolRenderer(tool.id);
   const hasDoc = Boolean(tool.doc);
   const hasIntegrableCode = Boolean(tool.integrableCode);
-  const introNotice = toolIntroNotices[tool.id];
   const relatedTools = (relatedToolSlugs[tool.id] ?? []).map((relatedSlug) => getToolBySlug(relatedSlug)).filter(isToolMetadata);
 
   return (
@@ -151,11 +135,6 @@ export function ToolDetailPage() {
           <div>
             <h1 className="text-2xl font-semibold leading-tight text-ink-900 md:text-3xl">{tool.name}</h1>
             <p className="mt-1.5 max-w-4xl text-sm leading-6 text-ink-500 md:text-base md:leading-7">{tool.description}</p>
-            {introNotice ? (
-              <p className="mt-2 max-w-4xl rounded-lg border border-accent-cyan/20 bg-accent-cyan/10 px-3 py-2 text-sm leading-6 text-ink-700">
-                {introNotice}
-              </p>
-            ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2 lg:justify-end">
             <ToolStatusBadge status={tool.status} />

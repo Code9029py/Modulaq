@@ -215,7 +215,7 @@ export function ImageToPdfTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.98fr)_minmax(310px,0.5fr)]">
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Imágenes</h3>
@@ -359,7 +359,7 @@ export function ImageToPdfTool() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">PDF resultante</h3>
           <p className="mt-1 text-xs leading-5 text-ink-500">Una página por imagen, centrada y sin deformar.</p>

@@ -26,14 +26,14 @@ export function FavoriteToolsSection() {
         <Star size={16} className="fill-current text-accent-teal" />
         <h2 className="text-sm font-semibold text-ink-900">Tus favoritos</h2>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))]">
         {favoriteTools.map((tool) => (
           <Link
             key={tool.id}
             to={buildToolPath(tool.slug)}
-            className="group flex items-center justify-between gap-2 rounded-xl border border-surface-200/80 bg-surface-50/95 px-4 py-3 text-sm font-semibold text-ink-900 shadow-sm transition hover:-translate-y-0.5 hover:border-accent-cyan/40 hover:shadow-panel"
+            className="group flex min-w-0 items-center justify-between gap-2 rounded-xl border border-surface-200/80 bg-surface-50/95 px-4 py-3 text-sm font-semibold text-ink-900 shadow-sm transition hover:-translate-y-0.5 hover:border-accent-cyan/40 hover:shadow-panel motion-reduce:hover:translate-y-0"
           >
-            <span className="truncate">{tool.name}</span>
+            <span className="min-w-0 truncate">{tool.name}</span>
             <ArrowRight size={16} className="shrink-0 text-ink-300 transition group-hover:text-accent-teal" />
           </Link>
         ))}

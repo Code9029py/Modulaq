@@ -72,7 +72,7 @@ export function ToolsCatalogPage() {
                 Herramientas PDF, QR y texto gratis
               </h1>
               <p className="mt-3 max-w-5xl text-base leading-7 text-ink-500">
-                Explora las primeras herramientas de Modulaq. Usa utilidades rápidas en tu navegador, sin cuenta y sin instalar nada.
+                Explorá el catálogo de Modulaq y abrí la que necesites. Todo corre en tu navegador.
               </p>
             </div>
             <div className="flex items-center gap-3 lg:hidden">

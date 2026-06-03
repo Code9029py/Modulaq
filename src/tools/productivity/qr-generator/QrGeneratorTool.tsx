@@ -112,7 +112,7 @@ export function QrGeneratorTool() {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(320px,0.65fr)]">
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-5">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Contenido del QR</h3>
@@ -237,7 +237,7 @@ export function QrGeneratorTool() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">Vista previa</h3>

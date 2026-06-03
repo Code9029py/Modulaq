@@ -13,7 +13,7 @@ const principles = [
   {
     icon: ShieldCheck,
     title: "Gratis y sin cuenta",
-    description: "Usa las herramientas públicas sin registro, pagos ni instalación.",
+    description: "Sin registro, pagos ni instalación. Abrís la herramienta y funciona.",
   },
   {
     icon: Braces,
@@ -60,8 +60,8 @@ export function HomePage() {
               Microherramientas digitales que funcionan en tu navegador.
             </p>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-ink-500">
-              {tools.length} herramientas gratis para PDF, QR y texto. Úsalas sin cuenta, sin instalar nada y con
-              resultados listos para descargar.
+              Convertí, ordená y limpiá archivos directo desde el navegador. Cada herramienta hace una sola tarea,
+              simple y sin fricción.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href={routePaths.tools}>
@@ -78,7 +78,7 @@ export function HomePage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-surface-200/75 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
                 <span className="text-3xl font-semibold text-ink-900">{tools.length}</span>
-                <p className="mt-1 text-sm text-ink-500">herramientas gratis</p>
+                <p className="mt-1 text-sm text-ink-500">herramientas activas</p>
               </div>
               <div className="rounded-xl border border-surface-200/75 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
                 <span className="text-3xl font-semibold text-ink-900">{categories.length}</span>
@@ -123,8 +123,7 @@ export function HomePage() {
               Útil, rápido y listo para integrar
             </h2>
             <p className="mt-2 w-full text-base leading-7 text-ink-500">
-              Cada herramienta resuelve una tarea concreta, funciona sin instalar nada y guarda tus favoritos y
-              recientes para volver rápido.
+              Cada herramienta resuelve una tarea concreta y guarda tus favoritos y recientes para volver rápido.
             </p>
           </div>
 
