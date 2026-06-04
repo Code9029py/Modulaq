@@ -15,6 +15,35 @@ export function filterTools(tools: ToolMetadata[], filters: ToolFilters) {
   });
 }
 
+export function orderToolsByFavoriteIds(tools: ToolMetadata[], favoriteIds: string[]) {
+  if (favoriteIds.length === 0) {
+    return tools;
+  }
+
+  const favoriteOrder = new Map<string, number>();
+  favoriteIds.forEach((id, index) => {
+    if (!favoriteOrder.has(id)) {
+      favoriteOrder.set(id, index);
+    }
+  });
+
+  return tools
+    .map((tool, index) => ({ favoriteIndex: favoriteOrder.get(tool.id), index, tool }))
+    .sort((a, b) => {
+      if (a.favoriteIndex !== undefined && b.favoriteIndex !== undefined) {
+        return a.favoriteIndex - b.favoriteIndex;
+      }
+      if (a.favoriteIndex !== undefined) {
+        return -1;
+      }
+      if (b.favoriteIndex !== undefined) {
+        return 1;
+      }
+      return a.index - b.index;
+    })
+    .map((entry) => entry.tool);
+}
+
 export function getVisibleCategoryIds(tools: ToolMetadata[]): ToolCategoryId[] {
   const visibleStatuses = new Set(["active", "planned"]);
   const categoryIds = tools
