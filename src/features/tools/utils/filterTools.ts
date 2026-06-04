@@ -1,7 +1,7 @@
 import type { ToolCategoryId, ToolDefinition, ToolFilters, ToolModeId, ToolStatus } from "../types/tool.types";
 
 /**
- * Filtra `ToolDefinition`s. La búsqueda matchea en ambos idiomas para que el
+ * Filtra `ToolDefinition`s. La busqueda matchea en ambos idiomas para que el
  * usuario pueda escribir en EN o ES sin importar la UI activa.
  */
 export function filterTools(tools: ToolDefinition[], filters: ToolFilters) {

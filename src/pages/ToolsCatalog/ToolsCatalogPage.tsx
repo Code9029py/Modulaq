@@ -1,14 +1,19 @@
-import { ArrowLeft, ArrowRight, LayoutGrid, Search, SlidersHorizontal, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, LayoutGrid, Search, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 import { categories } from "../../config/categories";
 import { toolModes } from "../../config/toolModes";
-import { FavoriteToolsSection } from "../../features/tools/components/FavoriteToolsSection";
 import { ToolCard } from "../../features/tools/components/ToolCard";
 import { ToolFilters } from "../../features/tools/components/ToolFilters";
 import { useFavorites } from "../../features/tools/context/ToolPrefsProvider";
 import { tools } from "../../features/tools/data/tools";
 import type { ToolFilters as ToolFiltersType } from "../../features/tools/types/tool.types";
-import { filterTools, getAvailableModeIds, getVisibleCategoryIds, getVisibleStatuses } from "../../features/tools/utils/filterTools";
+import {
+  filterTools,
+  getAvailableModeIds,
+  getVisibleCategoryIds,
+  getVisibleStatuses,
+  orderToolsByFavoriteIds,
+} from "../../features/tools/utils/filterTools";
 import { Button } from "../../shared/components/Button";
 import { Container } from "../../shared/components/Container";
 import { EmptyState } from "../../shared/components/EmptyState";
@@ -35,7 +40,7 @@ export function ToolsCatalogPage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
-  const { hydrated, favoriteIds, isFavorite } = useFavorites();
+  const { hydrated, favoriteIds } = useFavorites();
 
   const visibleCategories = useMemo(() => {
     const visibleCategoryIds = getVisibleCategoryIds(tools);
@@ -50,14 +55,27 @@ export function ToolsCatalogPage() {
   const visibleStatuses = useMemo(() => getVisibleStatuses(tools), []);
   const filteredTools = useMemo(() => filterTools(tools, filters), [filters]);
   const totalToolsCount = tools.length;
-  const showFavoritesControls = hydrated && favoriteIds.length > 0;
-  const displayedTools =
-    showFavoritesControls && onlyFavorites ? filteredTools.filter((tool) => isFavorite(tool.id)) : filteredTools;
+  const showFavoritesFilter = hydrated;
+  const displayedTools = useMemo(() => {
+    if (!showFavoritesFilter) {
+      return filteredTools;
+    }
+
+    const favoriteIdSet = new Set(favoriteIds);
+    const scopedTools = onlyFavorites ? filteredTools.filter((tool) => favoriteIdSet.has(tool.id)) : filteredTools;
+
+    return orderToolsByFavoriteIds(scopedTools, favoriteIds);
+  }, [favoriteIds, filteredTools, onlyFavorites, showFavoritesFilter]);
   const hasActiveFilters =
-    filters.search !== "" || filters.category !== "all" || filters.mode !== "all" || filters.status !== "all";
+    onlyFavorites ||
+    filters.search !== "" ||
+    filters.category !== "all" ||
+    filters.mode !== "all" ||
+    filters.status !== "all";
 
   const resetFilters = () => {
     setFilters(defaultFilters);
+    setOnlyFavorites(false);
   };
 
   return (
@@ -112,28 +130,6 @@ export function ToolsCatalogPage() {
           </label>
         </div>
 
-        {showFavoritesControls ? (
-          <div className="mt-4">
-            <button
-              type="button"
-              aria-pressed={onlyFavorites}
-              onClick={() => setOnlyFavorites((value) => !value)}
-              className={cn(
-                "inline-flex min-h-10 items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25",
-                onlyFavorites
-                  ? "border-accent-cyan/40 bg-accent-cyan/10 text-accent-teal"
-                  : "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/30 hover:bg-surface-50 hover:text-ink-900",
-              )}
-            >
-              <Star size={16} className={cn(onlyFavorites && "fill-current")} />
-              {t("catalog.favorites.toggle")}
-              <span className="text-xs font-medium text-ink-500">({favoriteIds.length})</span>
-            </button>
-          </div>
-        ) : null}
-
-        {showFavoritesControls && !onlyFavorites ? <FavoriteToolsSection /> : null}
-
         {isMobileFiltersOpen ? (
           <section id="compact-tool-filters" className="mt-4 rounded-xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 lg:hidden">
             <div className="mb-4 flex items-center justify-between gap-3">
@@ -146,9 +142,13 @@ export function ToolsCatalogPage() {
             </div>
             <ToolFilters
               categories={visibleCategories}
+              favoriteCount={favoriteIds.length}
               filters={filters}
               modes={visibleModes}
               onChange={setFilters}
+              onOnlyFavoritesChange={setOnlyFavorites}
+              onlyFavorites={onlyFavorites}
+              showFavoritesFilter={showFavoritesFilter}
               statuses={visibleStatuses}
             />
           </section>
@@ -181,9 +181,13 @@ export function ToolsCatalogPage() {
                   ) : null}
                   <ToolFilters
                     categories={visibleCategories}
+                    favoriteCount={favoriteIds.length}
                     filters={filters}
                     modes={visibleModes}
                     onChange={setFilters}
+                    onOnlyFavoritesChange={setOnlyFavorites}
+                    onlyFavorites={onlyFavorites}
+                    showFavoritesFilter={showFavoritesFilter}
                     statuses={visibleStatuses}
                   />
                 </div>
