@@ -1193,6 +1193,110 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-placeholder",
+    slug: "generar-placeholder-imagen",
+    slugEn: "generate-placeholder-image",
+    name: { es: "Generar imagen placeholder", en: "Generate placeholder image" },
+    description: {
+      es: "Genera una imagen placeholder para disenos, pruebas o desarrollo web.",
+      en: "Generate a placeholder image for layouts, tests or web development.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "placeholder", "diseno", "desarrollo", "png", "jpg", "webp"],
+      en: ["image", "placeholder", "design", "development", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Generar imagen placeholder online gratis",
+        description:
+          "Genera una imagen placeholder configurando tamano, texto y colores. Exporta PNG, JPG o WebP desde tu navegador, sin backend.",
+      },
+      en: {
+        title: "Generate placeholder image online free",
+        description:
+          "Generate a placeholder image by setting size, text and colors. Export PNG, JPG or WebP from your browser, with no backend.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Generar imagen placeholder crea una imagen simple con tamano, texto y colores configurables desde el navegador.",
+        howTo: [
+          "Define ancho y alto.",
+          "Edita el texto o deja el texto automatico basado en las dimensiones.",
+          "Elige color de fondo y color de texto.",
+          "Selecciona PNG, JPG o WebP si el navegador lo permite.",
+          "Genera la imagen y descargala.",
+        ],
+        useCases: [
+          "Crear imagenes temporales para maquetas.",
+          "Probar layouts web con dimensiones reales.",
+          "Generar placeholders simples para desarrollo.",
+        ],
+        limits: [
+          "Maximo 8000 px por lado.",
+          "Maximo 64 megapixeles.",
+          "No es un editor avanzado: genera texto centrado sobre fondo plano.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+        ],
+        privacy:
+          "La imagen se genera localmente en tu navegador; no se sube nada a Modulaq.",
+        commonErrors: [
+          "Ancho o alto con valores no validos.",
+          "Dimensiones demasiado grandes para canvas.",
+          "Formato de salida no disponible en el navegador actual.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "La calidad aplica a JPG y WebP, no a PNG.",
+          "El nombre de salida se deriva de las dimensiones.",
+        ],
+      },
+      en: {
+        summary:
+          "Generate placeholder image creates a simple image with configurable size, text and colors from the browser.",
+        howTo: [
+          "Set width and height.",
+          "Edit the text or keep the automatic text based on dimensions.",
+          "Choose background color and text color.",
+          "Select PNG, JPG or WebP if the browser supports it.",
+          "Generate the image and download it.",
+        ],
+        useCases: [
+          "Create temporary images for mockups.",
+          "Test web layouts with real dimensions.",
+          "Generate simple placeholders for development.",
+        ],
+        limits: [
+          "Maximum 8000 px per side.",
+          "Maximum 64 megapixels.",
+          "It is not an advanced editor: it creates centered text over a flat background.",
+          "WebP appears if your browser can export it correctly.",
+        ],
+        privacy:
+          "The image is generated locally in your browser; nothing is uploaded to Modulaq.",
+        commonErrors: [
+          "Width or height with invalid values.",
+          "Dimensions too large for canvas.",
+          "Output format unavailable in the current browser.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Quality applies to JPG and WebP, not PNG.",
+          "The output name is derived from dimensions.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",

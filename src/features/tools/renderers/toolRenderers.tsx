@@ -31,6 +31,9 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "image-joiner": lazy(() =>
     import("../../../tools/image/image-joiner").then((module) => ({ default: module.ImageJoinerTool })),
   ),
+  "image-placeholder": lazy(() =>
+    import("../../../tools/image/image-placeholder").then((module) => ({ default: module.ImagePlaceholderTool })),
+  ),
   "image-splitter": lazy(() =>
     import("../../../tools/image/image-splitter").then((module) => ({ default: module.ImageSplitterTool })),
   ),
