@@ -775,6 +775,108 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-to-favicon",
+    slug: "imagen-a-favicon",
+    slugEn: "image-to-favicon",
+    name: { es: "Imagen a favicon", en: "Image to favicon" },
+    description: {
+      es: "Genera un pack de iconos PNG para favicon, Apple touch icon y PWA.",
+      en: "Generate a PNG icon pack for favicon, Apple touch icon and PWA.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "favicon", "iconos", "png", "pwa"],
+      en: ["image", "favicon", "icons", "png", "pwa"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Imagen a favicon online gratis",
+        description:
+          "Genera un ZIP con iconos PNG para favicon, Apple touch icon y PWA desde tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Image to favicon online free",
+        description:
+          "Generate a ZIP with PNG icons for favicon, Apple touch icon and PWA from your browser. No account and no uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Imagen a favicon crea un pack ZIP con iconos PNG en tamanos comunes para web y PWA. No genera un archivo .ico clasico.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "La herramienta prepara iconos PNG cuadrados en 16, 32, 48, 180, 192 y 512 px.",
+          "Opcional: ajusta el nombre del ZIP.",
+          "Genera el pack y descarga el ZIP.",
+        ],
+        useCases: [
+          "Preparar favicons PNG para un sitio web.",
+          "Crear apple-touch-icon.png desde una imagen de marca.",
+          "Generar iconos base para el manifest de una PWA.",
+        ],
+        limits: [
+          "No genera archivo .ico clasico.",
+          "Usa ajuste cover centrado: una imagen rectangular puede recortarse para llenar el cuadrado.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para crear favicons.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Imagen danada o que el navegador no puede decodificar.",
+          "Imagen con dimensiones invalidas o demasiado grande.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "Los iconos se exportan como PNG y se empaquetan con jszip.",
+          "El ZIP incluye un README.txt con ejemplos HTML.",
+        ],
+      },
+      en: {
+        summary:
+          "Image to favicon creates a ZIP pack with PNG icons in common web and PWA sizes. It does not generate a classic .ico file.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "The tool prepares square PNG icons at 16, 32, 48, 180, 192 and 512 px.",
+          "Optionally adjust the ZIP name.",
+          "Generate the pack and download the ZIP.",
+        ],
+        useCases: [
+          "Prepare PNG favicons for a website.",
+          "Create apple-touch-icon.png from a brand image.",
+          "Generate base icons for a PWA manifest.",
+        ],
+        limits: [
+          "It does not generate a classic .ico file.",
+          "It uses centered cover fit: a rectangular image may be cropped to fill the square.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to create favicons.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "A damaged image or one the browser cannot decode.",
+          "An image with invalid dimensions or too many pixels.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Icons are exported as PNG and bundled with jszip.",
+          "The ZIP includes a README.txt with HTML examples.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",

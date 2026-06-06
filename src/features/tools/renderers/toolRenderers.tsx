@@ -20,6 +20,9 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "image-cropper": lazy(() =>
     import("../../../tools/image/image-cropper").then((module) => ({ default: module.ImageCropperTool })),
   ),
+  "image-to-favicon": lazy(() =>
+    import("../../../tools/image/image-to-favicon").then((module) => ({ default: module.ImageToFaviconTool })),
+  ),
   "image-rotator": lazy(() =>
     import("../../../tools/image/image-rotator").then((module) => ({ default: module.ImageRotatorTool })),
   ),
