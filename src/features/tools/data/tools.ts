@@ -671,6 +671,110 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-cropper",
+    slug: "recortar-imagen",
+    slugEn: "crop-image",
+    name: { es: "Recortar imagen", en: "Crop image" },
+    description: {
+      es: "Recorta una imagen definiendo el area exacta.",
+      en: "Crop an image by defining the exact area.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "recortar", "crop", "png", "jpg", "webp"],
+      en: ["image", "crop", "trim", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Recortar imagen online gratis",
+        description:
+          "Recorta una imagen PNG, JPG o WebP definiendo X, Y, ancho y alto en tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Crop image online free",
+        description:
+          "Crop a PNG, JPG or WebP image by setting X, Y, width and height in your browser. No account and no uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Recortar imagen permite definir un area exacta por valores numericos y exportar el recorte localmente desde el navegador.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Define X, Y, ancho y alto. X/Y empiezan desde la esquina superior izquierda.",
+          "Usa los accesos rapidos si quieres imagen completa, recorte centrado o cuadrado centrado.",
+          "Elige PNG, JPG o WebP si el navegador lo permite y descarga el resultado.",
+        ],
+        useCases: [
+          "Recortar una zona exacta de una captura.",
+          "Preparar una miniatura cuadrada.",
+          "Extraer una parte de una foto sin subirla a un servidor.",
+        ],
+        limits: [
+          "JPG no conserva transparencia.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Tamano maximo por imagen: 15 MB.",
+          "El area de recorte no puede salirse de la imagen.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para recortarla.",
+        commonErrors: [
+          "Valores no numericos o negativos.",
+          "Ancho o alto igual a cero.",
+          "Area de recorte fuera de los limites de la imagen.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "El recorte final tiene las dimensiones indicadas por ancho y alto.",
+          "La salida WebP depende del soporte real del navegador.",
+        ],
+      },
+      en: {
+        summary:
+          "Crop image lets you define an exact area with numeric values and export the crop locally from the browser.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Set X, Y, width and height. X/Y start from the top-left corner.",
+          "Use quick actions for full image, centered crop or centered square.",
+          "Choose PNG, JPG or WebP if the browser supports it and download the result.",
+        ],
+        useCases: [
+          "Crop an exact area from a screenshot.",
+          "Prepare a square thumbnail.",
+          "Extract part of a photo without uploading it to a server.",
+        ],
+        limits: [
+          "JPG does not preserve transparency.",
+          "WebP appears if your browser can export it correctly.",
+          "Maximum image size: 15 MB.",
+          "The crop area cannot go outside the image.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to crop it.",
+        commonErrors: [
+          "Non-numeric or negative values.",
+          "Width or height equal to zero.",
+          "Crop area outside the image bounds.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "The final crop has the width and height you set.",
+          "WebP output depends on actual browser support.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",

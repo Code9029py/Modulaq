@@ -17,6 +17,9 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "image-converter": lazy(() =>
     import("../../../tools/image/image-converter").then((module) => ({ default: module.ImageConverterTool })),
   ),
+  "image-cropper": lazy(() =>
+    import("../../../tools/image/image-cropper").then((module) => ({ default: module.ImageCropperTool })),
+  ),
   "image-rotator": lazy(() =>
     import("../../../tools/image/image-rotator").then((module) => ({ default: module.ImageRotatorTool })),
   ),
