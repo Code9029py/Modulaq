@@ -1,6 +1,7 @@
 import { Download, Image as ImageIcon, Loader2, RotateCcw, Type } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
@@ -30,7 +31,7 @@ import type {
 } from "./imagePlaceholder.types";
 
 const inputClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+  "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 type DownloadableResult = ImagePlaceholderResult & {
   url: string;
@@ -321,6 +322,20 @@ export function ImagePlaceholderTool() {
             </div>
           </div>
 
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <OutputFormatSelector
+              description={t(formatDescKeys[outputFormat])}
+              formats={outputFormats}
+              getLabel={getImageFormatLabel}
+              label={language === "en" ? "Output format" : "Formato final"}
+              value={outputFormat}
+              onChange={(format) => {
+                setOutputFormat(format);
+                resetFeedback();
+              }}
+            />
+          </div>
+
           {status === "processing" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
@@ -343,7 +358,7 @@ export function ImagePlaceholderTool() {
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <div className="grid min-h-56 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
+          <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
             {!dimensionError ? (
               <div
                 aria-label={labels.placeholderAlt}
@@ -367,28 +382,6 @@ export function ImagePlaceholderTool() {
           <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 text-sm shadow-sm">
             <p className="text-ink-500">{t("imageUi.finalDimensions")}</p>
             <p className="mt-1 font-semibold text-ink-900">{dimensionError ? "-" : `${width} x ${height}px`}</p>
-          </div>
-
-          <div className="grid gap-2">
-            {outputFormats.map((format) => (
-              <button
-                key={format}
-                type="button"
-                className={cn(
-                  "rounded-md border p-3 text-left transition",
-                  outputFormat === format
-                    ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
-                )}
-                onClick={() => {
-                  setOutputFormat(format);
-                  resetFeedback();
-                }}
-              >
-                <span className="block text-sm font-semibold text-ink-900">{getImageFormatLabel(format)}</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">{t(formatDescKeys[format])}</span>
-              </button>
-            ))}
           </div>
 
           {shouldShowQuality ? (

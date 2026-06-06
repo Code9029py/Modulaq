@@ -1,4 +1,4 @@
-import { Download, FileArchive, FileImage, Loader2, Package, RotateCcw, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, FileArchive, FileImage, Loader2, Package, RotateCcw, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
@@ -79,6 +79,7 @@ export function ImageToFaviconTool() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<DownloadableResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isZipContentsOpen, setIsZipContentsOpen] = useState(true);
 
   useEffect(() => {
     return () => {
@@ -191,8 +192,9 @@ export function ImageToFaviconTool() {
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,0.96fr)_minmax(310px,0.52fr)]">
-      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+    <div className="grid gap-5">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,0.96fr)_minmax(310px,0.52fr)]">
+        <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">{labels.sourceTitle}</h3>
@@ -301,22 +303,21 @@ export function ImageToFaviconTool() {
             </p>
           ) : null}
         </div>
-      </section>
+        </section>
 
-      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+        <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
           <p className="mt-1 text-xs leading-5 text-ink-500">{labels.readmeIncluded}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <div className="grid min-h-56 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-4">
+          <div className="mx-auto grid min-h-44 w-full max-w-72 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-4">
             {previewUrl ? (
               <div className="grid gap-3 text-center">
-                <div className="mx-auto grid h-32 w-32 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-[linear-gradient(45deg,#eef2f7_25%,transparent_25%),linear-gradient(-45deg,#eef2f7_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#eef2f7_75%),linear-gradient(-45deg,transparent_75%,#eef2f7_75%)] bg-[length:16px_16px] bg-[position:0_0,0_8px,8px_-8px,-8px_0] shadow-sm">
+                <div className="mx-auto grid h-28 w-28 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-[linear-gradient(45deg,#eef2f7_25%,transparent_25%),linear-gradient(-45deg,#eef2f7_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#eef2f7_75%),linear-gradient(-45deg,transparent_75%,#eef2f7_75%)] bg-[length:16px_16px] bg-[position:0_0,0_8px,8px_-8px,-8px_0] shadow-sm">
                   <img alt={labels.previewAlt} className="h-full w-full object-cover" src={previewUrl} />
                 </div>
-                <p className="text-xs leading-5 text-ink-500">Cover centrado</p>
               </div>
             ) : (
               <div className="text-center text-sm text-ink-500">
@@ -324,24 +325,6 @@ export function ImageToFaviconTool() {
                 <p className="mt-2 font-semibold text-ink-700">{t("imageUi.selectImage")}</p>
               </div>
             )}
-          </div>
-
-          <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{labels.zipContents}</p>
-            <ul className="mt-3 grid gap-2 text-sm text-ink-700">
-              {iconSpecs.map((icon) => (
-                <li key={icon.fileName} className="flex items-center justify-between gap-3 rounded-md border border-surface-200/70 bg-surface-50 px-3 py-2">
-                  <span className="min-w-0 truncate">{icon.fileName}</span>
-                  <span className="shrink-0 font-semibold text-ink-900">
-                    {icon.size} x {icon.size}
-                  </span>
-                </li>
-              ))}
-              <li className="flex items-center justify-between gap-3 rounded-md border border-surface-200/70 bg-surface-50 px-3 py-2">
-                <span className="min-w-0 truncate">README.txt</span>
-                <span className="shrink-0 font-semibold text-ink-900">HTML</span>
-              </li>
-            </ul>
           </div>
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
@@ -413,6 +396,33 @@ export function ImageToFaviconTool() {
             </Button>
           </div>
         </div>
+        </section>
+      </div>
+
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+        <details open={isZipContentsOpen} onToggle={(event) => setIsZipContentsOpen(event.currentTarget.open)}>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-ink-900">
+            <span>{labels.zipContents}</span>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-md bg-surface-100 px-2 py-1 text-xs text-ink-600">
+              {language === "en" ? `${iconSpecs.length + 1} files included` : `${iconSpecs.length + 1} archivos incluidos`}
+              {isZipContentsOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </span>
+          </summary>
+          <ul className="mt-4 grid gap-2 text-sm text-ink-700 sm:grid-cols-2 lg:grid-cols-4">
+            {iconSpecs.map((icon) => (
+              <li key={icon.fileName} className="flex min-w-0 items-center justify-between gap-3 rounded-md border border-surface-200/70 bg-surface-50 px-3 py-2">
+                <span className="min-w-0 truncate">{icon.fileName}</span>
+                <span className="shrink-0 font-semibold text-ink-900">
+                  {icon.size} x {icon.size}
+                </span>
+              </li>
+            ))}
+            <li className="flex min-w-0 items-center justify-between gap-3 rounded-md border border-surface-200/70 bg-surface-50 px-3 py-2">
+              <span className="min-w-0 truncate">README.txt</span>
+              <span className="shrink-0 font-semibold text-ink-900">HTML</span>
+            </li>
+          </ul>
+        </details>
       </section>
     </div>
   );

@@ -1,11 +1,13 @@
-# Imagen Base64
+# Imagen a Base64 / Base64 a imagen
 
-Herramienta frontend-only para convertir una imagen a Base64 y reconstruir una imagen desde Base64 o Data URL.
+Modulo frontend-only con dos herramientas publicas separadas y un service compartido:
+
+- Imagen a Base64.
+- Base64 a imagen.
 
 ## Alcance inicial
 
-- Modo Imagen a Base64.
-- Modo Base64 a imagen.
+- UI independiente para cada direccion.
 - Base64 puro y Data URL completa.
 - Copia de Base64 y Data URL.
 - Descarga TXT del resultado textual.
@@ -15,6 +17,12 @@ Herramienta frontend-only para convertir una imagen a Base64 y reconstruir una i
 ## Privacidad
 
 La lectura, codificacion y reconstruccion se realizan localmente en el navegador. No se usa backend.
+
+## Arquitectura
+
+- `ImageToBase64Tool.tsx`: flujo archivo imagen a Base64/Data URL.
+- `Base64ToImageTool.tsx`: flujo Base64/Data URL a imagen descargable.
+- `imageBase64.service.ts`: parseo, validacion, nombres de salida y conversiones compartidas.
 
 ## Limitaciones
 

@@ -8,7 +8,6 @@ Herramienta local para agregar una marca de agua de texto sobre una imagen.
 - Permite configurar texto, tamano de fuente, color, opacidad, posicion y margen.
 - Posiciones: arriba izquierda, arriba derecha, centro, abajo izquierda y abajo derecha.
 - Exporta PNG, JPG o WebP si el navegador lo soporta.
-- JPG no conserva transparencia.
 - Todo el procesamiento ocurre en el navegador.
 
 ## Limites

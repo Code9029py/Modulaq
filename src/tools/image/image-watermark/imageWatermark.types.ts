@@ -7,6 +7,8 @@ export type ImageWatermarkPosition =
   | "bottom-left"
   | "bottom-right";
 
+export type ImageWatermarkKind = "text" | "image";
+
 export type ImageDimensions = {
   height: number;
   width: number;
@@ -14,17 +16,29 @@ export type ImageDimensions = {
 
 export type TextBoxDimensions = ImageDimensions;
 
-export type ImageWatermarkOptions = {
-  color: string;
-  fontSize: number;
+export type SharedImageWatermarkOptions = {
   margin: number;
   opacity: number;
   outputBaseName: string;
   outputFormat: ImageWatermarkOutputFormat;
   position: ImageWatermarkPosition;
   quality?: number;
+};
+
+export type TextImageWatermarkOptions = SharedImageWatermarkOptions & {
+  color: string;
+  fontSize: number;
+  kind: "text";
   text: string;
 };
+
+export type LogoImageWatermarkOptions = SharedImageWatermarkOptions & {
+  kind: "image";
+  logoFile: File;
+  logoMaxWidthPercent: number;
+};
+
+export type ImageWatermarkOptions = TextImageWatermarkOptions | LogoImageWatermarkOptions;
 
 export type WatermarkCoordinates = {
   x: number;

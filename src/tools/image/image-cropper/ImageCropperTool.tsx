@@ -1,6 +1,7 @@
 import { Crop, Download, FileImage, Loader2, Maximize2, RotateCcw, Scan, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
@@ -35,7 +36,7 @@ import type {
 
 const acceptedImageTypes = "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp";
 const inputClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+  "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 type DownloadableResult = ImageCropperResult & {
   url: string;
@@ -52,12 +53,13 @@ const formatDescKeys: Record<ImageCropperOutputFormat, TranslationKey> = {
 const copy = {
   es: {
     centerCrop: "Centrar recorte",
-    cropHelp: "Los valores X/Y empiezan desde la esquina superior izquierda.",
+    cropHelp: "X e Y ubican el inicio del recorte; ancho y alto definen su tamano.",
+    cropSummary: "Recorte desde (X: {{x}}, Y: {{y}}), tamano {{width}} x {{height}} px",
     cropTitle: "Area de recorte",
     downloadReady: "Imagen recortada lista",
     fullImage: "Imagen completa",
+    heightLabel: "Alto del recorte",
     invalidPreview: "Ajusta el recorte para ver la vista previa.",
-    jpgTransparency: "JPG no conserva transparencia.",
     outputIntro: "El resultado se genera desde un canvas local.",
     outputTitle: "Vista previa y salida",
     previewAlt: "Vista previa del recorte",
@@ -65,16 +67,22 @@ const copy = {
     sourceIntro: "Recorta una imagen definiendo el area exacta.",
     sourceTitle: "Archivo y recorte",
     squareCrop: "Cuadrado centrado",
+    widthLabel: "Ancho del recorte",
     webpHint: "WebP aparece si tu navegador permite exportarlo correctamente.",
+    xHelp: "X indica cuantos pixeles se avanza desde el borde izquierdo.",
+    xLabel: "X / izquierda",
+    yHelp: "Y indica cuantos pixeles se baja desde el borde superior.",
+    yLabel: "Y / arriba",
   },
   en: {
     centerCrop: "Center crop",
-    cropHelp: "X/Y values start from the top-left corner.",
+    cropHelp: "X and Y place the crop start; width and height define its size.",
+    cropSummary: "Crop from (X: {{x}}, Y: {{y}}), size {{width}} x {{height}} px",
     cropTitle: "Crop area",
     downloadReady: "Cropped image ready",
     fullImage: "Full image",
+    heightLabel: "Crop height",
     invalidPreview: "Adjust the crop to see the preview.",
-    jpgTransparency: "JPG does not preserve transparency.",
     outputIntro: "The result is generated from a local canvas.",
     outputTitle: "Preview and output",
     previewAlt: "Crop preview",
@@ -82,9 +90,18 @@ const copy = {
     sourceIntro: "Crop an image by defining the exact area.",
     sourceTitle: "File and crop",
     squareCrop: "Centered square",
+    widthLabel: "Crop width",
     webpHint: "WebP appears if your browser can export it correctly.",
+    xHelp: "X indicates how many pixels to move from the left edge.",
+    xLabel: "X / left",
+    yHelp: "Y indicates how many pixels to move down from the top edge.",
+    yLabel: "Y / top",
   },
 } as const;
+
+function formatTemplate(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce((result, [key, value]) => result.replace(`{{${key}}}`, value), template);
+}
 
 function parseNumberInput(value: string) {
   const numberValue = Number(value);
@@ -155,7 +172,6 @@ export function ImageCropperTool() {
     outputFormat,
     metadata ? getCroppedImageOutputBaseName(metadata.fileName) : defaultOutputBaseName,
   );
-  const transparencyWarning = outputFormat === "jpeg" && metadata?.mimeType !== "image/jpeg" ? labels.jpgTransparency : null;
   const canCrop = Boolean(file && metadata) && !cropError && status !== "reading" && status !== "processing";
 
   const clearResult = () => {
@@ -376,21 +392,35 @@ export function ImageCropperTool() {
             </div>
             <div className="grid gap-3 sm:grid-cols-4">
               <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                X
+                {labels.xLabel}
                 <input className={inputClassName} inputMode="numeric" value={xInput} onChange={(event) => { setXInput(event.target.value); resetFeedback(); }} />
               </label>
               <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                Y
+                {labels.yLabel}
                 <input className={inputClassName} inputMode="numeric" value={yInput} onChange={(event) => { setYInput(event.target.value); resetFeedback(); }} />
               </label>
               <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                {language === "en" ? "Width" : "Ancho"}
+                {labels.widthLabel}
                 <input className={inputClassName} inputMode="numeric" value={widthInput} onChange={(event) => { setWidthInput(event.target.value); resetFeedback(); }} />
               </label>
               <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                {language === "en" ? "Height" : "Alto"}
+                {labels.heightLabel}
                 <input className={inputClassName} inputMode="numeric" value={heightInput} onChange={(event) => { setHeightInput(event.target.value); resetFeedback(); }} />
               </label>
+            </div>
+            <div className="grid gap-1 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-xs leading-5 text-ink-500">
+              <p>{labels.xHelp}</p>
+              <p>{labels.yHelp}</p>
+              {!cropError && outputDimensions ? (
+                <p className="font-semibold text-ink-700">
+                  {formatTemplate(labels.cropSummary, {
+                    height: String(outputDimensions.height),
+                    width: String(outputDimensions.width),
+                    x: stringifyCropValue(cropRect.x),
+                    y: stringifyCropValue(cropRect.y),
+                  })}
+                </p>
+              ) : null}
             </div>
             <div className="grid gap-2 sm:grid-cols-3">
               <Button
@@ -431,6 +461,38 @@ export function ImageCropperTool() {
             ) : null}
           </div>
 
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <OutputFormatSelector
+              description={t(formatDescKeys[outputFormat])}
+              formats={outputFormats}
+              getLabel={getImageFormatLabel}
+              label={language === "en" ? "Output format" : "Formato final"}
+              value={outputFormat}
+              onChange={(format) => {
+                setOutputFormat(format);
+                resetFeedback();
+              }}
+            />
+
+            {shouldShowQuality ? (
+              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
+                <input
+                  className="w-full accent-accent-cyan"
+                  min={10}
+                  max={100}
+                  step={1}
+                  type="range"
+                  value={qualityPercent}
+                  onChange={(event) => {
+                    setQualityPercent(Number(event.target.value));
+                    resetFeedback();
+                  }}
+                />
+              </label>
+            ) : null}
+          </div>
+
           {status === "reading" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
@@ -453,7 +515,7 @@ export function ImageCropperTool() {
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <div className="grid min-h-56 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
+          <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
             {previewUrl && metadata && !cropError ? (
               <div className="w-full max-w-md overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50 shadow-sm" style={{ aspectRatio: `${cropRect.width} / ${cropRect.height}` }}>
                 <img
@@ -478,54 +540,8 @@ export function ImageCropperTool() {
             </p>
           </div>
 
-          <div className="grid gap-2">
-            {outputFormats.map((format) => (
-              <button
-                key={format}
-                type="button"
-                className={cn(
-                  "rounded-md border p-3 text-left transition",
-                  outputFormat === format
-                    ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
-                )}
-                onClick={() => {
-                  setOutputFormat(format);
-                  resetFeedback();
-                }}
-              >
-                <span className="block text-sm font-semibold text-ink-900">{getImageFormatLabel(format)}</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">{t(formatDescKeys[format])}</span>
-              </button>
-            ))}
-          </div>
 
-          <p className="text-xs leading-5 text-ink-500">{labels.webpHint}</p>
 
-          {shouldShowQuality ? (
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
-              <input
-                className="w-full accent-accent-cyan"
-                min={10}
-                max={100}
-                step={1}
-                type="range"
-                value={qualityPercent}
-                onChange={(event) => {
-                  setQualityPercent(Number(event.target.value));
-                  resetFeedback();
-                }}
-              />
-              <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.qualityHelp")}</span>
-            </label>
-          ) : null}
-
-          {transparencyWarning ? (
-            <p className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              {transparencyWarning}
-            </p>
-          ) : null}
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
             {t("imageUi.outputName")}

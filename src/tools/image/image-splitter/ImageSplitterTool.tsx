@@ -1,6 +1,7 @@
 import { Download, FileArchive, FileImage, Grid3X3, Loader2, Ruler, RotateCcw, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
@@ -34,7 +35,7 @@ import type {
 
 const acceptedImageTypes = "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp";
 const inputClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+  "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 type DownloadableResult = ImageSplitterResult & {
   url: string;
@@ -56,7 +57,6 @@ const copy = {
     fixedMode: "Tamano fijo",
     fixedWidth: "Ancho de cada parte",
     gridMode: "Filas y columnas",
-    jpgTransparency: "JPG no conserva transparencia.",
     modeTitle: "Modo de division",
     outputIntro: "El resultado se descarga como ZIP.",
     outputTitle: "Vista previa y salida",
@@ -76,7 +76,6 @@ const copy = {
     fixedMode: "Fixed size",
     fixedWidth: "Part width",
     gridMode: "Rows and columns",
-    jpgTransparency: "JPG does not preserve transparency.",
     modeTitle: "Split mode",
     outputIntro: "The result downloads as a ZIP.",
     outputTitle: "Preview and output",
@@ -432,6 +431,38 @@ export function ImageSplitterTool() {
             ) : null}
           </div>
 
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <OutputFormatSelector
+              description={t(formatDescKeys[outputFormat])}
+              formats={outputFormats}
+              getLabel={getImageFormatLabel}
+              label={language === "en" ? "Output format" : "Formato final"}
+              value={outputFormat}
+              onChange={(format) => {
+                setOutputFormat(format);
+                resetFeedback();
+              }}
+            />
+
+            {shouldShowQuality ? (
+              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
+                <input
+                  className="w-full accent-accent-cyan"
+                  min={10}
+                  max={100}
+                  step={1}
+                  type="range"
+                  value={qualityPercent}
+                  onChange={(event) => {
+                    setQualityPercent(Number(event.target.value));
+                    resetFeedback();
+                  }}
+                />
+              </label>
+            ) : null}
+          </div>
+
           {status === "reading" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
@@ -454,7 +485,7 @@ export function ImageSplitterTool() {
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <div className="grid min-h-56 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
+          <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
             {previewUrl && metadata && parts.length > 0 ? (
               <div
                 className="relative w-full max-w-md overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50 shadow-sm"
@@ -488,54 +519,8 @@ export function ImageSplitterTool() {
             </div>
           </div>
 
-          <div className="grid gap-2">
-            {outputFormats.map((format) => (
-              <button
-                key={format}
-                type="button"
-                className={cn(
-                  "rounded-md border p-3 text-left transition",
-                  outputFormat === format
-                    ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
-                )}
-                onClick={() => {
-                  setOutputFormat(format);
-                  resetFeedback();
-                }}
-              >
-                <span className="block text-sm font-semibold text-ink-900">{getImageFormatLabel(format)}</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">{t(formatDescKeys[format])}</span>
-              </button>
-            ))}
-          </div>
 
-          <p className="text-xs leading-5 text-ink-500">{labels.webpHint}</p>
 
-          {shouldShowQuality ? (
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
-              <input
-                className="w-full accent-accent-cyan"
-                min={10}
-                max={100}
-                step={1}
-                type="range"
-                value={qualityPercent}
-                onChange={(event) => {
-                  setQualityPercent(Number(event.target.value));
-                  resetFeedback();
-                }}
-              />
-              <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.qualityHelp")}</span>
-            </label>
-          ) : null}
-
-          {outputFormat === "jpeg" ? (
-            <p className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              {labels.jpgTransparency}
-            </p>
-          ) : null}
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
             {labels.zipName}

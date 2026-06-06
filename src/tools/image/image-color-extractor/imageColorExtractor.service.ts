@@ -14,8 +14,9 @@ import type {
 } from "./imageColorExtractor.types";
 
 export const defaultOutputBaseName = "paleta-imagen";
-export const defaultColorCount = 6;
-export const colorCountOptions = [4, 6, 8, 12] as const;
+export const defaultColorCount = 8;
+export const colorCountOptions = [4, 8, 12, 24] as const;
+export const maxColorCount = 24;
 export const maxSamplePixels = 50_000;
 const bucketSize = 32;
 
@@ -87,9 +88,11 @@ function getBucketKey(color: RgbColor) {
 }
 
 function normalizeColorCount(colorCount: number) {
-  return colorCountOptions.includes(colorCount as (typeof colorCountOptions)[number])
-    ? colorCount
-    : defaultColorCount;
+  if (!Number.isFinite(colorCount) || colorCount < 1) {
+    return defaultColorCount;
+  }
+
+  return Math.min(maxColorCount, Math.floor(colorCount));
 }
 
 function toExtractedColor(bucket: ColorBucket, visiblePixelCount: number): ExtractedImageColor {
@@ -188,14 +191,14 @@ export async function readImageMetadata(file: File): Promise<ImageColorExtractor
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
   }
 
   try {
     const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones validas.");
+      throw new Error("La imagen no tiene dimensiones válidas.");
     }
 
     return {
@@ -216,10 +219,10 @@ export async function readImageMetadata(file: File): Promise<ImageColorExtractor
 
 export async function extractImageColors(
   file: File,
-  { colorCount }: ExtractImageColorsOptions,
+  options: ExtractImageColorsOptions,
 ): Promise<ImageColorExtractorResult> {
   if (!isColorExtractableImageFile(file)) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
   }
 
   const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
@@ -235,5 +238,6 @@ export async function extractImageColors(
 
   context.drawImage(image, 0, 0, sampleDimensions.width, sampleDimensions.height);
   const imageData = context.getImageData(0, 0, sampleDimensions.width, sampleDimensions.height);
-  return extractDominantColorsFromImageData(imageData.data, { colorCount });
+
+  return extractDominantColorsFromImageData(imageData.data, options);
 }

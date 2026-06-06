@@ -1,6 +1,7 @@
 import { Download, FileImage, Loader2, Maximize2, RotateCcw, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
@@ -33,7 +34,7 @@ import type {
 
 const acceptedImageTypes = "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp";
 const inputClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+  "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 type DownloadableResult = ImageResizerResult & {
   url: string;
@@ -53,7 +54,7 @@ function toPositiveInteger(value: string) {
 }
 
 export function ImageResizerTool() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
@@ -97,10 +98,6 @@ export function ImageResizerTool() {
     outputFormat,
     metadata ? getResizedImageOutputBaseName(metadata.fileName) : defaultOutputBaseName,
   );
-  const transparencyWarning =
-    outputFormat === "jpeg" && metadata?.mimeType !== "image/jpeg"
-      ? t("imageUi.transparencyWarning")
-      : null;
   const canResize = Boolean(file && metadata) && !dimensionsError && status !== "reading" && status !== "processing";
 
   const deltaLabel = (() => {
@@ -387,7 +384,7 @@ export function ImageResizerTool() {
             {t("tools.image-resizer.ui.maintainRatio")}
           </label>
 
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
             <label className="grid gap-2 text-sm font-semibold text-ink-700">
               {t("tools.image-resizer.ui.width")}
               <input className={inputClassName} inputMode="numeric" value={widthInput} onChange={(event) => updateWidth(event.target.value)} />
@@ -408,56 +405,6 @@ export function ImageResizerTool() {
             </p>
           ) : null}
 
-          <div className="grid gap-2">
-            {outputFormats.map((format) => (
-              <button
-                key={format}
-                type="button"
-                className={cn(
-                  "rounded-md border p-3 text-left transition",
-                  outputFormat === format
-                    ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
-                )}
-                onClick={() => {
-                  setOutputFormat(format);
-                  resetFeedback();
-                }}
-              >
-                <span className="block text-sm font-semibold text-ink-900">{getImageFormatLabel(format)}</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">{t(formatDescKeys[format])}</span>
-              </button>
-            ))}
-          </div>
-
-          {!webpSupported ? (
-            <p className="text-xs leading-5 text-ink-500">{t("imageUi.webpUnavailable")}</p>
-          ) : null}
-
-          {shouldShowQuality ? (
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
-              <input
-                className="w-full accent-accent-cyan"
-                min={10}
-                max={100}
-                step={1}
-                type="range"
-                value={qualityPercent}
-                onChange={(event) => {
-                  setQualityPercent(Number(event.target.value));
-                  resetFeedback();
-                }}
-              />
-            </label>
-          ) : null}
-
-          {transparencyWarning ? (
-            <p className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              {transparencyWarning}
-            </p>
-          ) : null}
-
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
             {t("imageUi.outputName")}
             <input
@@ -472,6 +419,37 @@ export function ImageResizerTool() {
             />
             <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.willPrepareAs", { name: finalOutputFileName })}</span>
           </label>
+
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <OutputFormatSelector
+              description={t(formatDescKeys[outputFormat])}
+              formats={outputFormats}
+              getLabel={getImageFormatLabel}
+              label={language === "en" ? "Output format" : "Formato final"}
+              value={outputFormat}
+              onChange={(format) => {
+                setOutputFormat(format);
+                resetFeedback();
+              }}
+            />
+            {shouldShowQuality ? (
+              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
+                <input
+                  className="w-full accent-accent-cyan"
+                  min={10}
+                  max={100}
+                  step={1}
+                  type="range"
+                  value={qualityPercent}
+                  onChange={(event) => {
+                    setQualityPercent(Number(event.target.value));
+                    resetFeedback();
+                  }}
+                />
+              </label>
+            ) : null}
+          </div>
 
           {status === "processing" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">

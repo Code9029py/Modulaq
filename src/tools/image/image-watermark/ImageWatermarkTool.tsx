@@ -1,6 +1,7 @@
-import { Download, FileImage, Loader2, RotateCcw, Stamp, Upload } from "lucide-react";
+import { Download, FileImage, Image as ImageIcon, Loader2, RotateCcw, Stamp, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
@@ -13,10 +14,12 @@ import {
 import {
   addImageWatermark,
   buildWatermarkedImageFileName,
+  calculateLogoWatermarkDimensions,
   calculateWatermarkPosition,
   defaultOutputBaseName,
   defaultWatermarkColor,
   defaultWatermarkFontSize,
+  defaultWatermarkLogoMaxWidthPercent,
   defaultWatermarkMargin,
   defaultWatermarkOpacity,
   defaultWatermarkText,
@@ -24,13 +27,16 @@ import {
   getImageFormatLabel,
   getImageMimeLabel,
   getWatermarkedImageOutputBaseName,
+  isWatermarkLogoFile,
   normalizeHexColor,
   readImageMetadata,
   validateWatermarkFontSize,
+  validateWatermarkLogoMaxWidthPercent,
   validateWatermarkMargin,
   validateWatermarkOpacity,
 } from "./imageWatermark.service";
 import type {
+  ImageWatermarkKind,
   ImageWatermarkMetadata,
   ImageWatermarkOutputFormat,
   ImageWatermarkPosition,
@@ -40,7 +46,7 @@ import type {
 
 const acceptedImageTypes = "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp";
 const inputClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+  "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 type DownloadableResult = ImageWatermarkResult & {
   url: string;
@@ -69,21 +75,29 @@ const copy = {
     center: "Centro",
     color: "Color",
     downloadReady: "Imagen con marca lista",
-    fontSize: "Tamano de fuente",
-    jpgTransparency: "JPG no conserva transparencia.",
+    fontSize: "Tamaño de fuente",
+    imageKind: "Imagen/logo",
+    logoHelp: "PNG, JPG/JPEG o WebP. Para usar un SVG como logo, convertí primero SVG a PNG.",
+    logoInvalid: "Seleccioná un logo PNG, JPG/JPEG o WebP. Para usar un SVG como logo, convertí primero SVG a PNG.",
+    logoMaxWidth: "Ancho máximo del logo",
+    logoMissing: "Seleccioná una imagen/logo para la marca de agua.",
     margin: "Margen",
     opacity: "Opacidad",
-    outputIntro: "Todo se procesa localmente en tu navegador.",
+    outputIntro: "Previsualizá el resultado y descargá la imagen final.",
     outputTitle: "Vista previa y salida",
-    position: "Posicion",
     previewAlt: "Vista previa de marca de agua",
+    previewHelp: "La vista previa aparecerá aquí.",
+    previewTitle: "Vista previa",
     processing: "Agregando marca de agua...",
-    sourceIntro: "Agrega una marca de agua de texto sobre una imagen.",
+    selectLogo: "Seleccionar logo",
+    sourceIntro: "Agregá una marca de agua de texto o logo sobre una imagen.",
     sourceTitle: "Imagen y marca",
     text: "Texto",
-    textHelp: "Configura texto, posicion, color y opacidad.",
+    textHelp: "Configurá texto, posición, color y opacidad.",
+    textKind: "Texto",
     topLeft: "Arriba izquierda",
     topRight: "Arriba derecha",
+    type: "Tipo de marca",
   },
   en: {
     bottomLeft: "Bottom left",
@@ -92,20 +106,28 @@ const copy = {
     color: "Color",
     downloadReady: "Watermarked image ready",
     fontSize: "Font size",
-    jpgTransparency: "JPG does not preserve transparency.",
+    imageKind: "Image/logo",
+    logoHelp: "PNG, JPG/JPEG or WebP. To use an SVG logo, convert SVG to PNG first.",
+    logoInvalid: "Select a PNG, JPG/JPEG or WebP logo. To use an SVG logo, convert SVG to PNG first.",
+    logoMaxWidth: "Logo max width",
+    logoMissing: "Select an image/logo watermark.",
     margin: "Margin",
     opacity: "Opacity",
-    outputIntro: "Everything is processed locally in your browser.",
+    outputIntro: "Preview the result and download the final image.",
     outputTitle: "Preview and output",
-    position: "Position",
     previewAlt: "Watermark preview",
+    previewHelp: "The preview will appear here.",
+    previewTitle: "Preview",
     processing: "Adding watermark...",
-    sourceIntro: "Add a text watermark over an image.",
+    selectLogo: "Select logo",
+    sourceIntro: "Add a text or logo watermark over an image.",
     sourceTitle: "Image and watermark",
     text: "Text",
     textHelp: "Configure text, position, color and opacity.",
+    textKind: "Text",
     topLeft: "Top left",
     topRight: "Top right",
+    type: "Watermark type",
   },
 } as const;
 
@@ -116,6 +138,8 @@ const positionLabelKeys: Record<ImageWatermarkPosition, keyof typeof copy.es> = 
   "bottom-left": "bottomLeft",
   "bottom-right": "bottomRight",
 };
+
+const watermarkKindOptions: ImageWatermarkKind[] = ["text", "image"];
 
 function parseNumberInput(value: string) {
   const numberValue = Number(value);
@@ -147,18 +171,47 @@ function getPreviewWatermarkStyle(
   };
 }
 
+function getPreviewLogoStyle(
+  metadata: ImageWatermarkMetadata,
+  logoMetadata: ImageWatermarkMetadata,
+  logoMaxWidthPercent: number,
+  position: ImageWatermarkPosition,
+  margin: number,
+) {
+  const logoDimensions = calculateLogoWatermarkDimensions(metadata, logoMetadata, logoMaxWidthPercent);
+  const coordinates = calculateWatermarkPosition(metadata, logoDimensions, position, margin);
+
+  return {
+    height: `${(logoDimensions.height / metadata.height) * 100}%`,
+    left: `${(coordinates.x / metadata.width) * 100}%`,
+    top: `${(coordinates.y / metadata.height) * 100}%`,
+    width: `${(logoDimensions.width / metadata.width) * 100}%`,
+  };
+}
+
+function isSvgFile(file: File) {
+  return file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg");
+}
+
 export function ImageWatermarkTool() {
   const { language, t } = useI18n();
   const labels = copy[language];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
+  const logoPreviewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<ImageWatermarkMetadata | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [watermarkKind, setWatermarkKind] = useState<ImageWatermarkKind>("text");
   const [text, setText] = useState(defaultWatermarkText);
   const [fontSizeInput, setFontSizeInput] = useState(String(defaultWatermarkFontSize));
   const [color, setColor] = useState(defaultWatermarkColor);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoMetadata, setLogoMetadata] = useState<ImageWatermarkMetadata | null>(null);
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
+  const [logoMaxWidthPercentInput, setLogoMaxWidthPercentInput] = useState(String(defaultWatermarkLogoMaxWidthPercent));
   const [opacityPercent, setOpacityPercent] = useState(Math.round(defaultWatermarkOpacity * 100));
   const [position, setPosition] = useState<ImageWatermarkPosition>("bottom-right");
   const [marginInput, setMarginInput] = useState(String(defaultWatermarkMargin));
@@ -176,6 +229,7 @@ export function ImageWatermarkTool() {
     setWebpSupported(canExportBrowserImageFormat("webp"));
     return () => {
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+      if (logoPreviewUrlRef.current) URL.revokeObjectURL(logoPreviewUrlRef.current);
       if (resultUrlRef.current) URL.revokeObjectURL(resultUrlRef.current);
     };
   }, []);
@@ -186,13 +240,19 @@ export function ImageWatermarkTool() {
   );
   const fontSize = parseNumberInput(fontSizeInput);
   const margin = parseNumberInput(marginInput);
+  const logoMaxWidthPercent = parseNumberInput(logoMaxWidthPercentInput);
   const opacity = opacityPercent / 100;
   const normalizedColor = normalizeHexColor(color);
   const fontSizeError = validateWatermarkFontSize(fontSize);
   const marginError = validateWatermarkMargin(margin);
   const opacityError = validateWatermarkOpacity(opacity);
-  const textError = text.trim() ? null : language === "en" ? "Enter watermark text." : "Ingresa un texto para la marca de agua.";
-  const watermarkError = textError ?? fontSizeError ?? marginError ?? opacityError;
+  const logoMaxWidthError = validateWatermarkLogoMaxWidthPercent(logoMaxWidthPercent);
+  const textError = text.trim() ? null : language === "en" ? "Enter watermark text." : "Ingresá un texto para la marca de agua.";
+  const sharedWatermarkError = marginError ?? opacityError;
+  const watermarkError =
+    watermarkKind === "text"
+      ? textError ?? fontSizeError ?? sharedWatermarkError
+      : (!logoFile || !logoMetadata ? labels.logoMissing : logoMaxWidthError ?? sharedWatermarkError);
   const shouldShowQuality = outputFormat === "jpeg" || outputFormat === "webp";
   const fallbackBaseName = metadata ? getWatermarkedImageOutputBaseName(metadata.fileName) : defaultOutputBaseName;
   const finalOutputFileName = buildWatermarkedImageFileName(outputFileName, outputFormat, fallbackBaseName);
@@ -212,6 +272,17 @@ export function ImageWatermarkTool() {
     if (status === "success" || status === "error") {
       setStatus(metadata ? "ready" : "idle");
     }
+  };
+
+  const clearLogoSelection = () => {
+    if (logoPreviewUrlRef.current) {
+      URL.revokeObjectURL(logoPreviewUrlRef.current);
+      logoPreviewUrlRef.current = null;
+    }
+    setLogoFile(null);
+    setLogoMetadata(null);
+    setLogoPreviewUrl(null);
+    if (logoInputRef.current) logoInputRef.current.value = "";
   };
 
   const processFile = async (nextFile: File | undefined) => {
@@ -252,18 +323,46 @@ export function ImageWatermarkTool() {
     }
   };
 
+  const processLogoFile = async (nextLogoFile: File | undefined) => {
+    if (!nextLogoFile) return;
+    resetFeedback();
+
+    if (isSvgFile(nextLogoFile) || !isWatermarkLogoFile(nextLogoFile)) {
+      clearLogoSelection();
+      setError(labels.logoInvalid);
+      return;
+    }
+
+    try {
+      const nextLogoMetadata = await readImageMetadata(nextLogoFile);
+      if (logoPreviewUrlRef.current) URL.revokeObjectURL(logoPreviewUrlRef.current);
+      const nextLogoPreviewUrl = URL.createObjectURL(nextLogoFile);
+      logoPreviewUrlRef.current = nextLogoPreviewUrl;
+      setLogoFile(nextLogoFile);
+      setLogoMetadata(nextLogoMetadata);
+      setLogoPreviewUrl(nextLogoPreviewUrl);
+      setWatermarkKind("image");
+    } catch (nextError) {
+      clearLogoSelection();
+      setError(nextError instanceof Error ? nextError.message : labels.logoInvalid);
+    }
+  };
+
   const clearSelection = () => {
     if (previewUrlRef.current) {
       URL.revokeObjectURL(previewUrlRef.current);
       previewUrlRef.current = null;
     }
     clearResult();
+    clearLogoSelection();
     setFile(null);
     setMetadata(null);
     setPreviewUrl(null);
+    setWatermarkKind("text");
     setText(defaultWatermarkText);
     setFontSizeInput(String(defaultWatermarkFontSize));
     setColor(defaultWatermarkColor);
+    setLogoMaxWidthPercentInput(String(defaultWatermarkLogoMaxWidthPercent));
     setOpacityPercent(Math.round(defaultWatermarkOpacity * 100));
     setPosition("bottom-right");
     setMarginInput(String(defaultWatermarkMargin));
@@ -284,17 +383,33 @@ export function ImageWatermarkTool() {
     clearResult();
 
     try {
-      const nextResult = await addImageWatermark(file, {
-        color: normalizedColor,
-        fontSize,
-        margin,
-        opacity,
-        outputBaseName: outputFileName,
-        outputFormat,
-        position,
-        quality: shouldShowQuality ? jpegQualityPercentToDecimal(qualityPercent) : undefined,
-        text,
-      });
+      const nextResult = await addImageWatermark(
+        file,
+        watermarkKind === "image" && logoFile
+          ? {
+              kind: "image",
+              logoFile,
+              logoMaxWidthPercent,
+              margin,
+              opacity,
+              outputBaseName: outputFileName,
+              outputFormat,
+              position,
+              quality: shouldShowQuality ? jpegQualityPercentToDecimal(qualityPercent) : undefined,
+            }
+          : {
+              color: normalizedColor,
+              fontSize,
+              kind: "text",
+              margin,
+              opacity,
+              outputBaseName: outputFileName,
+              outputFormat,
+              position,
+              quality: shouldShowQuality ? jpegQualityPercentToDecimal(qualityPercent) : undefined,
+              text,
+            },
+      );
       const resultUrl = URL.createObjectURL(new Blob([nextResult.bytes], { type: nextResult.mimeType }));
       resultUrlRef.current = resultUrl;
       setResult({ ...nextResult, url: resultUrl });
@@ -367,6 +482,17 @@ export function ImageWatermarkTool() {
             }}
           />
 
+          <input
+            ref={logoInputRef}
+            accept={acceptedImageTypes}
+            className="hidden"
+            type="file"
+            onChange={(event) => {
+              void processLogoFile(event.target.files?.[0]);
+              event.target.value = "";
+            }}
+          />
+
           {metadata ? (
             <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm sm:grid-cols-[128px_minmax(0,1fr)]">
               {previewUrl ? (
@@ -406,34 +532,118 @@ export function ImageWatermarkTool() {
           ) : null}
 
           <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{labels.textHelp}</p>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {labels.text}
-              <input
-                className={inputClassName}
-                value={text}
-                onChange={(event) => {
-                  setText(event.target.value);
-                  resetFeedback();
-                }}
-              />
-            </label>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                {labels.fontSize}
-                <input
-                  className={inputClassName}
-                  inputMode="numeric"
-                  min={8}
-                  type="number"
-                  value={fontSizeInput}
-                  onChange={(event) => {
-                    setFontSizeInput(event.target.value);
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{labels.type}</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {watermarkKindOptions.map((nextKind) => (
+                <button
+                  key={nextKind}
+                  type="button"
+                  className={cn(
+                    "rounded-md border p-3 text-left transition",
+                    watermarkKind === nextKind
+                      ? "border-accent-cyan/45 bg-accent-cyan/10"
+                      : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
+                  )}
+                  onClick={() => {
+                    setWatermarkKind(nextKind);
                     resetFeedback();
                   }}
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                >
+                  <span className="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                    {nextKind === "text" ? <Stamp size={16} /> : <ImageIcon size={16} />}
+                    {nextKind === "text" ? labels.textKind : labels.imageKind}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {watermarkKind === "text" ? (
+              <div className="grid gap-3">
+                <p className="text-xs leading-5 text-ink-500">{labels.textHelp}</p>
+                <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
+                  {labels.text}
+                  <input
+                    className={inputClassName}
+                    value={text}
+                    onChange={(event) => {
+                      setText(event.target.value);
+                      resetFeedback();
+                    }}
+                  />
+                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
+                    {labels.fontSize}
+                    <input
+                      className={inputClassName}
+                      inputMode="numeric"
+                      min={8}
+                      type="number"
+                      value={fontSizeInput}
+                      onChange={(event) => {
+                        setFontSizeInput(event.target.value);
+                        resetFeedback();
+                      }}
+                    />
+                  </label>
+                  <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
+                    {labels.color}
+                    <span className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg border border-surface-200/90 bg-surface-50/95 px-2 shadow-sm">
+                      <input
+                        className="h-8 w-10 shrink-0 rounded border border-surface-200 bg-transparent"
+                        type="color"
+                        value={normalizedColor}
+                        onChange={(event) => {
+                          setColor(event.target.value);
+                          resetFeedback();
+                        }}
+                      />
+                      <input
+                        className="min-w-0 flex-1 bg-transparent text-sm font-normal text-ink-900 outline-none"
+                        value={color}
+                        onChange={(event) => {
+                          setColor(event.target.value);
+                          resetFeedback();
+                        }}
+                      />
+                    </span>
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                <p className="text-xs leading-5 text-ink-500">{labels.logoHelp}</p>
+                <button
+                  className="grid min-h-28 place-items-center rounded-lg border border-dashed border-surface-200/80 bg-surface-50/80 p-4 text-center transition hover:border-accent-cyan/55 hover:bg-surface-50"
+                  type="button"
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  <span>
+                    <ImageIcon className="mx-auto text-accent-teal" size={26} />
+                    <span className="mt-2 block text-sm font-semibold text-ink-900">{labels.selectLogo}</span>
+                    <span className="mt-1 block break-all text-xs leading-5 text-ink-500">{logoMetadata?.fileName ?? labels.logoHelp}</span>
+                  </span>
+                </button>
+                <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
+                  {labels.logoMaxWidth}: {logoMaxWidthPercentInput}%
+                  <input
+                    className="w-full accent-accent-cyan"
+                    min={1}
+                    max={100}
+                    step={1}
+                    type="range"
+                    value={logoMaxWidthPercentInput}
+                    onChange={(event) => {
+                      setLogoMaxWidthPercentInput(event.target.value);
+                      resetFeedback();
+                    }}
+                  />
+                </label>
+              </div>
+            )}
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
                 {labels.margin}
                 <input
                   className={inputClassName}
@@ -447,7 +657,7 @@ export function ImageWatermarkTool() {
                   }}
                 />
               </label>
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+              <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
                 {labels.opacity}: {opacityPercent}%
                 <input
                   className="h-11 w-full accent-accent-cyan"
@@ -464,36 +674,13 @@ export function ImageWatermarkTool() {
               </label>
             </div>
 
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {labels.color}
-              <span className="flex min-h-11 items-center gap-2 rounded-lg border border-surface-200/90 bg-surface-50/95 px-2 shadow-sm">
-                <input
-                  className="h-8 w-10 rounded border border-surface-200 bg-transparent"
-                  type="color"
-                  value={normalizedColor}
-                  onChange={(event) => {
-                    setColor(event.target.value);
-                    resetFeedback();
-                  }}
-                />
-                <input
-                  className="min-w-0 flex-1 bg-transparent text-sm font-normal text-ink-900 outline-none"
-                  value={color}
-                  onChange={(event) => {
-                    setColor(event.target.value);
-                    resetFeedback();
-                  }}
-                />
-              </span>
-            </label>
-
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
               {positionOptions.map((nextPosition) => (
                 <button
                   key={nextPosition}
                   type="button"
                   className={cn(
-                    "rounded-md border px-3 py-2 text-sm font-semibold transition",
+                    "min-h-10 rounded-md border px-2 py-2 text-sm font-semibold transition",
                     position === nextPosition
                       ? "border-accent-cyan/45 bg-accent-cyan/10 text-ink-900"
                       : "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/35",
@@ -537,14 +724,14 @@ export function ImageWatermarkTool() {
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <div className="grid min-h-56 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
+          <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
             {previewUrl && metadata ? (
               <div
                 className="relative w-full max-w-md overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50 shadow-sm"
                 style={{ aspectRatio: `${metadata.width} / ${metadata.height}` }}
               >
                 <img alt={labels.previewAlt} className="h-full w-full object-fill" src={previewUrl} />
-                {text.trim() && !watermarkError ? (
+                {watermarkKind === "text" && text.trim() && !textError && !fontSizeError && !marginError ? (
                   <span
                     className="pointer-events-none absolute whitespace-nowrap font-bold leading-none"
                     style={{
@@ -556,38 +743,40 @@ export function ImageWatermarkTool() {
                     {text}
                   </span>
                 ) : null}
+                {watermarkKind === "image" && logoPreviewUrl && logoMetadata && !logoMaxWidthError && !marginError ? (
+                  <img
+                    alt=""
+                    className="pointer-events-none absolute object-contain"
+                    src={logoPreviewUrl}
+                    style={{
+                      ...getPreviewLogoStyle(metadata, logoMetadata, logoMaxWidthPercent, position, margin),
+                      opacity,
+                    }}
+                  />
+                ) : null}
               </div>
             ) : (
               <div className="text-center text-sm text-ink-500">
                 <Stamp className="mx-auto text-accent-teal" size={32} />
-                <p className="mt-2 font-semibold text-ink-700">{t("imageUi.selectImage")}</p>
+                <p className="mt-2 font-semibold text-ink-700">{labels.previewTitle}</p>
+                <p className="mt-1 text-xs leading-5 text-ink-500">{labels.previewHelp}</p>
               </div>
             )}
           </div>
 
-          <div className="grid gap-2">
-            {outputFormats.map((format) => (
-              <button
-                key={format}
-                type="button"
-                className={cn(
-                  "rounded-md border p-3 text-left transition",
-                  outputFormat === format
-                    ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
-                )}
-                onClick={() => {
-                  setOutputFormat(format);
-                  resetFeedback();
-                }}
-              >
-                <span className="block text-sm font-semibold text-ink-900">{getImageFormatLabel(format)}</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">{t(formatDescKeys[format])}</span>
-              </button>
-            ))}
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <OutputFormatSelector
+              description={t(formatDescKeys[outputFormat])}
+              formats={outputFormats}
+              getLabel={getImageFormatLabel}
+              label={language === "en" ? "Output format" : "Formato final"}
+              value={outputFormat}
+              onChange={(format) => {
+                setOutputFormat(format);
+                resetFeedback();
+              }}
+            />
           </div>
-
-          <p className="text-xs leading-5 text-ink-500">{language === "en" ? "WebP appears if your browser can export it correctly." : "WebP aparece si tu navegador permite exportarlo correctamente."}</p>
 
           {shouldShowQuality ? (
             <label className="grid gap-2 text-sm font-semibold text-ink-700">
@@ -608,16 +797,10 @@ export function ImageWatermarkTool() {
             </label>
           ) : null}
 
-          {outputFormat === "jpeg" ? (
-            <p className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              {labels.jpgTransparency}
-            </p>
-          ) : null}
-
-          <label className="grid gap-2 text-sm font-semibold text-ink-700">
+          <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
             {t("imageUi.outputName")}
             <input
-              className={cn(inputClassName, "w-full")}
+              className={inputClassName}
               value={outputFileName}
               placeholder={fallbackBaseName}
               onChange={(event) => {
@@ -626,7 +809,7 @@ export function ImageWatermarkTool() {
                 resetFeedback();
               }}
             />
-            <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.willPrepareAs", { name: finalOutputFileName })}</span>
+            <span className="break-all text-xs font-normal leading-5 text-ink-500">{t("imageUi.willPrepareAs", { name: finalOutputFileName })}</span>
           </label>
 
           {result ? (

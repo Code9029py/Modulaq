@@ -65,6 +65,30 @@ describe("imageColorExtractor.service", () => {
     expect(extractDominantColorsFromImageData(data, { colorCount: 4 }).colors).toHaveLength(4);
   });
 
+  it("accepts custom color counts between presets", () => {
+    const data = new Uint8ClampedArray([
+      ...pixel(255, 0, 0),
+      ...pixel(0, 255, 0),
+      ...pixel(0, 0, 255),
+      ...pixel(255, 255, 0),
+      ...pixel(0, 255, 255),
+      ...pixel(255, 0, 255),
+    ]);
+
+    expect(extractDominantColorsFromImageData(data, { colorCount: 5 }).colors).toHaveLength(5);
+  });
+
+
+  it("does not pad dominant colors beyond detected buckets", () => {
+    const data = new Uint8ClampedArray([
+      ...pixel(255, 0, 0),
+      ...pixel(0, 255, 0),
+      ...pixel(0, 0, 255),
+    ]);
+
+    expect(extractDominantColorsFromImageData(data, { colorCount: 12 }).colors).toHaveLength(3);
+  });
+
   it("exports TXT and JSON palettes", () => {
     const colors = [
       { count: 2, hex: "#FF0000", percentage: 66.666, rgb: { r: 255, g: 0, b: 0 } },

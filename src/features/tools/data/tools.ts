@@ -529,7 +529,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "La conversión usa canvas del navegador.",
-          "JPG no conserva transparencia; la herramienta usa fondo blanco al exportar.",
           "La calidad se aplica a JPG y WebP, no a PNG.",
         ],
       },
@@ -562,7 +561,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "Conversion uses the browser canvas.",
-          "JPG does not preserve transparency; the tool exports it over a white background.",
           "Quality applies to JPG and WebP, not PNG.",
         ],
       },
@@ -618,7 +616,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Preparar una captura o recurso visual sin subirlo a un servidor.",
         ],
         limits: [
-          "JPG no conserva transparencia.",
           "WebP aparece si tu navegador permite exportarlo correctamente.",
           "Tamano maximo por imagen: 15 MB.",
         ],
@@ -651,7 +648,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Prepare a screenshot or visual asset without uploading it to a server.",
         ],
         limits: [
-          "JPG does not preserve transparency.",
           "WebP appears if your browser can export it correctly.",
           "Maximum image size: 15 MB.",
         ],
@@ -720,7 +716,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Extraer una parte de una foto sin subirla a un servidor.",
         ],
         limits: [
-          "JPG no conserva transparencia.",
           "WebP aparece si tu navegador permite exportarlo correctamente.",
           "Tamano maximo por imagen: 15 MB.",
           "El area de recorte no puede salirse de la imagen.",
@@ -754,7 +749,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Extract part of a photo without uploading it to a server.",
         ],
         limits: [
-          "JPG does not preserve transparency.",
           "WebP appears if your browser can export it correctly.",
           "Maximum image size: 15 MB.",
           "The crop area cannot go outside the image.",
@@ -880,9 +874,9 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     id: "image-joiner",
     slug: "unir-imagenes",
     slugEn: "join-images",
-    name: { es: "Unir imÃ¡genes", en: "Join images" },
+    name: { es: "Unir imágenes", en: "Join images" },
     description: {
-      es: "Une varias imÃ¡genes en una sola imagen vertical, horizontal o en cuadrÃ­cula.",
+      es: "Une varias imágenes en una sola imagen vertical, horizontal o en cuadrícula.",
       en: "Join multiple images into one vertical, horizontal or grid image.",
     },
     category: "image",
@@ -899,9 +893,9 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Unir imÃ¡genes online gratis",
+        title: "Unir imágenes online gratis",
         description:
-          "Une imÃ¡genes PNG, JPG o WebP en una sola imagen vertical, horizontal o en cuadrÃ­cula desde tu navegador. Sin subir archivos a Modulaq.",
+          "Une imágenes PNG, JPG o WebP en una sola imagen vertical, horizontal o en cuadrícula desde tu navegador. Sin subir archivos a Modulaq.",
       },
       en: {
         title: "Join images online free",
@@ -912,37 +906,36 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     doc: {
       es: {
         summary:
-          "Unir imÃ¡genes combina varias imÃ¡genes locales en un solo canvas con modo vertical, horizontal o cuadrÃ­cula.",
+          "Unir imágenes combina varias imágenes locales en un solo canvas con modo vertical, horizontal o cuadrícula.",
         howTo: [
-          "Agrega dos o mÃ¡s imÃ¡genes PNG, JPG/JPEG o WebP.",
+          "Agrega dos o más imágenes PNG, JPG/JPEG o WebP.",
           "Revisa nombre, tipo, peso y dimensiones de cada imagen.",
           "Ordena la lista con subir, bajar o eliminar.",
-          "Elige modo vertical, horizontal o cuadrÃ­cula. En cuadrÃ­cula, define columnas.",
-          "Ajusta separaciÃ³n, padding, color de fondo y formato de salida.",
-          "Une las imÃ¡genes y descarga el resultado.",
+          "Elige modo vertical, horizontal o cuadrícula. En cuadrícula, define columnas.",
+          "Ajusta separación, padding, color de fondo y formato de salida.",
+          "Une las imágenes y descarga el resultado.",
         ],
         useCases: [
           "Crear una tira vertical de capturas.",
-          "Poner imÃ¡genes lado a lado.",
-          "Armar una cuadrÃ­cula simple sin subir archivos.",
+          "Poner imágenes lado a lado.",
+          "Armar una cuadrícula simple sin subir archivos.",
         ],
         limits: [
-          "JPG no conserva transparencia.",
           "WebP aparece si tu navegador permite exportarlo correctamente.",
-          "Hasta 30 imÃ¡genes, 15 MB por imagen y 100 MB en total.",
-          "Las imÃ¡genes se dibujan en sus dimensiones originales.",
+          "Hasta 30 imágenes, 15 MB por imagen y 100 MB en total.",
+          "Las imágenes se dibujan en sus dimensiones originales.",
         ],
         privacy:
-          "El procesamiento de estas imÃ¡genes ocurre en tu navegador; no las subimos a Modulaq para unirlas.",
+          "El procesamiento de estas imágenes ocurre en tu navegador; no las subimos a Modulaq para unirlas.",
         commonErrors: [
           "Archivo que no es una imagen PNG, JPG o WebP.",
-          "Imagen daÃ±ada o que el navegador no puede decodificar.",
+          "Imagen dañada o que el navegador no puede decodificar.",
           "Canvas final demasiado grande para procesarlo localmente.",
         ],
         technicalNotes: [
-          "La exportaciÃ³n usa canvas en el navegador.",
+          "La exportación usa canvas en el navegador.",
           "Vertical y horizontal centran cada imagen en el eje secundario.",
-          "La cuadrÃ­cula usa celdas uniformes y calcula filas automÃ¡ticamente.",
+          "La cuadrícula usa celdas uniformes y calcula filas automáticamente.",
         ],
       },
       en: {
@@ -962,7 +955,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Build a simple grid without uploading files.",
         ],
         limits: [
-          "JPG does not preserve transparency.",
           "WebP appears if your browser can export it correctly.",
           "Up to 30 images, 15 MB each and 100 MB total.",
           "Images are drawn at their original dimensions.",
@@ -1034,7 +1026,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         limits: [
           "Maximo 100 partes por operacion.",
-          "JPG no conserva transparencia.",
           "WebP aparece si tu navegador permite exportarlo correctamente.",
           "Tamano maximo por imagen: 15 MB.",
         ],
@@ -1069,7 +1060,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         limits: [
           "Maximum 100 parts per operation.",
-          "JPG does not preserve transparency.",
           "WebP appears if your browser can export it correctly.",
           "Maximum image size: 15 MB.",
         ],
@@ -1425,7 +1415,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Agregar marca de agua a imagen online gratis",
         description:
-          "Agrega una marca de agua de texto a una imagen PNG, JPG o WebP. Configura texto, posicion, color y opacidad desde tu navegador.",
+          "Agrega una marca de agua de texto o logo a una imagen PNG, JPG o WebP. Configura posición, margen y opacidad desde tu navegador.",
       },
       en: {
         title: "Add image watermark online free",
@@ -1436,7 +1426,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     doc: {
       es: {
         summary:
-          "Agregar marca de agua permite superponer texto sobre una imagen local y exportar el resultado desde el navegador.",
+          "Agregar marca de agua permite superponer texto o un logo sobre una imagen local y exportar el resultado desde el navegador.",
         howTo: [
           "Selecciona una imagen PNG, JPG/JPEG o WebP.",
           "Revisa nombre, tipo, peso y dimensiones originales.",
@@ -1451,7 +1441,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Preparar una imagen con texto sobrepuesto sin subirla a un servidor.",
         ],
         limits: [
-          "JPG no conserva transparencia.",
           "WebP aparece si tu navegador permite exportarlo correctamente.",
           "No promete proteccion real contra copia o uso no autorizado.",
           "No incluye marca de agua con otra imagen ni drag visual.",
@@ -1486,7 +1475,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Prepare an image with overlaid text without uploading it to a server.",
         ],
         limits: [
-          "JPG does not preserve transparency.",
           "WebP appears if your browser can export it correctly.",
           "It does not promise real protection against copying or unauthorized use.",
           "It does not include image watermarks or visual drag editing.",
@@ -1569,7 +1557,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "La exportación usa canvas.toBlob.",
-          "JPG no conserva transparencia; la herramienta exporta sobre fondo blanco.",
           "PNG no usa control de calidad y puede no reducir peso.",
         ],
       },
@@ -1602,7 +1589,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "Export uses canvas.toBlob.",
-          "JPG does not preserve transparency; the tool exports over a white background.",
           "PNG has no quality control and may not reduce file size.",
         ],
       },
@@ -1671,7 +1657,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "La redimensión usa canvas del navegador.",
-          "JPG no conserva transparencia; la herramienta exporta sobre fondo blanco.",
           "La salida WebP depende del soporte real del navegador.",
         ],
       },
@@ -1704,20 +1689,19 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "Resizing uses the browser canvas.",
-          "JPG does not preserve transparency; the tool exports over a white background.",
           "WebP output depends on actual browser support.",
         ],
       },
     },
   },
   {
-    id: "image-base64",
-    slug: "imagen-base64",
-    slugEn: "image-base64",
-    name: { es: "Imagen ↔ Base64", en: "Image ↔ Base64" },
+    id: "image-to-base64",
+    slug: "imagen-a-base64",
+    slugEn: "image-to-base64",
+    name: { es: "Imagen a Base64", en: "Image to Base64" },
     description: {
-      es: "Convierte imágenes a Base64 y reconstruye imágenes desde Base64 o Data URL.",
-      en: "Convert images to Base64 and rebuild images from Base64 or Data URLs.",
+      es: "Convierte una imagen en texto Base64 o Data URL. Todo se procesa localmente en tu navegador.",
+      en: "Convert an image into Base64 text or a Data URL. Everything runs locally in your browser.",
     },
     category: "image",
     tags: {
@@ -1733,81 +1717,179 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Imagen a Base64 y Base64 a imagen online",
+        title: "Imagen a Base64 online",
         description:
-          "Convertí una imagen a Base64 o reconstruí una imagen desde Base64/Data URL. Todo se procesa localmente en tu navegador.",
+          "Convierte una imagen PNG, JPG o WebP a Base64 puro o Data URL. Todo se procesa localmente en tu navegador.",
       },
       en: {
-        title: "Image to Base64 and Base64 to image online",
+        title: "Image to Base64 online",
         description:
-          "Convert an image to Base64 or rebuild an image from Base64/Data URL. Everything runs locally in your browser.",
+          "Convert a PNG, JPG or WebP image to plain Base64 or a Data URL. Everything runs locally in your browser.",
       },
     },
     doc: {
       es: {
         summary:
-          "Imagen ↔ Base64 ofrece dos modos internos: convertir una imagen a Base64/Data URL y reconstruir una imagen desde texto Base64.",
+          "Imagen a Base64 convierte un archivo PNG, JPG/JPEG o WebP en texto Base64 puro y Data URL completa.",
         howTo: [
-          "Elegí el modo Imagen a Base64 o Base64 a imagen.",
-          "Para imagen a Base64, cargá una imagen PNG, JPG/JPEG o WebP.",
-          "Copiá Base64 puro o Data URL completa, o descargá el resultado como TXT.",
-          "Para Base64 a imagen, pegá Base64 puro o una Data URL.",
-          "Si pegás Base64 puro, elegí el tipo de imagen esperado antes de reconstruir.",
+          "Carga una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa nombre, tipo, peso original y extension detectada.",
+          "Copia Base64 puro o Data URL completa.",
+          "Descarga el resultado como TXT si necesitas guardarlo.",
         ],
         useCases: [
-          "Incrustar una imagen pequeña en HTML, CSS o JSON.",
-          "Probar payloads Base64 en desarrollo.",
-          "Recuperar una imagen a partir de una Data URL.",
+          "Incrustar una imagen pequena en HTML, CSS o JSON.",
+          "Preparar una Data URL para pruebas frontend.",
+          "Compartir un payload Base64 sin backend.",
         ],
         limits: [
-          "Base64 suele ocupar más que el archivo binario original.",
+          "Base64 suele ocupar mas que el archivo binario original.",
           "No comprime, optimiza ni convierte formato de imagen.",
-          "Una cadena Base64 válida puede no representar una imagen previsualizable.",
+          "Las imagenes grandes generan textos largos dificiles de revisar manualmente.",
         ],
         privacy:
-          "La conversión y reconstrucción ocurren en tu navegador; no subimos estos datos a Modulaq.",
+          "La conversion ocurre en tu navegador; no subimos esta imagen a Modulaq.",
         commonErrors: [
-          "Base64 inválido o incompleto.",
-          "Data URL sin MIME válido.",
-          "Base64 válido que no corresponde a una imagen del tipo elegido.",
+          "Archivo que no es PNG, JPG/JPEG o WebP.",
+          "Imagen danada o que el navegador no puede leer.",
+          "Archivo demasiado grande para procesar con estabilidad.",
         ],
         technicalNotes: [
-          "Imagen a Base64 usa FileReader.readAsDataURL.",
-          "Base64 a imagen decodifica con atob y genera un Blob local.",
+          "Usa FileReader.readAsDataURL.",
+          "El Base64 puro se obtiene removiendo el prefijo Data URL.",
           "Los MIME admitidos son image/png, image/jpeg e image/webp.",
         ],
       },
       en: {
         summary:
-          "Image ↔ Base64 provides two internal modes: convert an image to Base64/Data URL and rebuild an image from Base64 text.",
+          "Image to Base64 converts a PNG, JPG/JPEG or WebP file into plain Base64 text and a full Data URL.",
         howTo: [
-          "Choose Image to Base64 or Base64 to image.",
-          "For image to Base64, upload a PNG, JPG/JPEG or WebP image.",
-          "Copy the plain Base64 or full Data URL, or download the result as TXT.",
-          "For Base64 to image, paste plain Base64 or a Data URL.",
-          "If you paste plain Base64, choose the expected image type before rebuilding.",
+          "Upload a PNG, JPG/JPEG or WebP image.",
+          "Review name, type, original size and detected extension.",
+          "Copy the plain Base64 or the full Data URL.",
+          "Download the result as TXT if you need to save it.",
         ],
         useCases: [
           "Embed a small image in HTML, CSS or JSON.",
-          "Test Base64 payloads during development.",
-          "Recover an image from a Data URL.",
+          "Prepare a Data URL for frontend testing.",
+          "Share a Base64 payload without a backend.",
         ],
         limits: [
           "Base64 usually takes more space than the original binary file.",
           "It does not compress, optimize or convert the image format.",
-          "A valid Base64 string may not represent a previewable image.",
+          "Large images generate long text that is hard to inspect manually.",
         ],
         privacy:
-          "Conversion and rebuilding happen in your browser; we don't upload this data to Modulaq.",
+          "Conversion happens in your browser; we don't upload this image to Modulaq.",
+        commonErrors: [
+          "A file that is not PNG, JPG/JPEG or WebP.",
+          "A damaged image or one the browser cannot read.",
+          "A file too large to process reliably.",
+        ],
+        technicalNotes: [
+          "Uses FileReader.readAsDataURL.",
+          "Plain Base64 is obtained by removing the Data URL prefix.",
+          "Supported MIME types are image/png, image/jpeg and image/webp.",
+        ],
+      },
+    },
+  },
+  {
+    id: "base64-to-image",
+    slug: "base64-a-imagen",
+    slugEn: "base64-to-image",
+    name: { es: "Base64 a imagen", en: "Base64 to image" },
+    description: {
+      es: "Reconstruye una imagen desde Base64 o Data URL. Una cadena Base64 valida no siempre representa una imagen.",
+      en: "Rebuild an image from Base64 or a Data URL. A valid Base64 string does not always represent an image.",
+    },
+    category: "image",
+    tags: {
+      es: ["base64", "imagen", "data url", "png", "jpg", "webp"],
+      en: ["base64", "image", "data url", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Base64 a imagen online",
+        description:
+          "Pega Base64 puro o una Data URL y descarga la imagen reconstruida como PNG, JPG o WebP. El proceso ocurre localmente.",
+      },
+      en: {
+        title: "Base64 to image online",
+        description:
+          "Paste plain Base64 or a Data URL and download the rebuilt image as PNG, JPG or WebP. Processing happens locally.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Base64 a imagen reconstruye un archivo descargable desde Base64 puro o una Data URL con MIME de imagen.",
+        howTo: [
+          "Pega Base64 puro o una Data URL.",
+          "Si pegas Base64 puro, elige el tipo esperado: PNG, JPG o WebP.",
+          "Define el nombre de salida.",
+          "Reconstruye la imagen y descargala si la previsualizacion es valida.",
+        ],
+        useCases: [
+          "Recuperar una imagen desde una Data URL.",
+          "Validar payloads Base64 recibidos en desarrollo.",
+          "Convertir texto Base64 en un archivo descargable.",
+        ],
+        limits: [
+          "Una cadena Base64 valida puede no representar una imagen previsualizable.",
+          "Data URL debe usar image/png, image/jpeg o image/webp.",
+          "No corrige contenido danado ni cambia la imagen real.",
+        ],
+        privacy:
+          "La reconstruccion ocurre en tu navegador; no subimos este texto a Modulaq.",
+        commonErrors: [
+          "Base64 invalido o incompleto.",
+          "Data URL invalida o con MIME no soportado.",
+          "Base64 valido que no corresponde a una imagen del tipo elegido.",
+        ],
+        technicalNotes: [
+          "Decodifica con atob y genera un Blob local.",
+          "Si el texto es Data URL, se usa el MIME detectado.",
+          "Si el texto es Base64 puro, se usa el MIME elegido por el usuario.",
+        ],
+      },
+      en: {
+        summary:
+          "Base64 to image rebuilds a downloadable file from plain Base64 or a Data URL with an image MIME type.",
+        howTo: [
+          "Paste plain Base64 or a Data URL.",
+          "If you paste plain Base64, choose the expected type: PNG, JPG or WebP.",
+          "Set the output name.",
+          "Rebuild the image and download it if the preview is valid.",
+        ],
+        useCases: [
+          "Recover an image from a Data URL.",
+          "Validate Base64 payloads during development.",
+          "Turn Base64 text into a downloadable file.",
+        ],
+        limits: [
+          "A valid Base64 string may not represent a previewable image.",
+          "Data URLs must use image/png, image/jpeg or image/webp.",
+          "It does not repair damaged content or change the actual image.",
+        ],
+        privacy:
+          "Rebuilding happens in your browser; we don't upload this text to Modulaq.",
         commonErrors: [
           "Invalid or incomplete Base64.",
-          "Data URL without a valid MIME type.",
+          "Invalid Data URL or unsupported MIME type.",
           "Valid Base64 that does not match the selected image type.",
         ],
         technicalNotes: [
-          "Image to Base64 uses FileReader.readAsDataURL.",
-          "Base64 to image decodes with atob and creates a local Blob.",
-          "Supported MIME types are image/png, image/jpeg and image/webp.",
+          "Decodes with atob and creates a local Blob.",
+          "If the text is a Data URL, the detected MIME is used.",
+          "If the text is plain Base64, the user-selected MIME is used.",
         ],
       },
     },
