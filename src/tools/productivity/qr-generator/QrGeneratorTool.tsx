@@ -1,30 +1,53 @@
 import { Clipboard, Download, QrCode, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import { buildDownloadFileName } from "../../../shared/utils/downloadFileName";
-import { generateQrPng, qrContentCopy, resolveQrOutputSize, validateQrInput } from "./qrGenerator.service";
+import { generateQrPng, resolveQrOutputSize, validateQrInput } from "./qrGenerator.service";
 import type { QrContentType, QrGenerationResult, QrSize } from "./qrGenerator.types";
-
-const contentTypes: Array<{ label: string; value: QrContentType }> = [
-  { label: "Texto libre", value: "text" },
-  { label: "URL", value: "url" },
-  { label: "Email", value: "email" },
-  { label: "Teléfono", value: "phone" },
-];
-
-const sizeOptions: Array<{ label: string; value: QrSize }> = [
-  { label: "Pequeño", value: "small" },
-  { label: "Mediano", value: "medium" },
-  { label: "Grande", value: "large" },
-  { label: "Personalizado", value: "custom" },
-];
 
 const inputClassName =
   "min-h-12 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
-const defaultOutputBaseName = "qr";
+
+const contentTypeLabelKeys: Record<QrContentType, TranslationKey> = {
+  text: "tools.qr-generator.ui.copy.text.label",
+  url: "tools.qr-generator.ui.copy.url.label",
+  email: "tools.qr-generator.ui.copy.email.label",
+  phone: "tools.qr-generator.ui.copy.phone.label",
+};
+const placeholderKeys: Record<QrContentType, TranslationKey> = {
+  text: "tools.qr-generator.ui.copy.text.placeholder",
+  url: "tools.qr-generator.ui.copy.url.placeholder",
+  email: "tools.qr-generator.ui.copy.email.placeholder",
+  phone: "tools.qr-generator.ui.copy.phone.placeholder",
+};
+const helpKeys: Record<QrContentType, TranslationKey> = {
+  text: "tools.qr-generator.ui.copy.text.help",
+  url: "tools.qr-generator.ui.copy.url.help",
+  email: "tools.qr-generator.ui.copy.email.help",
+  phone: "tools.qr-generator.ui.copy.phone.help",
+};
+const warningKeys: Record<Exclude<QrContentType, "text">, TranslationKey> = {
+  url: "tools.qr-generator.ui.warnings.url",
+  email: "tools.qr-generator.ui.warnings.email",
+  phone: "tools.qr-generator.ui.warnings.phone",
+};
+
+const sizeOptionLabelKeys: Record<QrSize, TranslationKey> = {
+  small: "tools.qr-generator.ui.size.small2",
+  medium: "tools.qr-generator.ui.size.medium2",
+  large: "tools.qr-generator.ui.size.large2",
+  custom: "tools.qr-generator.ui.size.custom2",
+};
+
+const sizeOptionOrder: QrSize[] = ["small", "medium", "large", "custom"];
+const contentTypeOrder: QrContentType[] = ["text", "url", "email", "phone"];
 
 export function QrGeneratorTool() {
+  const { t } = useI18n();
+  const defaultOutputBaseName = t("tools.qr-generator.ui.defaultFileName");
   const [contentType, setContentType] = useState<QrContentType>("text");
   const [input, setInput] = useState("");
   const [size, setSize] = useState<QrSize>("medium");
@@ -35,16 +58,19 @@ export function QrGeneratorTool() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
   const [outputFileName, setOutputFileName] = useState(defaultOutputBaseName);
 
-  const copy = qrContentCopy[contentType];
   const trimmedInput = input.trim();
   const validation = useMemo(() => validateQrInput(contentType, input), [contentType, input]);
   const outputSize = useMemo(() => resolveQrOutputSize(size, customSizeInput), [customSizeInput, size]);
   const hasContent = trimmedInput.length > 0;
   const finalOutputFileName = buildDownloadFileName(outputFileName, "png", defaultOutputBaseName);
+  const contentLabel = t(contentTypeLabelKeys[contentType]);
+  const contentPlaceholder = t(placeholderKeys[contentType]);
+  const helpText = t(helpKeys[contentType]);
+  const warningText =
+    validation.isWarning && contentType !== "text" ? t(warningKeys[contentType]) : null;
 
   useEffect(() => {
     let isCancelled = false;
-
     setQrResult(null);
     setGenerationError(null);
 
@@ -66,27 +92,23 @@ export function QrGeneratorTool() {
         if (!isCancelled) {
           setQrResult(null);
           setIsGenerating(false);
-          setGenerationError("No se pudo generar el QR. Revisá el contenido e intentá de nuevo.");
+          setGenerationError(t("tools.qr-generator.ui.couldNotGenerate"));
         }
       });
 
     return () => {
       isCancelled = true;
     };
-  }, [contentType, hasContent, input, outputSize.pixels]);
+  }, [contentType, hasContent, input, outputSize.pixels, t]);
 
   const copyOriginalContent = async () => {
-    if (!hasContent) {
-      return;
-    }
-
+    if (!hasContent) return;
     try {
       await navigator.clipboard.writeText(trimmedInput);
       setCopyStatus("copied");
     } catch {
       setCopyStatus("error");
     }
-
     window.setTimeout(() => setCopyStatus("idle"), 1800);
   };
 
@@ -100,10 +122,7 @@ export function QrGeneratorTool() {
   };
 
   const downloadPng = () => {
-    if (!qrResult) {
-      return;
-    }
-
+    if (!qrResult) return;
     const link = document.createElement("a");
     link.href = qrResult.dataUrl;
     link.download = finalOutputFileName;
@@ -115,8 +134,8 @@ export function QrGeneratorTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-5">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Contenido del QR</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">Elegí el tipo, escribí el contenido y Modulaq genera la vista previa automáticamente.</p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("tools.qr-generator.ui.contentTitle")}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.qr-generator.ui.contentIntro")}</p>
           </div>
 
           <div
@@ -128,7 +147,7 @@ export function QrGeneratorTool() {
             )}
           >
             <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
-              Tipo de contenido
+              {t("tools.qr-generator.ui.typeOptionLabel")}
               <select
                 className={cn(inputClassName, "w-full")}
                 value={contentType}
@@ -138,16 +157,16 @@ export function QrGeneratorTool() {
                   setCopyStatus("idle");
                 }}
               >
-                {contentTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
+                {contentTypeOrder.map((value) => (
+                  <option key={value} value={value}>
+                    {t(contentTypeLabelKeys[value])}
                   </option>
                 ))}
               </select>
             </label>
 
             <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
-              Tamaño
+              {t("tools.qr-generator.ui.sizeOptionLabel")}
               <select
                 className={cn(inputClassName, "w-full")}
                 value={size}
@@ -156,9 +175,9 @@ export function QrGeneratorTool() {
                   setSize(event.target.value as QrSize);
                 }}
               >
-                {sizeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+                {sizeOptionOrder.map((value) => (
+                  <option key={value} value={value}>
+                    {t(sizeOptionLabelKeys[value])}
                   </option>
                 ))}
               </select>
@@ -166,13 +185,13 @@ export function QrGeneratorTool() {
 
             {size === "custom" ? (
               <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink-700">
-                Tamaño personalizado
+                {t("tools.qr-generator.ui.customLabel")}
                 <input
                   className={cn(inputClassName, "w-full")}
                   inputMode="numeric"
                   min={128}
                   max={2048}
-                  placeholder="Ej: 500"
+                  placeholder={t("tools.qr-generator.ui.customPlaceholder")}
                   step={1}
                   type="number"
                   value={customSizeInput}
@@ -183,8 +202,8 @@ export function QrGeneratorTool() {
                 />
                 <span className="text-xs font-normal leading-5 text-ink-500">
                   {outputSize.pixels
-                    ? `Se usará como ${outputSize.pixels} × ${outputSize.pixels} px.`
-                    : "Ingresá un valor entero entre 128 y 2048 px."}
+                    ? t("tools.qr-generator.ui.customWillUse", { px: outputSize.pixels })
+                    : t("tools.qr-generator.ui.customHint")}
                 </span>
                 {outputSize.error ? <span role="alert" className="text-sm font-normal text-ink-700">{outputSize.error}</span> : null}
               </label>
@@ -192,10 +211,10 @@ export function QrGeneratorTool() {
           </div>
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
-            {copy.label}
+            {contentLabel}
             <textarea
               className="min-h-44 resize-y rounded-xl border border-surface-200/90 bg-surface-50/95 px-4 py-3 text-sm font-normal leading-6 text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
-              placeholder={copy.placeholder}
+              placeholder={contentPlaceholder}
               value={input}
               onChange={(event) => {
                 setQrResult(null);
@@ -211,13 +230,13 @@ export function QrGeneratorTool() {
               validation.isWarning ? "border-accent-violet/35 bg-accent-violet/8 text-ink-700" : "border-surface-200/80 bg-surface-50/80 text-ink-500",
             )}
           >
-            {validation.message ?? copy.help}
+            {warningText ?? helpText}
           </div>
 
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="secondary" className="gap-2" onClick={copyOriginalContent} disabled={!hasContent}>
               <Clipboard size={16} />
-              {copyStatus === "copied" ? "Copiado" : "Copiar contenido"}
+              {copyStatus === "copied" ? t("toolUi.copied") : t("toolUi.copyContent")}
             </Button>
             <Button
               type="button"
@@ -227,12 +246,14 @@ export function QrGeneratorTool() {
               disabled={!hasContent && outputFileName === defaultOutputBaseName}
             >
               <Trash2 size={16} />
-              Limpiar todo
+              {t("toolUi.clearAll")}
             </Button>
           </div>
 
           {copyStatus === "error" ? (
-            <p role="alert" className="text-sm font-semibold text-ink-700">No se pudo copiar automáticamente. Podés seleccionar el contenido y copiarlo manualmente.</p>
+            <p role="alert" className="text-sm font-semibold text-ink-700">
+              {t("tools.qr-generator.ui.copyError")}
+            </p>
           ) : null}
         </div>
       </section>
@@ -240,12 +261,12 @@ export function QrGeneratorTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Vista previa</h3>
-            <p className="mt-1 text-xs leading-5 text-ink-500">La vista se ajusta al panel. El PNG conserva su resolución final.</p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("tools.qr-generator.ui.previewTitle2")}</h3>
+            <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.qr-generator.ui.previewIntro2")}</p>
           </div>
           <Button type="button" className="gap-2" onClick={downloadPng} disabled={!qrResult || !outputSize.pixels || isGenerating}>
             <Download size={16} />
-            Descargar PNG
+            {t("toolUi.downloadPng")}
           </Button>
         </div>
 
@@ -258,25 +279,25 @@ export function QrGeneratorTool() {
           )}
         >
           {outputSize.pixels
-            ? `Tamaño de salida: ${outputSize.pixels} × ${outputSize.pixels} px`
-            : "Tamaño de salida: ingresá un valor válido para generar el PNG."}
+            ? t("tools.qr-generator.ui.outputSizeOk", { px: outputSize.pixels })
+            : t("tools.qr-generator.ui.outputSizeMissing")}
         </p>
 
         <label className="mt-4 grid gap-1.5 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm font-semibold text-ink-700 shadow-sm">
-          Nombre del archivo
+          {t("toolUi.outputName")}
           <input
             className={cn(inputClassName, "w-full")}
             value={outputFileName}
             placeholder={defaultOutputBaseName}
             onChange={(event) => setOutputFileName(event.target.value)}
           />
-          <span className="break-all text-xs font-normal leading-5 text-ink-500">Se descargará como {finalOutputFileName}</span>
+          <span className="break-all text-xs font-normal leading-5 text-ink-500">{t("toolUi.downloadAs", { name: finalOutputFileName })}</span>
         </label>
 
         <div className="mt-5 grid min-h-80 place-items-center rounded-xl border border-surface-200/80 bg-surface-50/80 p-5 shadow-sm">
           {qrResult && !isGenerating ? (
             <img
-              alt="Vista previa del código QR generado"
+              alt={t("tools.qr-generator.ui.previewAlt")}
               className="h-auto max-h-[352px] w-full max-w-[352px] rounded-lg border border-surface-200/80 bg-surface-50 p-2 shadow-sm"
               src={qrResult.dataUrl}
             />
@@ -285,11 +306,9 @@ export function QrGeneratorTool() {
               <div className="mx-auto grid h-14 w-14 place-items-center rounded-lg border border-surface-200 bg-surface-50 text-accent-teal">
                 <QrCode size={26} />
               </div>
-              <p className="mt-4 text-sm font-semibold text-ink-900">{isGenerating ? "Generando QR..." : "Sin contenido todavía"}</p>
+              <p className="mt-4 text-sm font-semibold text-ink-900">{isGenerating ? t("tools.qr-generator.ui.generating") : t("tools.qr-generator.ui.idleTitle")}</p>
               <p className="mt-2 text-sm leading-6 text-ink-500">
-                {isGenerating
-                  ? "La descarga se habilitará cuando el nuevo PNG esté listo."
-                  : "Escribí texto, una URL, un correo o un teléfono para generar el QR automáticamente."}
+                {isGenerating ? t("tools.qr-generator.ui.generatingBody") : t("tools.qr-generator.ui.idleBody")}
               </p>
             </div>
           )}

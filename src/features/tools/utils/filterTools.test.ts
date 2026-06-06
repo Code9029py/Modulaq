@@ -1,15 +1,16 @@
 import { describe, expect, it } from "vitest";
-import type { ToolMetadata } from "../types/tool.types";
+import type { ToolDefinition } from "../types/tool.types";
 import { orderToolsByFavoriteIds } from "./filterTools";
 
-function createTool(id: string): ToolMetadata {
+function createTool(id: string): ToolDefinition {
   return {
     id,
-    name: id,
+    name: { es: id, en: id },
     slug: id,
-    description: `${id} description`,
+    slugEn: id,
+    description: { es: `${id} description`, en: `${id} description` },
     category: "pdf",
-    tags: [],
+    tags: { es: [], en: [] },
     modes: ["online"],
     plannedModes: [],
     status: "active",

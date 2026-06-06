@@ -1,51 +1,30 @@
 import { ArrowDown, ArrowDownUp, ArrowUp, Clipboard, Download, RotateCcw, SlidersHorizontal, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import { buildDownloadFileName } from "../../../shared/utils/downloadFileName";
 import { cleanText, defaultTextCleanerOptions } from "./textCleaner.service";
 import type { TextCleanerOptions, TextStats } from "./textCleaner.types";
 
-const optionItems: Array<{
+type OptionDescriptor = {
   id: keyof TextCleanerOptions;
-  label: string;
-  description: string;
-}> = [
-  {
-    id: "removeMultipleSpaces",
-    label: "Quitar espacios múltiples",
-    description: "Reduce dobles espacios, tabulaciones repetidas y bloques horizontales.",
-  },
-  {
-    id: "removeExtraLineBreaks",
-    label: "Quitar saltos extra",
-    description: "Limpia espacios antes y después de cada salto de línea.",
-  },
-  {
-    id: "trimEdges",
-    label: "Recortar inicio y final",
-    description: "Elimina espacios sobrantes al principio y al final del texto.",
-  },
-  {
-    id: "normalizeQuotes",
-    label: "Normalizar comillas",
-    description: "Convierte comillas tipográficas en comillas simples o dobles normales.",
-  },
-  {
-    id: "removeInvisibleCharacters",
-    label: "Quitar caracteres invisibles",
-    description: "Elimina caracteres de control, BOM y marcas invisibles frecuentes.",
-  },
-  {
-    id: "collapseEmptyLines",
-    label: "Reducir líneas vacías",
-    description: "Convierte varias líneas vacías consecutivas en una sola.",
-  },
+  labelKey: TranslationKey;
+  descKey: TranslationKey;
+};
+
+const optionItems: OptionDescriptor[] = [
+  { id: "removeMultipleSpaces", labelKey: "tools.text-cleaner.ui.optLabel.removeMultipleSpaces", descKey: "tools.text-cleaner.ui.optDesc.removeMultipleSpaces" },
+  { id: "removeExtraLineBreaks", labelKey: "tools.text-cleaner.ui.optLabel.removeExtraLineBreaks", descKey: "tools.text-cleaner.ui.optDesc.removeExtraLineBreaks" },
+  { id: "trimEdges", labelKey: "tools.text-cleaner.ui.optLabel.trimEdges", descKey: "tools.text-cleaner.ui.optDesc.trimEdges" },
+  { id: "normalizeQuotes", labelKey: "tools.text-cleaner.ui.optLabel.normalizeQuotes", descKey: "tools.text-cleaner.ui.optDesc.normalizeQuotes" },
+  { id: "removeInvisibleCharacters", labelKey: "tools.text-cleaner.ui.optLabel.removeInvisibleCharacters", descKey: "tools.text-cleaner.ui.optDesc.removeInvisibleCharacters" },
+  { id: "collapseEmptyLines", labelKey: "tools.text-cleaner.ui.optLabel.collapseEmptyLines", descKey: "tools.text-cleaner.ui.optDesc.collapseEmptyLines" },
 ];
 
 const textareaClassName =
   "min-h-72 w-full flex-1 resize-y rounded-xl border border-surface-200/90 bg-surface-50/95 px-4 py-3 text-sm leading-6 text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
-const defaultOutputBaseName = "texto-limpio";
 
 function OptionsList({
   options,
@@ -54,6 +33,7 @@ function OptionsList({
   options: TextCleanerOptions;
   updateOption: (optionId: keyof TextCleanerOptions) => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="grid gap-2">
       {optionItems.map((option) => (
@@ -68,8 +48,8 @@ function OptionsList({
             onChange={() => updateOption(option.id)}
           />
           <span>
-            <span className="block text-sm font-semibold text-ink-900">{option.label}</span>
-            <span className="mt-1 block text-xs leading-5 text-ink-500">{option.description}</span>
+            <span className="block text-sm font-semibold text-ink-900">{t(option.labelKey)}</span>
+            <span className="mt-1 block text-xs leading-5 text-ink-500">{t(option.descKey)}</span>
           </span>
         </label>
       ))}
@@ -78,6 +58,7 @@ function OptionsList({
 }
 
 function StatCard({ label, before, after }: { label: string; before: number; after: number }) {
+  const { t } = useI18n();
   const delta = after - before;
 
   return (
@@ -85,16 +66,16 @@ function StatCard({ label, before, after }: { label: string; before: number; aft
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{label}</p>
         <p className={cn("text-xs font-semibold", delta === 0 ? "text-ink-500" : "text-ink-700")}>
-          {delta === 0 ? "Sin cambios" : `${delta > 0 ? "+" : ""}${delta}`}
+          {delta === 0 ? t("tools.text-cleaner.ui.noChanges") : `${delta > 0 ? "+" : ""}${delta}`}
         </p>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div>
-          <p className="text-xs text-ink-500">Antes</p>
+          <p className="text-xs text-ink-500">{t("tools.text-cleaner.ui.statsBefore")}</p>
           <p className="text-2xl font-semibold text-ink-900">{before}</p>
         </div>
         <div>
-          <p className="text-xs text-ink-500">Después</p>
+          <p className="text-xs text-ink-500">{t("tools.text-cleaner.ui.statsAfter")}</p>
           <p className="text-2xl font-semibold text-ink-900">{after}</p>
         </div>
       </div>
@@ -103,16 +84,19 @@ function StatCard({ label, before, after }: { label: string; before: number; aft
 }
 
 function StatsGrid({ before, after }: { before: TextStats; after: TextStats }) {
+  const { t } = useI18n();
   return (
     <div className="grid gap-3 lg:grid-cols-3">
-      <StatCard label="Caracteres" before={before.characters} after={after.characters} />
-      <StatCard label="Palabras" before={before.words} after={after.words} />
-      <StatCard label="Líneas" before={before.lines} after={after.lines} />
+      <StatCard label={t("tools.text-cleaner.ui.statsCharsLabel")} before={before.characters} after={after.characters} />
+      <StatCard label={t("tools.text-cleaner.ui.statsWordsLabel")} before={before.words} after={after.words} />
+      <StatCard label={t("tools.text-cleaner.ui.statsLinesLabel")} before={before.lines} after={after.lines} />
     </div>
   );
 }
 
 export function TextCleanerTool() {
+  const { t } = useI18n();
+  const defaultOutputBaseName = t("tools.text-cleaner.ui.defaultOutputName");
   const [input, setInput] = useState("");
   const [options, setOptions] = useState<TextCleanerOptions>(defaultTextCleanerOptions);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "error">("idle");
@@ -127,24 +111,17 @@ export function TextCleanerTool() {
   const finalOutputFileName = buildDownloadFileName(outputFileName, "txt", defaultOutputBaseName);
 
   const updateOption = (optionId: keyof TextCleanerOptions) => {
-    setOptions((currentOptions) => ({
-      ...currentOptions,
-      [optionId]: !currentOptions[optionId],
-    }));
+    setOptions((currentOptions) => ({ ...currentOptions, [optionId]: !currentOptions[optionId] }));
   };
 
   const copyResult = async () => {
-    if (!hasOutput) {
-      return;
-    }
-
+    if (!hasOutput) return;
     try {
       await navigator.clipboard.writeText(result.output);
       setCopyStatus("copied");
     } catch {
       setCopyStatus("error");
     }
-
     window.setTimeout(() => setCopyStatus("idle"), 1800);
   };
 
@@ -160,13 +137,9 @@ export function TextCleanerTool() {
   };
 
   const downloadResult = () => {
-    if (!hasOutput) {
-      return;
-    }
-
+    if (!hasOutput) return;
     const url = URL.createObjectURL(new Blob([result.output], { type: "text/plain;charset=utf-8" }));
     const link = document.createElement("a");
-
     link.href = url;
     link.download = finalOutputFileName;
     link.click();
@@ -178,7 +151,7 @@ export function TextCleanerTool() {
       <div className="hidden justify-end lg:flex">
         <Button type="button" variant="secondary" className="gap-2" onClick={() => setIsOptionsOpen((value) => !value)}>
           <SlidersHorizontal size={16} />
-          {isOptionsOpen ? "Ocultar opciones" : "Mostrar opciones"}
+          {isOptionsOpen ? t("tools.text-cleaner.ui.hideOptions") : t("tools.text-cleaner.ui.showOptions")}
           {isOptionsOpen ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
         </Button>
       </div>
@@ -189,8 +162,8 @@ export function TextCleanerTool() {
             <article className="grid gap-3">
               <div className="xl:min-h-[5.75rem]">
                 <div>
-                  <h3 className="text-sm font-semibold text-ink-900">Texto original</h3>
-                  <p className="mt-1 text-xs leading-5 text-ink-500">Pega un texto para empezar.</p>
+                  <h3 className="text-sm font-semibold text-ink-900">{t("tools.text-cleaner.ui.originalTitle")}</h3>
+                  <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.text-cleaner.ui.originalIntro")}</p>
                 </div>
                 <div className="mt-3 flex min-h-10 flex-wrap items-center gap-2">
                   <Button
@@ -201,13 +174,13 @@ export function TextCleanerTool() {
                     disabled={!input && outputFileName === defaultOutputBaseName}
                   >
                     <Trash2 size={16} />
-                    Limpiar
+                    {t("toolUi.clear")}
                   </Button>
                 </div>
               </div>
               <textarea
                 className={cn(textareaClassName, "min-h-[30rem]")}
-                placeholder="Pega aquí texto con espacios de más, comillas tipográficas o líneas vacías..."
+                placeholder={t("tools.text-cleaner.ui.usePlaceholder")}
                 value={input}
                 onChange={(event) => {
                   setInput(event.target.value);
@@ -219,13 +192,13 @@ export function TextCleanerTool() {
             <article className="grid gap-3">
               <div className="xl:min-h-[5.75rem]">
                 <div>
-                  <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
-                  <p className="mt-1 text-xs leading-5 text-ink-500">Se actualiza automáticamente.</p>
+                  <h3 className="text-sm font-semibold text-ink-900">{t("tools.text-cleaner.ui.outputTitle2")}</h3>
+                  <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.text-cleaner.ui.outputIntro2")}</p>
                 </div>
                 <div className="mt-3 flex min-h-10 flex-wrap items-center gap-2">
                   <Button type="button" variant="secondary" className="shrink-0 gap-2 whitespace-nowrap px-3" onClick={copyResult} disabled={!hasOutput}>
                     <Clipboard size={16} />
-                    {copyStatus === "copied" ? "Copiado" : "Copiar"}
+                    {copyStatus === "copied" ? t("toolUi.copied") : t("toolUi.copy")}
                   </Button>
                   <Button
                     type="button"
@@ -235,17 +208,17 @@ export function TextCleanerTool() {
                     disabled={!hasOutput}
                   >
                     <ArrowDownUp size={16} />
-                    Usar como entrada
+                    {t("tools.text-cleaner.ui.useAsInput")}
                   </Button>
                 </div>
               </div>
-              <textarea className={cn(textareaClassName, "min-h-[30rem]")} readOnly placeholder="El resultado aparecerá aquí." value={result.output} />
+              <textarea className={cn(textareaClassName, "min-h-[30rem]")} readOnly placeholder={t("tools.text-cleaner.ui.outputPlaceholder")} value={result.output} />
             </article>
           </div>
 
           <div className="mt-4">
             <label className="grid gap-2 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm font-semibold text-ink-700 shadow-sm">
-              <span>Nombre del archivo</span>
+              <span>{t("toolUi.outputName")}</span>
               <span className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
                 <input
                   className="min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
@@ -255,16 +228,16 @@ export function TextCleanerTool() {
                 />
                 <Button type="button" variant="secondary" className="w-full gap-2 px-3 sm:w-auto" onClick={downloadResult} disabled={!hasOutput}>
                   <Download size={16} />
-                  Descargar TXT
+                  {t("toolUi.downloadTxt")}
                 </Button>
               </span>
-              <span className="break-all text-xs font-normal leading-5 text-ink-500">Se descargará como {finalOutputFileName}</span>
+              <span className="break-all text-xs font-normal leading-5 text-ink-500">{t("toolUi.downloadAs", { name: finalOutputFileName })}</span>
             </label>
           </div>
 
           {copyStatus === "error" ? (
             <p className="mt-4 text-sm font-semibold text-ink-700">
-              No se pudo copiar automáticamente. Puedes seleccionar el resultado y copiarlo manualmente.
+              {t("tools.text-cleaner.ui.copyFailed")}
             </p>
           ) : null}
         </section>
@@ -272,8 +245,8 @@ export function TextCleanerTool() {
         {isOptionsOpen ? (
           <aside className="hidden rounded-2xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur lg:block">
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-ink-900">Opciones de limpieza</h3>
-              <p className="mt-1 text-xs text-ink-500">{activeOptionsCount}/6 activas</p>
+              <h3 className="text-sm font-semibold text-ink-900">{t("tools.text-cleaner.ui.optionsTitle2")}</h3>
+              <p className="mt-1 text-xs text-ink-500">{t("tools.text-cleaner.ui.activeCount", { active: activeOptionsCount })}</p>
             </div>
             <OptionsList options={options} updateOption={updateOption} />
           </aside>
@@ -287,10 +260,10 @@ export function TextCleanerTool() {
           onClick={() => setIsMobileOptionsOpen((value) => !value)}
         >
           <span className="inline-flex items-center gap-2">
-            {isMobileOptionsOpen ? "Ocultar opciones" : "Mostrar opciones"}
+            {isMobileOptionsOpen ? t("tools.text-cleaner.ui.hideOptions") : t("tools.text-cleaner.ui.showOptions")}
             {isMobileOptionsOpen ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
           </span>
-          <span className="text-xs font-semibold text-ink-500">{activeOptionsCount}/6 activas</span>
+          <span className="text-xs font-semibold text-ink-500">{t("tools.text-cleaner.ui.activeCount", { active: activeOptionsCount })}</span>
         </button>
         {isMobileOptionsOpen ? (
           <div className="border-t border-surface-200/80 p-3">
@@ -308,7 +281,7 @@ export function TextCleanerTool() {
         >
           <span className="inline-flex items-center gap-2">
             <RotateCcw size={16} />
-            Estadísticas
+            {t("tools.text-cleaner.ui.statsLabel")}
           </span>
           {isStatsOpen ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
         </button>

@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, Download, FileImage, ImagePlus, Loader2, RotateCcw, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import {
   fileProcessingLimitLabels,
@@ -27,23 +28,17 @@ function createItemId(file: File) {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
   }
-
   return `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2)}`;
 }
 
 function getImageTypeLabel(type: ImageToPdfItem["type"]) {
-  if (type === "image/jpeg") {
-    return "JPG";
-  }
-
-  if (type === "image/webp") {
-    return "WebP";
-  }
-
+  if (type === "image/jpeg") return "JPG";
+  if (type === "image/webp") return "WebP";
   return "PNG";
 }
 
 export function ImageToPdfTool() {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlsRef = useRef<Set<string>>(new Set());
   const [images, setImages] = useState<ImageToPdfItem[]>([]);
@@ -67,7 +62,6 @@ export function ImageToPdfTool() {
   const createImageItem = (file: File): ImageToPdfItem => {
     const previewUrl = URL.createObjectURL(file);
     previewUrlsRef.current.add(previewUrl);
-
     return {
       id: createItemId(file),
       file,
@@ -80,10 +74,7 @@ export function ImageToPdfTool() {
 
   const addFiles = (fileList: FileList | File[]) => {
     const selectedFiles = Array.from(fileList);
-
-    if (selectedFiles.length === 0) {
-      return;
-    }
+    if (selectedFiles.length === 0) return;
 
     const supportedFiles = selectedFiles.filter(isSupportedImageFile);
     const invalidCount = selectedFiles.length - supportedFiles.length;
@@ -94,8 +85,8 @@ export function ImageToPdfTool() {
     if (invalidCount > 0) {
       messages.push(
         invalidCount === 1
-          ? "Se omitió un archivo porque no es PNG, JPG o WebP."
-          : `Se omitieron ${invalidCount} archivos porque no son PNG, JPG o WebP.`,
+          ? t("tools.image-to-pdf.ui.skippedNotImageGenericOne")
+          : t("tools.image-to-pdf.ui.skippedNotImageGenericMany", { count: invalidCount }),
       );
     }
 
@@ -118,7 +109,7 @@ export function ImageToPdfTool() {
 
     if (validFiles.length === 0) {
       setStatus("error");
-      setError(messages[0] ?? "Seleccioná imágenes en formato PNG, JPG o WebP.");
+      setError(messages[0] ?? t("tools.image-to-pdf.ui.pickValidImages"));
       return;
     }
 
@@ -134,11 +125,7 @@ export function ImageToPdfTool() {
   const moveImage = (imageIndex: number, direction: -1 | 1) => {
     setImages((currentImages) => {
       const targetIndex = imageIndex + direction;
-
-      if (targetIndex < 0 || targetIndex >= currentImages.length) {
-        return currentImages;
-      }
-
+      if (targetIndex < 0 || targetIndex >= currentImages.length) return currentImages;
       const nextImages = [...currentImages];
       [nextImages[imageIndex], nextImages[targetIndex]] = [nextImages[targetIndex], nextImages[imageIndex]];
       return nextImages;
@@ -150,12 +137,10 @@ export function ImageToPdfTool() {
   const removeImage = (imageId: string) => {
     setImages((currentImages) => {
       const imageToRemove = currentImages.find((image) => image.id === imageId);
-
       if (imageToRemove) {
         URL.revokeObjectURL(imageToRemove.previewUrl);
         previewUrlsRef.current.delete(imageToRemove.previewUrl);
       }
-
       return currentImages.filter((image) => image.id !== imageId);
     });
     setStatus("idle");
@@ -174,17 +159,13 @@ export function ImageToPdfTool() {
     setIsDragging(false);
     setOutputFileName(defaultOutputFileName);
     setHasCustomOutputFileName(false);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const downloadPdf = (bytes: ArrayBuffer, fileName: string) => {
     const blob = new Blob([bytes], { type: "application/pdf" });
     const pdfUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
-
     link.href = pdfUrl;
     link.download = fileName;
     link.click();
@@ -192,10 +173,7 @@ export function ImageToPdfTool() {
   };
 
   const generatePdf = async () => {
-    if (images.length === 0 || status === "processing") {
-      return;
-    }
-
+    if (images.length === 0 || status === "processing") return;
     setStatus("processing");
     setError(null);
     setWarning(null);
@@ -209,7 +187,7 @@ export function ImageToPdfTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo generar el PDF.");
+      setError(nextError instanceof Error ? nextError.message : t("tools.image-to-pdf.ui.couldNotGenerate2"));
     }
   };
 
@@ -218,10 +196,8 @@ export function ImageToPdfTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Imágenes</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">
-              Seleccioná una o varias imágenes. Cada archivo se agregará como una página del PDF.
-            </p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("toolUi.imagesSection")}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.image-to-pdf.ui.imagesIntro")}</p>
           </div>
 
           <button
@@ -252,10 +228,8 @@ export function ImageToPdfTool() {
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-lg border border-surface-200 bg-surface-50 text-accent-teal">
                 <Upload size={26} />
               </span>
-              <span className="mt-4 block text-base font-semibold text-ink-900">Seleccionar imágenes</span>
-              <span className="mt-2 block text-sm leading-6 text-ink-500">
-                PNG, JPG/JPEG o WebP. También podés arrastrarlas aquí.
-              </span>
+              <span className="mt-4 block text-base font-semibold text-ink-900">{t("toolUi.uploadImages")}</span>
+              <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.image-to-pdf.ui.dropHint")}</span>
             </span>
           </button>
           <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.images}</p>
@@ -267,10 +241,7 @@ export function ImageToPdfTool() {
             multiple
             type="file"
             onChange={(event) => {
-              if (event.target.files) {
-                addFiles(event.target.files);
-              }
-
+              if (event.target.files) addFiles(event.target.files);
               event.target.value = "";
             }}
           />
@@ -283,11 +254,11 @@ export function ImageToPdfTool() {
             <div className="grid gap-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">
-                  {images.length} {images.length === 1 ? "imagen cargada" : "imágenes cargadas"}
+                  {images.length} {images.length === 1 ? t("tools.image-to-pdf.ui.imageLoaded") : t("tools.image-to-pdf.ui.imagesLoaded")}
                 </p>
                 <Button type="button" variant="ghost" className="min-h-9 gap-2 px-3" onClick={clearAll}>
                   <RotateCcw size={15} />
-                  Limpiar todo
+                  {t("toolUi.clearAll")}
                 </Button>
               </div>
 
@@ -298,7 +269,7 @@ export function ImageToPdfTool() {
                     className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm sm:grid-cols-[auto_72px_minmax(0,1fr)] sm:items-center xl:grid-cols-[auto_72px_minmax(0,1fr)_auto]"
                   >
                     <span className="w-fit rounded-md border border-accent-cyan/25 bg-accent-cyan/10 px-2.5 py-1 text-xs font-semibold text-ink-700 sm:justify-self-start">
-                      Pág. {imageIndex + 1}
+                      {t("tools.image-to-pdf.ui.pageBadge", { number: imageIndex + 1 })}
                     </span>
                     <img
                       src={image.previewUrl}
@@ -312,29 +283,17 @@ export function ImageToPdfTool() {
                       </p>
                     </div>
                     <div className="grid gap-2 sm:grid-cols-3 xl:flex xl:justify-end">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="min-h-9 gap-2 px-3"
-                        onClick={() => moveImage(imageIndex, -1)}
-                        disabled={imageIndex === 0}
-                      >
+                      <Button type="button" variant="ghost" className="min-h-9 gap-2 px-3" onClick={() => moveImage(imageIndex, -1)} disabled={imageIndex === 0}>
                         <ArrowUp size={15} />
-                        Subir
+                        {t("toolUi.moveUp")}
                       </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="min-h-9 gap-2 px-3"
-                        onClick={() => moveImage(imageIndex, 1)}
-                        disabled={imageIndex === images.length - 1}
-                      >
+                      <Button type="button" variant="ghost" className="min-h-9 gap-2 px-3" onClick={() => moveImage(imageIndex, 1)} disabled={imageIndex === images.length - 1}>
                         <ArrowDown size={15} />
-                        Bajar
+                        {t("toolUi.moveDown")}
                       </Button>
                       <Button type="button" variant="ghost" className="min-h-9 gap-2 px-3" onClick={() => removeImage(image.id)}>
                         <Trash2 size={15} />
-                        Quitar
+                        {t("toolUi.remove")}
                       </Button>
                     </div>
                   </li>
@@ -348,10 +307,8 @@ export function ImageToPdfTool() {
                   <FileImage size={20} />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-ink-900">Sin imágenes todavía</p>
-                  <p className="mt-1 text-sm leading-6 text-ink-500">
-                    Agregá imágenes para preparar un PDF descargable, sin subir archivos a servidores.
-                  </p>
+                  <p className="text-sm font-semibold text-ink-900">{t("tools.image-to-pdf.ui.noImagesYet")}</p>
+                  <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.image-to-pdf.ui.noImagesIntro")}</p>
                 </div>
               </div>
             </div>
@@ -361,25 +318,25 @@ export function ImageToPdfTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">PDF resultante</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">Una página por imagen, centrada y sin deformar.</p>
+          <h3 className="text-sm font-semibold text-ink-900">{t("tools.image-to-pdf.ui.outputTitle2")}</h3>
+          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.image-to-pdf.ui.outputIntro2")}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
-            <p className="text-sm font-semibold text-ink-700">Páginas listas</p>
+            <p className="text-sm font-semibold text-ink-700">{t("tools.image-to-pdf.ui.pagesReady")}</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{images.length}</p>
-            <p className="mt-2 text-sm font-semibold text-ink-700">{images.length === 1 ? "página" : "páginas"}</p>
+            <p className="mt-2 text-sm font-semibold text-ink-700">{images.length === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural")}</p>
           </div>
 
           <dl className="grid gap-3 text-sm">
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Tamaño total</dt>
+              <dt className="text-ink-500">{t("toolUi.totalSize")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">{formatFileSize(totalSize)}</dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">
-                <label htmlFor="image-to-pdf-output-name">Nombre del archivo</label>
+                <label htmlFor="image-to-pdf-output-name">{t("toolUi.outputName")}</label>
               </dt>
               <dd className="mt-2">
                 <input
@@ -394,7 +351,7 @@ export function ImageToPdfTool() {
                     setError(null);
                   }}
                 />
-                <span className="mt-2 block break-all text-xs text-ink-500">Se descargará como {sanitizedOutputFileName}</span>
+                <span className="mt-2 block break-all text-xs text-ink-500">{t("toolUi.downloadAs", { name: sanitizedOutputFileName })}</span>
               </dd>
             </div>
           </dl>
@@ -402,13 +359,13 @@ export function ImageToPdfTool() {
           {status === "processing" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
-              Generando PDF...
+              {t("tools.image-to-pdf.ui.generating")}
             </p>
           ) : null}
 
           {status === "success" ? (
             <p className="rounded-md border border-accent-teal/25 bg-accent-teal/10 px-3 py-2 text-sm text-ink-700">
-              PDF generado y descargado.
+              {t("toolUi.outputReady")}
             </p>
           ) : null}
 
@@ -419,11 +376,11 @@ export function ImageToPdfTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void generatePdf()} disabled={images.length === 0 || status === "processing"}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
-              Generar PDF
+              {t("tools.image-to-pdf.ui.generate")}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <ImagePlus size={16} />
-              Agregar imágenes
+              {t("tools.image-to-pdf.ui.addImages")}
             </Button>
             <Button
               type="button"
@@ -433,7 +390,7 @@ export function ImageToPdfTool() {
               disabled={images.length === 0 && !hasCustomOutputFileName}
             >
               <RotateCcw size={16} />
-              Limpiar todo
+              {t("toolUi.clearAll")}
             </Button>
           </div>
         </div>

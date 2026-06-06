@@ -1,6 +1,7 @@
 import { Download, FileArchive, FileText, Loader2, Minimize2, RotateCcw, Trash2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import { fileProcessingLimitLabels, getPdfFileSizeLimitError, getTotalPdfSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
@@ -45,15 +46,11 @@ function createItem(file: File, metadata: CompressPdfMetadata): CompressionItem 
 }
 
 function resetItemResult(item: CompressionItem): CompressionItem {
-  return {
-    ...item,
-    error: null,
-    result: null,
-    status: "ready",
-  };
+  return { ...item, error: null, result: null, status: "ready" };
 }
 
 export function CompressPdfTool() {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [items, setItems] = useState<CompressionItem[]>([]);
   const [download, setDownload] = useState<CompressPdfDownload | null>(null);
@@ -66,11 +63,13 @@ export function CompressPdfTool() {
   const isBusy = status === "reading" || status === "processing";
   const results = items.flatMap((item) => (item.result ? [item.result] : []));
   const originalTotal = items.reduce((total, item) => total + item.metadata.fileSize, 0);
-  const outputTotal = results.length === items.length && items.length > 0
-    ? results.reduce((total, result) => total + result.outputSize, 0)
-    : null;
+  const outputTotal =
+    results.length === items.length && items.length > 0
+      ? results.reduce((total, result) => total + result.outputSize, 0)
+      : null;
   const savedTotal = outputTotal === null ? null : originalTotal - outputTotal;
-  const totalReductionPercentage = savedTotal === null || originalTotal === 0 ? null : (savedTotal / originalTotal) * 100;
+  const totalReductionPercentage =
+    savedTotal === null || originalTotal === 0 ? null : (savedTotal / originalTotal) * 100;
   const reducedCount = results.filter((result) => result.hasSignificantReduction).length;
   const noSignificantReductionCount = results.filter((result) => !result.hasSignificantReduction).length;
   const canCompress = items.length > 0 && !isBusy;
@@ -81,9 +80,7 @@ export function CompressPdfTool() {
   const expectedOutputName = download?.fileName ?? getDownloadFileName(outputFileName, outputUsesZip, fallbackOutputBaseName);
 
   const processFiles = async (nextFiles: File[]) => {
-    if (nextFiles.length === 0 || isBusy) {
-      return;
-    }
+    if (nextFiles.length === 0 || isBusy) return;
 
     const pdfFiles = nextFiles.filter(isPdfFile);
     const rejectedCount = nextFiles.length - pdfFiles.length;
@@ -111,7 +108,7 @@ export function CompressPdfTool() {
         acceptedTotalSize += nextItem.metadata.fileSize;
       } catch (nextError) {
         readErrors.push(
-          `${nextFile.name}: ${nextError instanceof Error ? nextError.message : "No se pudo leer este PDF."}`,
+          `${nextFile.name}: ${nextError instanceof Error ? nextError.message : t("tools.compress-pdf.ui.couldNotReadItem")}`,
         );
       }
     }
@@ -122,11 +119,13 @@ export function CompressPdfTool() {
     }
 
     const messages: string[] = [];
-
     if (rejectedCount > 0) {
-      messages.push(rejectedCount === 1 ? "Se omitió un archivo que no es PDF." : `Se omitieron ${rejectedCount} archivos que no son PDF.`);
+      messages.push(
+        rejectedCount === 1
+          ? t("tools.compress-pdf.ui.skippedNonPdfOne")
+          : t("tools.compress-pdf.ui.skippedNonPdfMany", { count: rejectedCount }),
+      );
     }
-
     messages.push(...readErrors);
     setError(messages.length > 0 ? messages.join(" ") : null);
     setStatus(items.length + nextItems.length > 0 ? "ready" : "error");
@@ -148,17 +147,11 @@ export function CompressPdfTool() {
     setIsDragging(false);
     setOutputFileName(defaultOutputBaseName);
     setHasCustomOutputFileName(false);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const optimizePdfs = async () => {
-    if (!canCompress) {
-      return;
-    }
-
+    if (!canCompress) return;
     const nextResults: CompressPdfResult[] = [];
     const processErrors: string[] = [];
 
@@ -181,7 +174,7 @@ export function CompressPdfTool() {
           ),
         );
       } catch (nextError) {
-        const message = nextError instanceof Error ? nextError.message : "No se pudo optimizar este PDF.";
+        const message = nextError instanceof Error ? nextError.message : t("tools.compress-pdf.ui.couldNotCompressItem");
         processErrors.push(`${item.metadata.fileName}: ${message}`);
         setItems((currentItems) =>
           currentItems.map((currentItem) =>
@@ -192,7 +185,7 @@ export function CompressPdfTool() {
     }
 
     if (nextResults.length === 0) {
-      setError(processErrors.join(" ") || "No se pudo procesar ningún PDF.");
+      setError(processErrors.join(" ") || t("tools.compress-pdf.ui.noItemsProcessed"));
       setStatus("error");
       return;
     }
@@ -202,16 +195,13 @@ export function CompressPdfTool() {
       setError(processErrors.length > 0 ? processErrors.join(" ") : null);
       setStatus("success");
     } catch (nextError) {
-      setError(nextError instanceof Error ? nextError.message : "No se pudo preparar la descarga.");
+      setError(nextError instanceof Error ? nextError.message : t("tools.compress-pdf.ui.couldNotPrepare"));
       setStatus("error");
     }
   };
 
   const downloadResult = () => {
-    if (!download) {
-      return;
-    }
-
+    if (!download) return;
     const url = URL.createObjectURL(new Blob([download.bytes], { type: download.mimeType }));
     const link = document.createElement("a");
     link.href = url;
@@ -225,15 +215,12 @@ export function CompressPdfTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Archivos PDF</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">
-              Seleccioná uno o varios documentos para intentar optimizar su tamaño localmente.
-            </p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("tools.compress-pdf.ui.section")}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.compress-pdf.ui.intro2")}</p>
           </div>
 
           <p className="rounded-md border border-accent-cyan/25 bg-accent-cyan/10 px-3 py-2 text-sm leading-6 text-ink-700">
-            La compresión desde navegador puede variar según el contenido del PDF. Algunos archivos ya vienen optimizados o incluyen
-            imágenes comprimidas, por lo que pueden reducirse poco o nada.
+            {t("tools.compress-pdf.ui.notice")}
           </p>
 
           <button
@@ -249,9 +236,7 @@ export function CompressPdfTool() {
             onClick={() => fileInputRef.current?.click()}
             onDragEnter={(event) => {
               event.preventDefault();
-              if (!isBusy) {
-                setIsDragging(true);
-              }
+              if (!isBusy) setIsDragging(true);
             }}
             onDragOver={(event) => event.preventDefault()}
             onDragLeave={(event) => {
@@ -268,8 +253,8 @@ export function CompressPdfTool() {
               <span className="mx-auto grid h-12 w-12 place-items-center rounded-lg border border-surface-200 bg-surface-50 text-accent-teal">
                 <Upload size={23} />
               </span>
-              <span className="mt-3 block text-base font-semibold text-ink-900">Seleccionar PDFs</span>
-              <span className="mt-2 block text-sm leading-6 text-ink-500">También podés arrastrar varios archivos aquí.</span>
+              <span className="mt-3 block text-base font-semibold text-ink-900">{t("toolUi.uploadPdfs")}</span>
+              <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.compress-pdf.ui.dropHintMany")}</span>
             </span>
           </button>
           <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfMultiple}</p>
@@ -297,20 +282,24 @@ export function CompressPdfTool() {
                     <p className="truncate text-sm font-semibold text-ink-900">{item.metadata.fileName}</p>
                     <p className="mt-1 text-xs leading-5 text-ink-500">
                       {formatFileSize(item.metadata.fileSize)} · {item.metadata.pageCount}{" "}
-                      {item.metadata.pageCount === 1 ? "página" : "páginas"}
+                      {item.metadata.pageCount === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural")}
                     </p>
                     <p className="mt-1 text-xs font-semibold text-ink-700">
-                      {item.status === "ready" ? "Listo para comprimir" : null}
-                      {item.status === "processing" ? "Optimizando..." : null}
+                      {item.status === "ready" ? t("tools.compress-pdf.ui.readyToCompress") : null}
+                      {item.status === "processing" ? t("tools.compress-pdf.ui.optimizing") : null}
                       {item.status === "success" && item.result?.hasSignificantReduction
                         ? `${formatSizeDifference(item.result.savedBytes)} (${item.result.reductionPercentage.toFixed(1)}%)`
                         : null}
                       {item.status === "success" && !item.result?.hasSignificantReduction
-                        ? "Sin reducción significativa. Puede que ya esté optimizado o contenga imágenes comprimidas."
+                        ? t("tools.compress-pdf.ui.noSignificantReduction")
                         : null}
                       {item.status === "error" ? item.error : null}
                     </p>
-                    {item.result ? <p className="mt-1 text-xs text-ink-500">Resultado: {formatFileSize(item.result.outputSize)}</p> : null}
+                    {item.result ? (
+                      <p className="mt-1 text-xs text-ink-500">
+                        {t("tools.compress-pdf.ui.resultPrefix", { size: formatFileSize(item.result.outputSize) })}
+                      </p>
+                    ) : null}
                   </div>
                   <Button
                     type="button"
@@ -320,7 +309,7 @@ export function CompressPdfTool() {
                     disabled={isBusy}
                   >
                     <Trash2 size={15} />
-                    Quitar
+                    {t("toolUi.remove")}
                   </Button>
                 </li>
               ))}
@@ -331,8 +320,8 @@ export function CompressPdfTool() {
                 <FileText size={20} />
               </span>
               <div>
-                <p className="text-sm font-semibold text-ink-900">Sin PDFs seleccionados</p>
-                <p className="mt-1 text-sm leading-6 text-ink-500">Cargá archivos para consultar tamaños y procesarlos.</p>
+                <p className="text-sm font-semibold text-ink-900">{t("tools.compress-pdf.ui.idleTitle")}</p>
+                <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.compress-pdf.ui.idleBody")}</p>
               </div>
             </div>
           )}
@@ -341,34 +330,36 @@ export function CompressPdfTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
+          <h3 className="text-sm font-semibold text-ink-900">{t("tools.compress-pdf.ui.outputTitle")}</h3>
           <p className="mt-1 text-xs leading-5 text-ink-500">
-            {outputUsesZip ? "Los resultados se descargarán en un archivo ZIP." : "El resultado se descargará como PDF."}
+            {outputUsesZip ? t("tools.compress-pdf.ui.outputZip") : t("tools.compress-pdf.ui.outputPdf")}
           </p>
         </div>
 
         <div className="mt-5 grid gap-3">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
-            <p className="text-sm font-semibold text-ink-700">Archivos cargados</p>
+            <p className="text-sm font-semibold text-ink-700">{t("tools.compress-pdf.ui.filesLoaded")}</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{items.length}</p>
-            <p className="mt-2 text-sm font-semibold text-ink-700">{items.length === 1 ? "PDF" : "PDFs"}</p>
+            <p className="mt-2 text-sm font-semibold text-ink-700">
+              {items.length === 1 ? t("tools.merge-pdf.ui.pdfShort") : t("tools.merge-pdf.ui.pdfsShort")}
+            </p>
           </div>
 
           <dl className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-1">
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Antes</dt>
+              <dt className="text-ink-500">{t("tools.compress-pdf.ui.before")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">{items.length > 0 ? formatFileSize(originalTotal) : "--"}</dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Después</dt>
+              <dt className="text-ink-500">{t("tools.compress-pdf.ui.after")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">{outputTotal === null ? "--" : formatFileSize(outputTotal)}</dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Diferencia total</dt>
+              <dt className="text-ink-500">{t("tools.compress-pdf.ui.totalDiff")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">{savedTotal === null ? "--" : formatSizeDifference(savedTotal)}</dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Reducción total</dt>
+              <dt className="text-ink-500">{t("tools.compress-pdf.ui.totalReduction")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">
                 {totalReductionPercentage === null ? "--" : `${totalReductionPercentage.toFixed(1)}%`}
               </dd>
@@ -376,7 +367,7 @@ export function CompressPdfTool() {
           </dl>
 
           <label className="grid gap-1.5 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm font-semibold text-ink-700 shadow-sm">
-            Nombre del archivo
+            {t("toolUi.outputName")}
             <input
               className="min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
               value={outputFileName}
@@ -387,7 +378,7 @@ export function CompressPdfTool() {
                 setDownload(null);
               }}
             />
-            <span className="break-all text-xs font-normal leading-5 text-ink-500">Se descargará como {expectedOutputName}</span>
+            <span className="break-all text-xs font-normal leading-5 text-ink-500">{t("toolUi.downloadAs", { name: expectedOutputName })}</span>
           </label>
 
           {status === "reading" || status === "processing" ? (
@@ -397,14 +388,18 @@ export function CompressPdfTool() {
               className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm"
             >
               <Loader2 className="animate-spin text-accent-teal" size={16} />
-              {status === "reading" ? "Leyendo PDFs..." : "Optimizando PDFs..."}
+              {status === "reading" ? t("tools.compress-pdf.ui.readingMany") : t("tools.compress-pdf.ui.optimizingMany")}
             </p>
           ) : null}
 
           {status === "success" ? (
             <p aria-live="polite" role="status" className="rounded-md border border-accent-teal/25 bg-accent-teal/10 px-3 py-2 text-sm leading-6 text-ink-700">
-              Procesados: {results.length}. Reducciones logradas: {reducedCount}. Sin reducción significativa: {noSignificantReductionCount}.
-              {noSignificantReductionCount > 0 ? " Es posible que esos PDFs ya estuvieran optimizados o incluyan imágenes comprimidas." : ""}
+              {t("tools.compress-pdf.ui.successSummary", {
+                processed: results.length,
+                reduced: reducedCount,
+                kept: noSignificantReductionCount,
+              })}
+              {noSignificantReductionCount > 0 ? t("tools.compress-pdf.ui.successSummaryNote") : ""}
             </p>
           ) : null}
 
@@ -415,11 +410,11 @@ export function CompressPdfTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void optimizePdfs()} disabled={!canCompress}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Minimize2 size={16} />}
-              {items.length > 1 ? "Comprimir PDFs" : "Comprimir PDF"}
+              {items.length > 1 ? t("tools.compress-pdf.ui.ctaMany") : t("tools.compress-pdf.ui.cta")}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={downloadResult} disabled={!canDownload}>
               {outputUsesZip ? <FileArchive size={16} /> : <Download size={16} />}
-              Descargar resultado
+              {t("tools.compress-pdf.ui.downloadResult")}
             </Button>
             <Button
               type="button"
@@ -429,7 +424,7 @@ export function CompressPdfTool() {
               disabled={(items.length === 0 && !hasCustomOutputFileName) || isBusy}
             >
               <RotateCcw size={16} />
-              Limpiar todo
+              {t("toolUi.clearAll")}
             </Button>
           </div>
         </div>

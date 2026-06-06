@@ -1,9 +1,9 @@
 import { Check, Copy, Package, ListChecks, TriangleAlert } from "lucide-react";
 import { useState } from "react";
-import type { CodeSnippet, ToolIntegrableCode } from "../types/tool.types";
+import type { LocalizedCodeSnippet, LocalizedToolIntegrableCode } from "../types/tool.types";
 
 type CodeSnippetPanelProps = {
-  data: ToolIntegrableCode;
+  data: LocalizedToolIntegrableCode;
 };
 
 function CopyButton({ code }: { code: string }) {
@@ -32,7 +32,7 @@ function CopyButton({ code }: { code: string }) {
   );
 }
 
-function SnippetCard({ snippet }: { snippet: CodeSnippet }) {
+function SnippetCard({ snippet }: { snippet: LocalizedCodeSnippet }) {
   return (
     <article className="min-w-0 max-w-full overflow-hidden rounded-xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/45 shadow-panel ring-1 ring-surface-50/80">
       <header className="flex flex-col gap-2 border-b border-surface-200/80 bg-surface-50/80 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">

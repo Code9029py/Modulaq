@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import { useFavorites } from "../context/ToolPrefsProvider";
 
@@ -9,6 +10,7 @@ type FavoriteToggleButtonProps = {
 };
 
 export function FavoriteToggleButton({ toolId, toolName, className }: FavoriteToggleButtonProps) {
+  const { t } = useI18n();
   const { isFavorite, toggleFavorite } = useFavorites();
   const active = isFavorite(toolId);
 
@@ -16,8 +18,8 @@ export function FavoriteToggleButton({ toolId, toolName, className }: FavoriteTo
     <button
       type="button"
       aria-pressed={active}
-      aria-label={active ? `Quitar ${toolName} de favoritos` : `Agregar ${toolName} a favoritos`}
-      title={active ? "Quitar de favoritos" : "Agregar a favoritos"}
+      aria-label={active ? t("favorites.remove", { name: toolName }) : t("favorites.add", { name: toolName })}
+      title={active ? t("favorites.removeShort") : t("favorites.addShort")}
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();

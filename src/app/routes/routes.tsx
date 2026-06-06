@@ -13,6 +13,7 @@ export const routes: RouteRecord[] = [
     path: "/",
     element: <RootLayout />,
     children: [
+      // --- Spanish (default) ---
       { index: true, element: <HomePage /> },
       { path: "herramientas", element: <ToolsCatalogPage /> },
       {
@@ -24,6 +25,19 @@ export const routes: RouteRecord[] = [
       { path: "consultas", element: <ConsultationsPage initialType="general" /> },
       { path: "solicitar-herramienta", element: <ConsultationsPage initialType="tool-request" /> },
       { path: "contacto", element: <ConsultationsPage initialType="general" /> },
+
+      // --- English (/en/*) ---
+      { path: "en", element: <HomePage /> },
+      { path: "en/tools", element: <ToolsCatalogPage /> },
+      {
+        path: "en/tools/:slug",
+        element: <ToolDetailPage />,
+        getStaticPaths: () => tools.map((tool) => `/en/tools/${tool.slugEn ?? tool.slug}`),
+      },
+      { path: "en/privacy", element: <PrivacyPage /> },
+      { path: "en/contact", element: <ConsultationsPage initialType="general" /> },
+      { path: "en/request-tool", element: <ConsultationsPage initialType="tool-request" /> },
+
       { path: "*", element: <NotFoundPage /> },
     ],
   },

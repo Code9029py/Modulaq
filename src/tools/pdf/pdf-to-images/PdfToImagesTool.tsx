@@ -2,11 +2,17 @@ import { Download, FileArchive, FileImage, Loader2, RotateCcw, Upload } from "lu
 import { useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { HelpHint } from "../../../shared/components/HelpHint";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
-import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
+import { getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { fileProcessingLimitLabels, getGeneratedPageFilesLimitError, getPdfFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
-  convertPdfPagesToPng,
+  buildImageDownloadFileName,
+  buildImageZipDownloadFileName,
+  jpegQualityPercentToDecimal,
+} from "../../../shared/utils/imageFiles";
+import {
+  convertPdfPagesToImages,
   createAllPageNumbers,
   defaultOutputBaseName,
   formatFileSize,
@@ -14,15 +20,20 @@ import {
   parsePageRange,
   readPdfMetadata,
 } from "./pdfToImages.service";
-import type { PdfToImagesMetadata, PdfToImagesMode, PdfToImagesProgress, PdfToImagesStatus } from "./pdfToImages.types";
+import type {
+  PdfToImagesMetadata,
+  PdfToImagesMode,
+  PdfToImagesOutputFormat,
+  PdfToImagesProgress,
+  PdfToImagesStatus,
+} from "./pdfToImages.types";
 
 const acceptedPdfTypes = "application/pdf,.pdf";
 const inputClassName =
   "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
-const pageRangeHelp =
-  "Podés indicar páginas individuales o rangos. Ejemplos: 1,2,3 o 1-3,5,8-10. Los rangos son inclusivos.";
 
 export function PdfToImagesTool() {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<PdfToImagesMetadata | null>(null);
@@ -35,12 +46,11 @@ export function PdfToImagesTool() {
   const [lastOutput, setLastOutput] = useState<string | null>(null);
   const [outputFileName, setOutputFileName] = useState(defaultOutputBaseName);
   const [hasCustomOutputFileName, setHasCustomOutputFileName] = useState(false);
+  const [outputFormat, setOutputFormat] = useState<PdfToImagesOutputFormat>("png");
+  const [jpegQualityPercent, setJpegQualityPercent] = useState(92);
 
   const rangeValidation = useMemo(() => {
-    if (!metadata || mode !== "page-range") {
-      return null;
-    }
-
+    if (!metadata || mode !== "page-range") return null;
     return parsePageRange(rangeInput, metadata.pageCount);
   }, [metadata, mode, rangeInput]);
   const selectedPages =
@@ -48,12 +58,20 @@ export function PdfToImagesTool() {
       ? createAllPageNumbers(metadata.pageCount)
       : rangeValidation?.pages ?? [];
   const imageCount = selectedPages.length;
-  const outputExtension = imageCount === 1 ? "png" : "zip";
   const fallbackOutputBaseName = metadata
     ? getSuggestedDownloadBaseName(metadata.fileName, defaultOutputBaseName)
     : defaultOutputBaseName;
-  const finalOutputFileName = buildDownloadFileName(outputFileName, outputExtension, fallbackOutputBaseName);
-  const outputType = imageCount === 0 ? "Según selección" : imageCount === 1 ? "PNG individual" : "Archivo ZIP";
+  const finalOutputFileName =
+    imageCount === 1
+      ? buildImageDownloadFileName(outputFileName, outputFormat, fallbackOutputBaseName)
+      : buildImageZipDownloadFileName(outputFileName, fallbackOutputBaseName);
+  const outputFormatLabel = outputFormat === "png" ? "PNG" : "JPG";
+  const outputType =
+    imageCount === 0
+      ? t("tools.pdf-to-images.ui.bySelection")
+      : imageCount === 1
+        ? t("tools.pdf-to-images.ui.individualFile", { format: outputFormatLabel })
+        : t("tools.pdf-to-images.ui.zipArchive");
   const isBusy = status === "reading" || status === "processing";
   const generatedOutputLimitError = imageCount > 0 ? getGeneratedPageFilesLimitError(imageCount, "convertir") : null;
   const canConvert = Boolean(file && metadata) && !isBusy && imageCount > 0 && !rangeValidation?.error && !generatedOutputLimitError;
@@ -62,17 +80,13 @@ export function PdfToImagesTool() {
     setError(null);
     setLastOutput(null);
     setProgress(null);
-
     if (status === "success" || status === "error") {
       setStatus(metadata ? "ready" : "idle");
     }
   };
 
   const processFile = async (nextFile: File | undefined) => {
-    if (!nextFile) {
-      return;
-    }
-
+    if (!nextFile) return;
     setFile(null);
     setMetadata(null);
     setProgress(null);
@@ -81,12 +95,10 @@ export function PdfToImagesTool() {
 
     if (!isPdfFile(nextFile)) {
       setStatus("error");
-      setError("Seleccioná un archivo PDF válido.");
+      setError(t("toolUi.invalidPdfPicked"));
       return;
     }
-
     const fileLimitError = getPdfFileSizeLimitError(nextFile);
-
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -94,7 +106,6 @@ export function PdfToImagesTool() {
     }
 
     setStatus("reading");
-
     try {
       const nextMetadata = await readPdfMetadata(nextFile);
       setFile(nextFile);
@@ -107,7 +118,7 @@ export function PdfToImagesTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo leer el archivo PDF.");
+      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
     }
   };
 
@@ -123,16 +134,14 @@ export function PdfToImagesTool() {
     setLastOutput(null);
     setOutputFileName(defaultOutputBaseName);
     setHasCustomOutputFileName(false);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    setOutputFormat("png");
+    setJpegQualityPercent(92);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const downloadResult = (bytes: ArrayBuffer, mimeType: string, fileName: string) => {
     const url = URL.createObjectURL(new Blob([bytes], { type: mimeType }));
     const link = document.createElement("a");
-
     link.href = url;
     link.download = fileName;
     link.click();
@@ -140,27 +149,31 @@ export function PdfToImagesTool() {
   };
 
   const convertPages = async () => {
-    if (!file || !canConvert) {
-      return;
-    }
-
+    if (!file || !canConvert) return;
     setStatus("processing");
     setError(null);
     setLastOutput(null);
     setProgress({ current: 0, total: imageCount });
 
     try {
-      const result = await convertPdfPagesToPng(file, selectedPages, outputFileName, setProgress);
+      const result = await convertPdfPagesToImages(
+        file,
+        selectedPages,
+        outputFileName,
+        outputFormat,
+        jpegQualityPercentToDecimal(jpegQualityPercent),
+        setProgress,
+      );
       downloadResult(result.bytes, result.mimeType, result.fileName);
       setLastOutput(
         result.imageCount === 1
-          ? `Descargaste ${result.fileName}.`
-          : `Descargaste ${result.fileName} con ${result.imageCount} imágenes PNG.`,
+          ? t("tools.pdf-to-images.ui.downloadedOne", { name: result.fileName })
+          : t("tools.pdf-to-images.ui.downloadedMany", { name: result.fileName, count: result.imageCount, format: outputFormatLabel }),
       );
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudieron convertir las páginas.");
+      setError(nextError instanceof Error ? nextError.message : t("tools.pdf-to-images.ui.couldNotConvertPages"));
     }
   };
 
@@ -169,10 +182,8 @@ export function PdfToImagesTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Archivo y configuración</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">
-              Seleccioná un PDF y elegí qué páginas querés convertir a imágenes PNG.
-            </p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("tools.pdf-to-images.ui.section2")}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.pdf-to-images.ui.intro2")}</p>
           </div>
 
           <button
@@ -203,10 +214,8 @@ export function PdfToImagesTool() {
               <span className="mx-auto grid h-12 w-12 place-items-center rounded-lg border border-surface-200 bg-surface-50 text-accent-teal">
                 <Upload size={23} />
               </span>
-              <span className="mt-3 block text-base font-semibold text-ink-900">Seleccionar PDF</span>
-              <span className="mt-2 block text-sm leading-6 text-ink-500">
-                También podés arrastrar un archivo aquí. No se sube a servidores.
-              </span>
+              <span className="mt-3 block text-base font-semibold text-ink-900">{t("toolUi.uploadPdf")}</span>
+              <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.pdf-to-images.ui.dropHint")}</span>
             </span>
           </button>
           <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfToImages}</p>
@@ -223,16 +232,16 @@ export function PdfToImagesTool() {
           />
 
           {metadata ? (
-            <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <div className="min-w-0 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <p className="truncate text-sm font-semibold text-ink-900">{metadata.fileName}</p>
               <p className="mt-1 text-xs text-ink-500">
-                {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? "página" : "páginas"}
+                {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural")}
               </p>
             </div>
           ) : null}
 
           <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Páginas a convertir</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{t("tools.pdf-to-images.ui.rangeLabel")}</p>
             <div className="grid gap-2 sm:grid-cols-2">
               <button
                 type="button"
@@ -247,8 +256,8 @@ export function PdfToImagesTool() {
                   resetFeedback();
                 }}
               >
-                <span className="block text-sm font-semibold text-ink-900">Todas las páginas</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">Convierte el PDF completo.</span>
+                <span className="block text-sm font-semibold text-ink-900">{t("tools.pdf-to-images.ui.modeAllTitle")}</span>
+                <span className="mt-1 block text-xs leading-5 text-ink-500">{t("tools.pdf-to-images.ui.modeAllShort")}</span>
               </button>
               <button
                 type="button"
@@ -263,21 +272,21 @@ export function PdfToImagesTool() {
                   resetFeedback();
                 }}
               >
-                <span className="block text-sm font-semibold text-ink-900">Elegir páginas</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">Combiná páginas y rangos.</span>
+                <span className="block text-sm font-semibold text-ink-900">{t("tools.pdf-to-images.ui.modeRangeTitle")}</span>
+                <span className="mt-1 block text-xs leading-5 text-ink-500">{t("tools.pdf-to-images.ui.modeRangeShort")}</span>
               </button>
             </div>
 
             {mode === "page-range" ? (
               <div className="grid gap-1.5 text-sm font-semibold text-ink-700">
                 <div className="flex items-center gap-2">
-                  <label htmlFor="pdf-to-images-range">Páginas a convertir</label>
-                  <HelpHint id="pdf-to-images-range-help" text={pageRangeHelp} />
+                  <label htmlFor="pdf-to-images-range">{t("tools.pdf-to-images.ui.rangeLabel")}</label>
+                  <HelpHint id="pdf-to-images-range-help" text={t("tools.pdf-to-images.ui.pageRangeHelp")} />
                 </div>
                 <input
                   id="pdf-to-images-range"
                   className={inputClassName}
-                  placeholder="Ej.: 1-3,5,8-10"
+                  placeholder={t("tools.pdf-to-images.ui.rangePlaceholder")}
                   type="text"
                   value={rangeInput}
                   onChange={(event) => {
@@ -285,13 +294,73 @@ export function PdfToImagesTool() {
                     resetFeedback();
                   }}
                 />
-                <span className="text-xs font-normal leading-5 text-ink-500">Usá comas para separar páginas individuales o rangos.</span>
+                <span className="text-xs font-normal leading-5 text-ink-500">{t("tools.pdf-to-images.ui.rangeHelp")}</span>
                 {rangeValidation?.error ? <span role="alert" className="text-sm font-normal text-ink-700">{rangeValidation.error}</span> : null}
                 {!rangeValidation?.error && rangeValidation?.duplicatesRemoved ? (
-                  <span className="text-xs font-normal leading-5 text-ink-500">Se quitaron páginas repetidas manteniendo el orden indicado.</span>
+                  <span className="text-xs font-normal leading-5 text-ink-500">{t("tools.pdf-to-images.ui.duplicatesRemoved")}</span>
                 ) : null}
               </div>
             ) : null}
+
+            <div className="grid gap-3 rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{t("tools.pdf-to-images.ui.formatTitle")}</p>
+                <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.pdf-to-images.ui.formatIntro")}</p>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  className={cn(
+                    "rounded-md border p-3 text-left transition",
+                    outputFormat === "png"
+                      ? "border-accent-cyan/45 bg-accent-cyan/10"
+                      : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
+                  )}
+                  onClick={() => {
+                    setOutputFormat("png");
+                    resetFeedback();
+                  }}
+                >
+                  <span className="block text-sm font-semibold text-ink-900">PNG</span>
+                  <span className="mt-1 block text-xs leading-5 text-ink-500">{t("tools.pdf-to-images.ui.pngDesc")}</span>
+                </button>
+                <button
+                  type="button"
+                  className={cn(
+                    "rounded-md border p-3 text-left transition",
+                    outputFormat === "jpeg"
+                      ? "border-accent-cyan/45 bg-accent-cyan/10"
+                      : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
+                  )}
+                  onClick={() => {
+                    setOutputFormat("jpeg");
+                    resetFeedback();
+                  }}
+                >
+                  <span className="block text-sm font-semibold text-ink-900">JPG</span>
+                  <span className="mt-1 block text-xs leading-5 text-ink-500">{t("tools.pdf-to-images.ui.jpgDesc")}</span>
+                </button>
+              </div>
+
+              {outputFormat === "jpeg" ? (
+                <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                  {t("tools.pdf-to-images.ui.qualityFull", { percent: jpegQualityPercent })}
+                  <input
+                    className="w-full accent-accent-cyan"
+                    min={10}
+                    max={100}
+                    step={1}
+                    type="range"
+                    value={jpegQualityPercent}
+                    onChange={(event) => {
+                      setJpegQualityPercent(Number(event.target.value));
+                      resetFeedback();
+                    }}
+                  />
+                  <span className="text-xs font-normal leading-5 text-ink-500">{t("tools.pdf-to-images.ui.qualityHelp")}</span>
+                </label>
+              ) : null}
+            </div>
             {generatedOutputLimitError ? <p role="alert" className="text-sm text-ink-700">{generatedOutputLimitError}</p> : null}
           </div>
         </div>
@@ -299,21 +368,25 @@ export function PdfToImagesTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">Cada página se exporta como imagen PNG.</p>
+          <h3 className="text-sm font-semibold text-ink-900">{t("tools.pdf-to-images.ui.resultTitle")}</h3>
+          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.pdf-to-images.ui.resultIntro2", { format: outputFormatLabel })}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
-            <p className="text-sm font-semibold text-ink-700">Imágenes a generar</p>
+            <p className="text-sm font-semibold text-ink-700">{t("tools.pdf-to-images.ui.imagesToGenerate")}</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{imageCount}</p>
-            <p className="mt-2 text-sm font-semibold text-ink-700">{imageCount === 1 ? "imagen PNG" : "imágenes PNG"}</p>
+            <p className="mt-2 text-sm font-semibold text-ink-700">
+              {imageCount === 1
+                ? t("tools.pdf-to-images.ui.imageFormat", { format: outputFormatLabel })
+                : t("tools.pdf-to-images.ui.imagesFormat", { format: outputFormatLabel })}
+            </p>
           </div>
 
           <dl className="grid gap-3 text-sm">
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">
-                <label htmlFor="pdf-to-images-output-name">Nombre del archivo</label>
+                <label htmlFor="pdf-to-images-output-name">{t("toolUi.outputName")}</label>
               </dt>
               <dd className="mt-2">
                 <input
@@ -327,13 +400,13 @@ export function PdfToImagesTool() {
                     resetFeedback();
                   }}
                 />
-                <span className="mt-2 block break-all text-xs text-ink-500">Se descargará como {finalOutputFileName}</span>
+                <span className="mt-2 block break-all text-xs text-ink-500">{t("toolUi.downloadAs", { name: finalOutputFileName })}</span>
               </dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Archivo de descarga</dt>
+              <dt className="text-ink-500">{t("tools.pdf-to-images.ui.downloadFile")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">{outputType}</dd>
-              <dd className="mt-1 text-xs text-ink-500">Las imágenes internas se generan en PNG.</dd>
+              <dd className="mt-1 text-xs text-ink-500">{t("tools.pdf-to-images.ui.imageFormatLabel", { format: outputFormatLabel })}</dd>
             </div>
           </dl>
 
@@ -345,8 +418,8 @@ export function PdfToImagesTool() {
             >
               <Loader2 className="animate-spin text-accent-teal" size={16} />
               {status === "reading"
-                ? "Leyendo PDF..."
-                : `Procesando página ${progress?.current ?? 0} de ${progress?.total ?? imageCount}...`}
+                ? t("toolUi.readingPdf")
+                : t("tools.pdf-to-images.ui.processingPage", { current: progress?.current ?? 0, total: progress?.total ?? imageCount })}
             </p>
           ) : null}
 
@@ -360,18 +433,18 @@ export function PdfToImagesTool() {
 
           {!metadata && status === "idle" ? (
             <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
-              Seleccioná un PDF para habilitar la conversión.
+              {t("tools.pdf-to-images.ui.pickPdfFirst")}
             </p>
           ) : null}
 
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void convertPages()} disabled={!canConvert}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
-              Convertir a imágenes
+              {t("tools.pdf-to-images.ui.convertCta")}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               {imageCount > 1 ? <FileArchive size={16} /> : <FileImage size={16} />}
-              Seleccionar PDF
+              {t("toolUi.uploadPdf")}
             </Button>
             <Button
               type="button"
@@ -381,7 +454,7 @@ export function PdfToImagesTool() {
               disabled={!file && status === "idle" && !hasCustomOutputFileName}
             >
               <RotateCcw size={16} />
-              Limpiar
+              {t("toolUi.clear")}
             </Button>
           </div>
         </div>

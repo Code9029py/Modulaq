@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, Download, FileText, FilePlus2, Loader2, RotateCcw, Trash2, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import { fileProcessingLimitLabels, getPdfFileSizeLimitError, getTotalPdfSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
@@ -26,19 +27,22 @@ function createItemId(file: File) {
   return `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2)}`;
 }
 
-function getPageLabel(pageCount: number | null, status: MergePdfItem["status"]) {
-  if (status === "reading") {
-    return "Leyendo páginas...";
-  }
-
-  if (status === "error" || pageCount === null) {
-    return "Páginas no disponibles";
-  }
-
-  return `${pageCount} ${pageCount === 1 ? "página" : "páginas"}`;
+function useGetPageLabel() {
+  const { t } = useI18n();
+  return (pageCount: number | null, status: MergePdfItem["status"]) => {
+    if (status === "reading") {
+      return t("toolUi.pagesReading");
+    }
+    if (status === "error" || pageCount === null) {
+      return t("toolUi.pagesUnknown");
+    }
+    return `${pageCount} ${pageCount === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural")}`;
+  };
 }
 
 export function MergePdfTool() {
+  const { t } = useI18n();
+  const getPageLabel = useGetPageLabel();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [items, setItems] = useState<MergePdfItem[]>([]);
   const [status, setStatus] = useState<MergePdfStatus>("idle");
@@ -75,8 +79,8 @@ export function MergePdfTool() {
     if (invalidCount > 0) {
       messages.push(
         invalidCount === 1
-          ? "Se omitió un archivo porque no parece ser PDF."
-          : `Se omitieron ${invalidCount} archivos porque no parecen ser PDF.`,
+          ? t("toolUi.skippedNotPdfOne")
+          : t("toolUi.skippedNotPdfMany", { count: invalidCount }),
       );
     }
 
@@ -96,7 +100,7 @@ export function MergePdfTool() {
 
     if (validFiles.length === 0) {
       setStatus("error");
-      setError(messages[0] ?? "Seleccioná uno o varios archivos PDF válidos.");
+      setError(messages[0] ?? t("toolUi.invalidPdfsPicked"));
       return;
     }
 
@@ -143,7 +147,7 @@ export function MergePdfTool() {
                     ...currentItem,
                     pageCount: null,
                     status: "error",
-                    error: nextError instanceof Error ? nextError.message : "No se pudo procesar este PDF.",
+                    error: nextError instanceof Error ? nextError.message : t("toolUi.couldNotRead"),
                   }
                 : currentItem,
             ),
@@ -228,23 +232,21 @@ export function MergePdfTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo unir los PDFs.");
+      setError(nextError instanceof Error ? nextError.message : t("toolUi.failedMerge"));
     }
   };
 
   const pageSummary = hasPendingMetadata
-    ? `${knownPageCount}+ páginas detectadas`
-    : `${knownPageCount} ${knownPageCount === 1 ? "página" : "páginas"}`;
+    ? t("tools.merge-pdf.ui.pagesDetected", { count: knownPageCount })
+    : `${knownPageCount} ${knownPageCount === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural")}`;
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.98fr)_minmax(310px,0.5fr)]">
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid min-w-0 gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Archivos PDF</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">
-              Seleccioná varios PDFs y ordenalos antes de generar un único archivo descargable.
-            </p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("toolUi.filesSection")}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.merge-pdf.ui.filesIntro")}</p>
           </div>
 
           <button
@@ -275,10 +277,8 @@ export function MergePdfTool() {
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-lg border border-surface-200 bg-surface-50 text-accent-teal">
                 <Upload size={26} />
               </span>
-              <span className="mt-4 block text-base font-semibold text-ink-900">Seleccionar PDFs</span>
-              <span className="mt-2 block text-sm leading-6 text-ink-500">
-                Podés cargar dos o más archivos. Todo se procesa en tu navegador.
-              </span>
+              <span className="mt-4 block text-base font-semibold text-ink-900">{t("toolUi.uploadPdfs")}</span>
+              <span className="mt-2 block text-sm leading-6 text-ink-500">{t("toolUi.dropHereMany")}</span>
             </span>
           </button>
           <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfMultiple}</p>
@@ -306,11 +306,11 @@ export function MergePdfTool() {
             <div className="grid gap-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">
-                  {items.length} {items.length === 1 ? "PDF cargado" : "PDFs cargados"}
+                  {items.length} {items.length === 1 ? t("tools.merge-pdf.ui.pdfLoaded") : t("tools.merge-pdf.ui.pdfsLoaded")}
                 </p>
                 <Button type="button" variant="ghost" className="min-h-9 gap-2 px-3" onClick={clearAll}>
                   <RotateCcw size={15} />
-                  Limpiar todo
+                  {t("toolUi.clearAll")}
                 </Button>
               </div>
 
@@ -342,7 +342,7 @@ export function MergePdfTool() {
                         disabled={itemIndex === 0}
                       >
                         <ArrowUp size={15} />
-                        Subir
+                        {t("toolUi.moveUp")}
                       </Button>
                       <Button
                         type="button"
@@ -352,11 +352,11 @@ export function MergePdfTool() {
                         disabled={itemIndex === items.length - 1}
                       >
                         <ArrowDown size={15} />
-                        Bajar
+                        {t("toolUi.moveDown")}
                       </Button>
                       <Button type="button" variant="ghost" className="min-h-9 gap-2 px-3" onClick={() => removeItem(item.id)}>
                         <Trash2 size={15} />
-                        Quitar
+                        {t("toolUi.remove")}
                       </Button>
                     </div>
                   </li>
@@ -370,10 +370,8 @@ export function MergePdfTool() {
                   <FileText size={20} />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-ink-900">Sin PDFs todavía</p>
-                  <p className="mt-1 text-sm leading-6 text-ink-500">
-                    Agregá al menos dos archivos para preparar el PDF final.
-                  </p>
+                  <p className="text-sm font-semibold text-ink-900">{t("tools.merge-pdf.ui.noPdfsYet")}</p>
+                  <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.merge-pdf.ui.noPdfsHelp")}</p>
                 </div>
               </div>
             </div>
@@ -383,29 +381,29 @@ export function MergePdfTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">PDF final</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">Los archivos se unirán en el orden mostrado.</p>
+          <h3 className="text-sm font-semibold text-ink-900">{t("tools.merge-pdf.ui.outputTitle")}</h3>
+          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.merge-pdf.ui.outputIntro")}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
-            <p className="text-sm font-semibold text-ink-700">Archivos listos</p>
+            <p className="text-sm font-semibold text-ink-700">{t("tools.merge-pdf.ui.filesReady")}</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{items.length}</p>
-            <p className="mt-2 text-sm font-semibold text-ink-700">{items.length === 1 ? "PDF" : "PDFs"}</p>
+            <p className="mt-2 text-sm font-semibold text-ink-700">{items.length === 1 ? t("tools.merge-pdf.ui.pdfShort") : t("tools.merge-pdf.ui.pdfsShort")}</p>
           </div>
 
           <dl className="grid gap-3 text-sm">
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Páginas aproximadas</dt>
+              <dt className="text-ink-500">{t("tools.merge-pdf.ui.pagesSummary")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">{pageSummary}</dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Tamaño total</dt>
+              <dt className="text-ink-500">{t("toolUi.totalSize")}</dt>
               <dd className="mt-1 font-semibold text-ink-900">{formatFileSize(totalSize)}</dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">
-                <label htmlFor="merge-pdf-output-name">Nombre de descarga</label>
+                <label htmlFor="merge-pdf-output-name">{t("toolUi.outputNameDownload")}</label>
               </dt>
               <dd className="mt-2">
                 <input
@@ -421,33 +419,35 @@ export function MergePdfTool() {
                     setLastMergedPageCount(null);
                   }}
                 />
-                <span className="mt-2 block break-all text-xs text-ink-500">Se descargará como {sanitizedOutputFileName}</span>
+                <span className="mt-2 block break-all text-xs text-ink-500">{t("toolUi.downloadAs", { name: sanitizedOutputFileName })}</span>
               </dd>
             </div>
           </dl>
 
           {hasUnreadableFiles ? (
             <p className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              Quitá los PDFs marcados con error para poder unir el resto.
+              {t("tools.merge-pdf.ui.removeUnreadable")}
             </p>
           ) : null}
 
           {items.length === 1 ? (
             <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
-              Agregá otro PDF para habilitar la unión.
+              {t("tools.merge-pdf.ui.needMore")}
             </p>
           ) : null}
 
           {status === "processing" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
-              Uniendo PDFs...
+              {t("tools.merge-pdf.ui.merging")}
             </p>
           ) : null}
 
           {status === "success" ? (
             <p className="rounded-md border border-accent-teal/25 bg-accent-teal/10 px-3 py-2 text-sm text-ink-700">
-              PDF generado y descargado{lastMergedPageCount !== null ? ` con ${lastMergedPageCount} páginas.` : "."}
+              {lastMergedPageCount !== null
+                ? t("toolUi.outputReadyWithPages", { pages: lastMergedPageCount })
+                : t("toolUi.outputReady")}
             </p>
           ) : null}
 
@@ -458,11 +458,11 @@ export function MergePdfTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void mergeFiles()} disabled={!canMerge}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
-              Unir PDFs
+              {t("tools.merge-pdf.ui.mergeCta")}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <FilePlus2 size={16} />
-              Agregar PDFs
+              {t("tools.merge-pdf.ui.addPdfs")}
             </Button>
             <Button
               type="button"
@@ -472,7 +472,7 @@ export function MergePdfTool() {
               disabled={items.length === 0 && !hasCustomOutputFileName}
             >
               <RotateCcw size={16} />
-              Limpiar todo
+              {t("toolUi.clearAll")}
             </Button>
           </div>
         </div>
