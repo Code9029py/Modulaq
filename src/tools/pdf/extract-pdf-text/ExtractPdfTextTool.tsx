@@ -1,6 +1,7 @@
 import { Clipboard, Download, FileText, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import {
   defaultOutputBaseName,
@@ -21,6 +22,7 @@ import type {
 const acceptedPdfTypes = "application/pdf,.pdf";
 
 export function ExtractPdfTextTool() {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<ExtractPdfTextMetadata | null>(null);
@@ -41,10 +43,7 @@ export function ExtractPdfTextTool() {
   const finalOutputFileName = getTextFileName(outputFileName, fallbackOutputBaseName);
 
   const processFile = async (nextFile: File | undefined) => {
-    if (!nextFile) {
-      return;
-    }
-
+    if (!nextFile) return;
     setFile(null);
     setMetadata(null);
     setResult(null);
@@ -54,12 +53,11 @@ export function ExtractPdfTextTool() {
 
     if (!isPdfFile(nextFile)) {
       setStatus("error");
-      setError("Seleccioná un archivo PDF válido.");
+      setError(t("toolUi.invalidPdfPicked"));
       return;
     }
 
     setStatus("reading");
-
     try {
       const nextMetadata = await readPdfMetadata(nextFile);
       setFile(nextFile);
@@ -70,7 +68,7 @@ export function ExtractPdfTextTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo leer el archivo PDF.");
+      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
     }
   };
 
@@ -86,17 +84,11 @@ export function ExtractPdfTextTool() {
     setPreserveApproximateLineBreaks(true);
     setOutputFileName(defaultOutputBaseName);
     setHasCustomOutputFileName(false);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const runExtraction = async () => {
-    if (!file || !canExtract) {
-      return;
-    }
-
+    if (!file || !canExtract) return;
     setStatus("processing");
     setResult(null);
     setProgress({ current: 0, total: metadata?.pageCount ?? 0 });
@@ -109,47 +101,40 @@ export function ExtractPdfTextTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo extraer el texto del PDF.");
+      setError(nextError instanceof Error ? nextError.message : t("tools.extract-pdf-text.ui.couldNotExtract"));
     }
   };
 
   const copyText = async () => {
-    if (!result?.text) {
-      return;
-    }
-
+    if (!result?.text) return;
     try {
       await navigator.clipboard.writeText(result.text);
-      setFeedback("Texto copiado.");
+      setFeedback(t("toolUi.copiedShort"));
       setError(null);
     } catch {
-      setError("No se pudo copiar el texto. Seleccionalo manualmente en el panel.");
+      setError(t("toolUi.couldNotCopy"));
     }
   };
 
   const downloadText = () => {
-    if (!result?.text) {
-      return;
-    }
-
+    if (!result?.text) return;
     const url = URL.createObjectURL(new Blob([result.text], { type: "text/plain;charset=utf-8" }));
     const link = document.createElement("a");
-
     link.href = url;
     link.download = finalOutputFileName;
     link.click();
     URL.revokeObjectURL(url);
     setError(null);
-    setFeedback(`Descargaste ${finalOutputFileName}.`);
+    setFeedback(t("toolUi.downloadedAs", { name: finalOutputFileName }));
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(295px,0.56fr)_minmax(0,1fr)]">
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
-        <div className="grid gap-4">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,0.56fr)_minmax(0,1fr)]">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+        <div className="grid min-w-0 gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Archivo PDF</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">Seleccioná un documento para leer su texto seleccionable.</p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("toolUi.fileSection")}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.extract-pdf-text.ui.intro")}</p>
           </div>
 
           <button
@@ -180,10 +165,8 @@ export function ExtractPdfTextTool() {
               <span className="mx-auto grid h-12 w-12 place-items-center rounded-lg border border-surface-200 bg-surface-50 text-accent-teal">
                 <Upload size={23} />
               </span>
-              <span className="mt-3 block text-base font-semibold text-ink-900">Seleccionar PDF</span>
-              <span className="mt-2 block text-sm leading-6 text-ink-500">
-                También podés arrastrar un archivo aquí. El procesamiento es local.
-              </span>
+              <span className="mt-3 block text-base font-semibold text-ink-900">{t("toolUi.uploadPdf")}</span>
+              <span className="mt-2 block text-sm leading-6 text-ink-500">{t("toolUi.dropHere")}</span>
             </span>
           </button>
 
@@ -199,10 +182,10 @@ export function ExtractPdfTextTool() {
           />
 
           {metadata ? (
-            <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <div className="min-w-0 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <p className="truncate text-sm font-semibold text-ink-900">{metadata.fileName}</p>
               <p className="mt-1 text-xs text-ink-500">
-                {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? "página" : "páginas"}
+                {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural")}
               </p>
             </div>
           ) : null}
@@ -227,9 +210,9 @@ export function ExtractPdfTextTool() {
               }}
             />
             <span>
-              <span className="block font-semibold text-ink-900">Conservar saltos de línea aproximados</span>
+              <span className="block font-semibold text-ink-900">{t("tools.extract-pdf-text.ui.preserveBreaks")}</span>
               <span className="mt-1 block text-xs leading-5 text-ink-500">
-                Usa la posición visual del texto para reconstruir líneas.
+                {t("tools.extract-pdf-text.ui.preserveBreaksHelp")}
               </span>
             </span>
           </label>
@@ -242,8 +225,11 @@ export function ExtractPdfTextTool() {
             >
               <Loader2 className="animate-spin text-accent-teal" size={16} />
               {status === "reading"
-                ? "Leyendo PDF..."
-                : `Leyendo página ${progress?.current ?? 0} de ${progress?.total ?? metadata?.pageCount ?? 0}...`}
+                ? t("toolUi.readingPdf")
+                : t("tools.extract-pdf-text.ui.extracting", {
+                    current: progress?.current ?? 0,
+                    total: progress?.total ?? metadata?.pageCount ?? 0,
+                  })}
             </p>
           ) : null}
 
@@ -254,7 +240,7 @@ export function ExtractPdfTextTool() {
           <div className="grid gap-2">
             <Button type="button" className="gap-2" onClick={() => void runExtraction()} disabled={!canExtract}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <FileText size={16} />}
-              Extraer texto
+              {t("tools.extract-pdf-text.ui.extractCta")}
             </Button>
             <Button
               type="button"
@@ -264,44 +250,46 @@ export function ExtractPdfTextTool() {
               disabled={!file && status === "idle" && !hasCustomOutputFileName}
             >
               <RotateCcw size={16} />
-              Limpiar
+              {t("toolUi.clear")}
             </Button>
           </div>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Texto extraído</h3>
+            <h3 className="text-sm font-semibold text-ink-900">{t("tools.extract-pdf-text.ui.outputTitle")}</h3>
             <p aria-live="polite" className="mt-1 text-xs leading-5 text-ink-500">
               {result?.hasSelectableText
-                ? `${result.pagesWithText} de ${result.pageCount} páginas contienen texto.`
-                : "El resultado aparecerá en este panel."}
+                ? t("tools.extract-pdf-text.ui.outputSummary", {
+                    filled: result.pagesWithText,
+                    total: result.pageCount,
+                  })
+                : t("tools.extract-pdf-text.ui.outputIntro")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="secondary" className="gap-2" onClick={() => void copyText()} disabled={!canExport}>
               <Clipboard size={16} />
-              Copiar
+              {t("toolUi.copy")}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={downloadText} disabled={!canExport}>
               <Download size={16} />
-              Descargar TXT
+              {t("toolUi.downloadTxt")}
             </Button>
           </div>
         </div>
 
         {result?.likelyScanned ? (
           <p className="mt-4 rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm leading-6 text-ink-600">
-            No se detectó texto seleccionable. Este PDF puede ser escaneado o estar compuesto por imágenes. Esta herramienta no usa OCR.
+            {t("tools.extract-pdf-text.ui.scanned")}
           </p>
         ) : null}
 
         {result?.hasProblematicSymbols ? (
           <p className="mt-4 rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm leading-6 text-ink-600">
-            El PDF contiene símbolos o fórmulas que pueden no extraerse correctamente. El texto puede aparecer con caracteres extraños o
-            desordenado.
+            {t("tools.extract-pdf-text.ui.problematic")}
           </p>
         ) : null}
 
@@ -310,7 +298,7 @@ export function ExtractPdfTextTool() {
         ) : null}
 
         <label className="mt-4 grid gap-1.5 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm font-semibold text-ink-700 shadow-sm">
-          Nombre del archivo
+          {t("toolUi.outputName")}
           <input
             className="min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
             value={outputFileName}
@@ -321,13 +309,13 @@ export function ExtractPdfTextTool() {
               setFeedback(null);
             }}
           />
-          <span className="text-xs font-normal leading-5 text-ink-500">Se descargará como {finalOutputFileName}</span>
+          <span className="block break-all text-xs font-normal leading-5 text-ink-500">{t("toolUi.downloadAs", { name: finalOutputFileName })}</span>
         </label>
 
         <textarea
-          aria-label="Texto extraído del PDF"
+          aria-label={t("tools.extract-pdf-text.ui.outputTitle")}
           className="mt-4 h-[29rem] w-full resize-y rounded-xl border border-surface-200/90 bg-surface-50/95 p-4 text-sm leading-6 text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25"
-          placeholder="Cargá un PDF y elegí Extraer texto."
+          placeholder={t("tools.extract-pdf-text.ui.placeholder")}
           readOnly
           value={result?.text ?? ""}
         />

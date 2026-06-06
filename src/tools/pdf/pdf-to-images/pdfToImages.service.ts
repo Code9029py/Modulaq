@@ -1,6 +1,6 @@
 // Adaptador delgado sobre @modulaq/core (countPdfPages de /pdf + pdfToImages de /pdf-render).
 // Preserva la API histórica que el componente espera:
-//   convertPdfPagesToPng, createAllPageNumbers, defaultOutputBaseName,
+//   convertPdfPagesToImages, createAllPageNumbers, defaultOutputBaseName,
 //   formatFileSize, isPdfFile, parsePageRange, readPdfMetadata.
 //
 // Lo que queda en el adapter (no pertenece al SDK):
@@ -16,15 +16,20 @@ import {
   type PdfPageImage,
 } from "@modulaq/core/pdf-render";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import {
-  buildDownloadFileName,
-  getSuggestedDownloadBaseName,
-  sanitizeDownloadBaseName,
-} from "../../../shared/utils/downloadFileName";
+import { getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
+import {
+  buildImageDownloadFileName,
+  buildImageZipDownloadFileName,
+  buildPagedImageFileName,
+  getImageDownloadBaseName,
+  getImageOutputMimeType,
+  normalizeJpegQuality,
+} from "../../../shared/utils/imageFiles";
 import type {
   PdfPageRangeResult,
   PdfToImagesMetadata,
+  PdfToImagesOutputFormat,
   PdfToImagesProgress,
   PdfToImagesResult,
 } from "./pdfToImages.types";
@@ -120,11 +125,6 @@ export async function readPdfMetadata(file: File): Promise<PdfToImagesMetadata> 
   }
 }
 
-function getPngFileName(baseName: string, pageNumber: number, pageCount: number) {
-  const pageLabel = String(pageNumber).padStart(String(pageCount).length, "0");
-  return `${baseName}-pagina-${pageLabel}.png`;
-}
-
 function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
@@ -139,10 +139,12 @@ function validateSelectedPages(pages: number[], pageCount: number) {
   }
 }
 
-export async function convertPdfPagesToPng(
+export async function convertPdfPagesToImages(
   file: File,
   pages: number[],
   outputBaseName: string,
+  outputFormat: PdfToImagesOutputFormat = "png",
+  jpegQuality?: number,
   onProgress?: (progress: PdfToImagesProgress) => void,
 ): Promise<PdfToImagesResult> {
   if (!isPdfFile(file)) {
@@ -161,11 +163,16 @@ export async function convertPdfPagesToPng(
   onProgress?.({ current: 0, total: pages.length });
 
   const fallbackBaseName = getSuggestedDownloadBaseName(file.name, defaultOutputBaseName);
-  const baseName = sanitizeDownloadBaseName(outputBaseName, fallbackBaseName);
+  const baseName = getImageDownloadBaseName(outputBaseName, fallbackBaseName);
 
   let renderedImages: PdfPageImage[];
   try {
-    renderedImages = await corePdfToImages(file, { pages, scale: renderScale, format: "png" });
+    renderedImages = await corePdfToImages(file, {
+      pages,
+      scale: renderScale,
+      format: outputFormat,
+      quality: outputFormat === "jpeg" ? normalizeJpegQuality(jpegQuality) : undefined,
+    });
   } catch (error) {
     if (error instanceof Error && /página\s+\d+/i.test(error.message)) {
       throw new Error(`No se pudo convertir la página: ${error.message}`);
@@ -179,22 +186,22 @@ export async function convertPdfPagesToPng(
     const single = renderedImages[0];
     return {
       bytes: toArrayBuffer(single.bytes),
-      fileName: buildDownloadFileName(outputBaseName, "png", fallbackBaseName),
+      fileName: buildImageDownloadFileName(outputBaseName, outputFormat, fallbackBaseName),
       imageCount: 1,
-      mimeType: "image/png",
+      mimeType: getImageOutputMimeType(outputFormat),
     };
   }
 
   const zip = new JSZip();
   for (const image of renderedImages) {
-    zip.file(getPngFileName(baseName, image.pageNumber, pageCount), image.bytes);
+    zip.file(buildPagedImageFileName(baseName, image.pageNumber, pageCount, outputFormat), image.bytes);
   }
 
   try {
     const zipBytes = await zip.generateAsync({ type: "arraybuffer" });
     return {
       bytes: zipBytes,
-      fileName: buildDownloadFileName(outputBaseName, "zip", fallbackBaseName),
+      fileName: buildImageZipDownloadFileName(outputBaseName, fallbackBaseName),
       imageCount: renderedImages.length,
       mimeType: "application/zip",
     };

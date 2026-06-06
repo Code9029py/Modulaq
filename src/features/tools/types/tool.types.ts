@@ -29,6 +29,10 @@ export type ToolMode = {
   description: string;
 };
 
+/** Genérico para campos disponibles por idioma. ES es la fuente de verdad. */
+export type Localizable<T> = { es: T; en: T };
+export type LocalizableString = Localizable<string>;
+
 export type ToolSeo = {
   title?: string;
   description?: string;
@@ -46,7 +50,57 @@ export type ToolDoc = {
 
 export type CodeLanguage = "typescript" | "javascript" | "bash" | "html";
 
+/** Snippet de código: el `code` y `dependencies` no se localizan; sólo prosa. */
 export type CodeSnippet = {
+  id: string;
+  title: LocalizableString;
+  description?: LocalizableString;
+  language: CodeLanguage;
+  code: string;
+  dependencies?: string[];
+  usageNotes?: Localizable<string[]>;
+  limitations?: Localizable<string[]>;
+};
+
+export type ToolIntegrableCode = {
+  summary?: LocalizableString;
+  snippets: CodeSnippet[];
+};
+
+/**
+ * Definición cruda de una herramienta — la fuente persistida en tools.ts.
+ * Los campos públicos visibles llevan ambos idiomas. Para uso desde
+ * componentes preferí `LocalizedTool` (versión resuelta y plana) vía
+ * `useTool()` o `localizeTool()`.
+ */
+export type ToolDefinition = {
+  id: string;
+  slug: string;
+  slugEn: string;
+  /**
+   * Si true, la versión EN del renderer todavía contiene strings en español.
+   * El detalle EN se renderiza con noindex y la ruta se omite del sitemap
+   * (regla #10 de Fase 2 i18n) hasta completar la migración.
+   */
+  i18nIncomplete?: boolean;
+  name: LocalizableString;
+  description: LocalizableString;
+  category: ToolCategoryId;
+  tags: Localizable<string[]>;
+  modes: readonly ToolModeId[];
+  plannedModes: readonly ToolModeId[];
+  status: ToolStatus;
+  pricing: ToolPricing;
+  requiresBackend: boolean;
+  requiresAI: boolean;
+  apiStatus: ToolApiStatus;
+  seo?: Localizable<ToolSeo>;
+  doc?: Localizable<ToolDoc>;
+  integrableCode?: ToolIntegrableCode;
+};
+
+/** Versión "plana" de un snippet, ya resuelta al idioma activo. */
+export type LocalizedCodeSnippet = {
   id: string;
   title: string;
   description?: string;
@@ -57,15 +111,21 @@ export type CodeSnippet = {
   limitations?: string[];
 };
 
-export type ToolIntegrableCode = {
+export type LocalizedToolIntegrableCode = {
   summary?: string;
-  snippets: CodeSnippet[];
+  snippets: LocalizedCodeSnippet[];
 };
 
-export type ToolMetadata = {
+/**
+ * Herramienta resuelta al idioma activo, plana, lista para renderizar.
+ * Alias del tipo histórico `ToolMetadata` para minimizar churn en call-sites.
+ */
+export type LocalizedTool = {
   id: string;
-  name: string;
   slug: string;
+  slugEn: string;
+  i18nIncomplete?: boolean;
+  name: string;
   description: string;
   category: ToolCategoryId;
   tags: string[];
@@ -78,8 +138,14 @@ export type ToolMetadata = {
   apiStatus: ToolApiStatus;
   seo?: ToolSeo;
   doc?: ToolDoc;
-  integrableCode?: ToolIntegrableCode;
+  integrableCode?: LocalizedToolIntegrableCode;
 };
+
+/**
+ * Alias de back-compat. Los componentes que recibían `ToolMetadata` (plano)
+ * siguen funcionando — pero ahora reciben LocalizedTool ya resuelto.
+ */
+export type ToolMetadata = LocalizedTool;
 
 export type ToolFilters = {
   search: string;

@@ -2,6 +2,8 @@ import { FileArchive, FileText, Loader2, RotateCcw, Scissors, Upload } from "luc
 import { useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { HelpHint } from "../../../shared/components/HelpHint";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import { fileProcessingLimitLabels, getGeneratedPageFilesLimitError, getPdfFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
@@ -23,33 +25,30 @@ import type { SplitPdfMetadata, SplitPdfMode, SplitPdfStatus } from "./splitPdf.
 const acceptedPdfTypes = "application/pdf,.pdf";
 const inputClassName =
   "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
-const extractPagesHelp =
-  "Podés escribir páginas individuales o rangos. Ejemplos: 1, 2-5, 1,3,5, 1,3-5,7. Usá comas para separar.";
-const partsHelp =
-  "Cada parte puede usar páginas individuales o rangos. En este modo, todas las páginas deben estar asignadas una sola vez, sin repetirse y sin dejar partes vacías.";
-const modeContent: Record<SplitPdfMode, { button: string; description: string; label: string; shortDescription: string }> = {
+
+const modeKeys: Record<SplitPdfMode, { button: TranslationKey; description: TranslationKey; label: TranslationKey; shortDescription: TranslationKey }> = {
   "extract-pages": {
-    button: "Extraer páginas",
-    description: "Se creará un PDF con las páginas seleccionadas. Las demás páginas no se incluirán.",
-    label: "Extraer páginas",
-    shortDescription: "Crea un PDF nuevo solo con las páginas seleccionadas.",
+    button: "tools.split-pdf.ui.modeRangeBtn",
+    description: "tools.split-pdf.ui.modeRangeDesc",
+    label: "tools.split-pdf.ui.modeRangeLabel",
+    shortDescription: "tools.split-pdf.ui.modeRangeShort",
   },
   parts: {
-    button: "Dividir PDF",
-    description:
-      "Se creará un ZIP con la cantidad de partes definida. Todas las páginas deben estar asignadas exactamente una vez.",
-    label: "Dividir por partes",
-    shortDescription: "Crea un ZIP con varios PDFs definidos por vos.",
+    button: "tools.split-pdf.ui.modePartsBtn",
+    description: "tools.split-pdf.ui.modePartsDesc",
+    label: "tools.split-pdf.ui.modePartsLabel",
+    shortDescription: "tools.split-pdf.ui.modePartsShort",
   },
   "individual-pages": {
-    button: "Separar todas",
-    description: "Se creará un ZIP con un PDF individual por cada página.",
-    label: "Separar todas",
-    shortDescription: "Crea un ZIP con un PDF individual por cada página.",
+    button: "tools.split-pdf.ui.modeAllBtn",
+    description: "tools.split-pdf.ui.modeAllDesc",
+    label: "tools.split-pdf.ui.modeAllLabel",
+    shortDescription: "tools.split-pdf.ui.modeAllShort",
   },
 };
 
 export function SplitPdfTool() {
+  const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<SplitPdfMetadata | null>(null);
@@ -68,14 +67,12 @@ export function SplitPdfTool() {
     if (!metadata || mode !== "extract-pages") {
       return null;
     }
-
     return parsePageSelection(pageSelection, metadata.pageCount);
   }, [metadata, mode, pageSelection]);
   const partsValidation = useMemo(() => {
     if (!metadata || mode !== "parts") {
       return null;
     }
-
     return validateParts(parts, metadata.pageCount);
   }, [metadata, mode, parts]);
   const outputExtension = mode === "extract-pages" || (mode === "individual-pages" && metadata?.pageCount === 1) ? "pdf" : "zip";
@@ -103,17 +100,13 @@ export function SplitPdfTool() {
   const resetFeedback = () => {
     setError(null);
     setLastOutput(null);
-
     if (status === "success" || status === "error") {
       setStatus(metadata ? "ready" : "idle");
     }
   };
 
   const processFile = async (nextFile: File | undefined) => {
-    if (!nextFile) {
-      return;
-    }
-
+    if (!nextFile) return;
     setFile(null);
     setMetadata(null);
     setLastOutput(null);
@@ -121,12 +114,11 @@ export function SplitPdfTool() {
 
     if (!isPdfFile(nextFile)) {
       setStatus("error");
-      setError("Seleccioná un archivo PDF válido.");
+      setError(t("toolUi.invalidPdfPicked"));
       return;
     }
 
     const fileLimitError = getPdfFileSizeLimitError(nextFile);
-
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -134,7 +126,6 @@ export function SplitPdfTool() {
     }
 
     setStatus("reading");
-
     try {
       const nextMetadata = await readPdfMetadata(nextFile);
       setFile(nextFile);
@@ -145,15 +136,13 @@ export function SplitPdfTool() {
       setPageSelection(`1-${nextMetadata.pageCount}`);
       setPartCount(2);
       setParts(["", ""]);
-
       if (mode === "parts" && nextMetadata.pageCount < 2) {
         setMode("extract-pages");
       }
-
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo leer el archivo PDF.");
+      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
     }
   };
 
@@ -170,26 +159,18 @@ export function SplitPdfTool() {
     setError(null);
     setIsDragging(false);
     setLastOutput(null);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const selectMode = (nextMode: SplitPdfMode) => {
-    if (nextMode === "parts" && partsModeUnavailable) {
-      return;
-    }
-
+    if (nextMode === "parts" && partsModeUnavailable) return;
     setMode(nextMode);
     resetFeedback();
   };
 
   const changePartCount = (nextCount: number) => {
     setPartCount(nextCount);
-    setParts((currentParts) =>
-      Array.from({ length: nextCount }, (_, index) => currentParts[index] ?? ""),
-    );
+    setParts((currentParts) => Array.from({ length: nextCount }, (_, index) => currentParts[index] ?? ""));
     resetFeedback();
   };
 
@@ -201,7 +182,6 @@ export function SplitPdfTool() {
   const downloadResult = (bytes: ArrayBuffer, mimeType: string, fileName: string) => {
     const url = URL.createObjectURL(new Blob([bytes], { type: mimeType }));
     const link = document.createElement("a");
-
     link.href = url;
     link.download = fileName;
     link.click();
@@ -209,10 +189,7 @@ export function SplitPdfTool() {
   };
 
   const splitPdf = async () => {
-    if (!file || !canProcess) {
-      return;
-    }
-
+    if (!file || !canProcess) return;
     setStatus("processing");
     setError(null);
     setLastOutput(null);
@@ -228,33 +205,36 @@ export function SplitPdfTool() {
       downloadResult(result.bytes, result.mimeType, result.fileName);
 
       if (mode === "extract-pages") {
-        setLastOutput(
-          `Descargaste ${result.fileName} con ${result.pageCount} ${result.pageCount === 1 ? "página" : "páginas"}.`,
-        );
+        const label = result.pageCount === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural");
+        setLastOutput(t("tools.split-pdf.ui.successOne", { name: result.fileName, count: result.pageCount, label }));
       } else {
+        const label =
+          mode === "parts"
+            ? result.outputCount === 1
+              ? t("tools.split-pdf.ui.successOnePartLabel")
+              : t("tools.split-pdf.ui.successPartsLabel")
+            : result.outputCount === 1
+              ? t("tools.split-pdf.ui.successIndividualOne")
+              : t("tools.split-pdf.ui.successIndividualMany");
         setLastOutput(
-          `Descargaste ${result.fileName} con ${result.outputCount} ${
-            mode === "parts" ? "partes" : result.outputCount === 1 ? "PDF individual" : "PDFs individuales"
-          }.`,
+          `${t("tools.split-pdf.ui.successOne", { name: result.fileName, count: result.outputCount, label })}`,
         );
       }
 
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo dividir el PDF.");
+      setError(nextError instanceof Error ? nextError.message : t("tools.split-pdf.ui.couldNotSplit"));
     }
   };
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,0.94fr)_minmax(310px,0.54fr)]">
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">Archivo y división</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">
-              Seleccioná un PDF y elegí cómo querés separar sus páginas. Todo ocurre en tu navegador.
-            </p>
+            <h3 className="text-sm font-semibold text-ink-900">{t("tools.split-pdf.ui.section")}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.split-pdf.ui.intro2")}</p>
           </div>
 
           <button
@@ -285,8 +265,8 @@ export function SplitPdfTool() {
               <span className="mx-auto grid h-12 w-12 place-items-center rounded-lg border border-surface-200 bg-surface-50 text-accent-teal">
                 <Upload size={23} />
               </span>
-              <span className="mt-3 block text-base font-semibold text-ink-900">Seleccionar PDF</span>
-              <span className="mt-2 block text-sm leading-6 text-ink-500">También podés arrastrar un archivo aquí.</span>
+              <span className="mt-3 block text-base font-semibold text-ink-900">{t("toolUi.uploadPdf")}</span>
+              <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.split-pdf.ui.dropHintShort")}</span>
             </span>
           </button>
           <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.splitPdf}</p>
@@ -303,18 +283,18 @@ export function SplitPdfTool() {
           />
 
           {metadata ? (
-            <div className="rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <div className="min-w-0 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <p className="truncate text-sm font-semibold text-ink-900">{metadata.fileName}</p>
               <p className="mt-1 text-xs text-ink-500">
-                {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? "página" : "páginas"}
+                {formatFileSize(metadata.fileSize)} · {metadata.pageCount} {metadata.pageCount === 1 ? t("toolUi.pagesSingular") : t("toolUi.pagesPlural")}
               </p>
             </div>
           ) : null}
 
           <div className="grid gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Modo de división</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{t("tools.split-pdf.ui.modeLabel")}</p>
             <div className="grid gap-2 lg:grid-cols-3">
-              {(Object.keys(modeContent) as SplitPdfMode[]).map((modeId) => (
+              {(Object.keys(modeKeys) as SplitPdfMode[]).map((modeId) => (
                 <button
                   key={modeId}
                   type="button"
@@ -328,15 +308,15 @@ export function SplitPdfTool() {
                   )}
                   onClick={() => selectMode(modeId)}
                 >
-                  <span className="block text-sm font-semibold text-ink-900">{modeContent[modeId].label}</span>
-                  <span className="mt-1 block text-xs leading-5 text-ink-500">{modeContent[modeId].shortDescription}</span>
+                  <span className="block text-sm font-semibold text-ink-900">{t(modeKeys[modeId].label)}</span>
+                  <span className="mt-1 block text-xs leading-5 text-ink-500">{t(modeKeys[modeId].shortDescription)}</span>
                 </button>
               ))}
             </div>
             <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm leading-6 text-ink-500 shadow-sm">
               {mode === "individual-pages" && metadata?.pageCount === 1
-                ? "Se creará un PDF individual con la única página del documento."
-                : modeContent[mode].description}
+                ? t("tools.split-pdf.ui.singlePageNotice")
+                : t(modeKeys[mode].description)}
             </p>
             {generatedOutputLimitError ? <p role="alert" className="text-sm text-ink-700">{generatedOutputLimitError}</p> : null}
           </div>
@@ -345,14 +325,14 @@ export function SplitPdfTool() {
             <div className="grid gap-2 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <div className="flex items-center gap-2">
                 <label htmlFor="split-pdf-page-selection" className="text-sm font-semibold text-ink-700">
-                  Páginas a extraer
+                  {t("tools.split-pdf.ui.pagesToExtract")}
                 </label>
-                <HelpHint id="split-pdf-page-selection-help" text={extractPagesHelp} />
+                <HelpHint id="split-pdf-page-selection-help" text={t("tools.split-pdf.ui.extractPagesHelp")} />
               </div>
               <input
                 id="split-pdf-page-selection"
                 className={inputClassName}
-                placeholder="Ej.: 1,3-5,7"
+                placeholder={t("tools.split-pdf.ui.pagesPlaceholder")}
                 type="text"
                 value={pageSelection}
                 onChange={(event) => {
@@ -360,11 +340,11 @@ export function SplitPdfTool() {
                   resetFeedback();
                 }}
               />
-              <p className="text-xs leading-5 text-ink-500">Usá páginas individuales o rangos separados por comas.</p>
+              <p className="text-xs leading-5 text-ink-500">{t("tools.split-pdf.ui.pagesHelp")}</p>
               {selectionValidation?.error ? <p role="alert" className="text-sm text-ink-700">{selectionValidation.error}</p> : null}
               {!selectionValidation?.error && selectionValidation?.isOutOfOrder ? (
                 <p className="rounded-md border border-accent-cyan/25 bg-accent-cyan/10 px-3 py-2 text-sm text-ink-700">
-                  Aviso: las páginas se generarán en el orden que escribiste.
+                  {t("tools.split-pdf.ui.pagesOutOfOrder")}
                 </p>
               ) : null}
             </div>
@@ -373,14 +353,14 @@ export function SplitPdfTool() {
           {mode === "parts" ? (
             <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
               <label className="grid gap-1.5 text-sm font-semibold text-ink-700 sm:max-w-48">
-                Cantidad de partes
+                {t("tools.split-pdf.ui.partsCountLabel")}
                 <select
                   className={inputClassName}
                   disabled={!metadata || metadata.pageCount < 2}
                   value={partCount}
                   onChange={(event) => changePartCount(Number(event.target.value))}
                 >
-                  {!metadata || metadata.pageCount < 2 ? <option value={2}>Cargá un PDF primero</option> : null}
+                  {!metadata || metadata.pageCount < 2 ? <option value={2}>{t("tools.split-pdf.ui.uploadFirst")}</option> : null}
                   {metadata && metadata.pageCount >= 2
                     ? Array.from({ length: metadata.pageCount - 1 }, (_, index) => index + 2).map((count) => (
                         <option key={count} value={count}>
@@ -396,14 +376,14 @@ export function SplitPdfTool() {
                   <div key={index} className="grid gap-1.5">
                     <div className="flex items-center gap-2">
                       <label htmlFor={`split-pdf-part-${index + 1}`} className="text-sm font-semibold text-ink-700">
-                        Parte {index + 1}
+                        {t("tools.split-pdf.ui.partLabel", { number: index + 1 })}
                       </label>
-                      <HelpHint id={`split-pdf-part-${index + 1}-help`} text={partsHelp} />
+                      <HelpHint id={`split-pdf-part-${index + 1}-help`} text={t("tools.split-pdf.ui.partsHelp")} />
                     </div>
                     <input
                       id={`split-pdf-part-${index + 1}`}
                       className={inputClassName}
-                      placeholder={index === 0 ? "Ej.: 1-3" : "Ej.: 4-7"}
+                      placeholder={index === 0 ? t("tools.split-pdf.ui.partPlaceholderFirst") : t("tools.split-pdf.ui.partPlaceholderRest")}
                       type="text"
                       value={part}
                       onChange={(event) => changePart(index, event.target.value)}
@@ -422,9 +402,14 @@ export function SplitPdfTool() {
                   )}
                 >
                   <p className="font-semibold">
-                    Páginas asignadas: {partsValidation.assignedPageCount} de {metadata.pageCount}
+                    {t("tools.split-pdf.ui.assignedSummary", {
+                      assigned: partsValidation.assignedPageCount,
+                      total: metadata.pageCount,
+                    })}
                   </p>
-                  <p className="mt-1">{partsValidation.isValid ? "Listo para dividir." : partsValidation.error}</p>
+                  <p className="mt-1">
+                    {partsValidation.isValid ? t("tools.split-pdf.ui.assignedReady") : partsValidation.error}
+                  </p>
                 </div>
               ) : null}
             </div>
@@ -432,27 +417,29 @@ export function SplitPdfTool() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">Resultado</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">Los archivos se procesan localmente. No se suben a servidores.</p>
+          <h3 className="text-sm font-semibold text-ink-900">{t("tools.split-pdf.ui.resultTitle")}</h3>
+          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.split-pdf.ui.resultIntro2")}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
-            <p className="text-sm font-semibold text-ink-700">Total de páginas</p>
+            <p className="text-sm font-semibold text-ink-700">{t("tools.split-pdf.ui.totalPages")}</p>
             <p className="mt-2 text-5xl font-semibold text-ink-900">{metadata?.pageCount ?? 0}</p>
-            <p className="mt-2 text-sm font-semibold text-ink-700">{metadata?.pageCount === 1 ? "página detectada" : "páginas detectadas"}</p>
+            <p className="mt-2 text-sm font-semibold text-ink-700">
+              {metadata?.pageCount === 1 ? t("tools.split-pdf.ui.pageDetected") : t("tools.split-pdf.ui.pagesDetected")}
+            </p>
           </div>
 
           <dl className="grid gap-3 text-sm">
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Modo seleccionado</dt>
-              <dd className="mt-1 font-semibold text-ink-900">{modeContent[mode].label}</dd>
+              <dt className="text-ink-500">{t("tools.split-pdf.ui.selectedMode")}</dt>
+              <dd className="mt-1 font-semibold text-ink-900">{t(modeKeys[mode].label)}</dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
               <dt className="text-ink-500">
-                <label htmlFor="split-pdf-output-name">Nombre de salida</label>
+                <label htmlFor="split-pdf-output-name">{t("tools.split-pdf.ui.outputName")}</label>
               </dt>
               <dd className="mt-2">
                 <input
@@ -467,15 +454,17 @@ export function SplitPdfTool() {
                   }}
                 />
                 <span className="mt-2 block text-xs leading-5 text-ink-500">
-                  Si lo dejás vacío, se usará el nombre original del PDF seguido de "-dividido".
+                  {t("tools.split-pdf.ui.outputNameHelp")}
                 </span>
                 {outputNameError ? <span role="alert" className="mt-2 block text-sm text-ink-700">{outputNameError}</span> : null}
               </dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">
-              <dt className="text-ink-500">Descarga final</dt>
-              <dd className="mt-1 break-all font-semibold text-ink-900">{outputFileName ?? "Nombre de salida inválido"}</dd>
-              <dd className="mt-1 text-xs text-ink-500">{outputExtension === "pdf" ? "Archivo PDF" : "Archivo ZIP"}</dd>
+              <dt className="text-ink-500">{t("tools.split-pdf.ui.finalDownload")}</dt>
+              <dd className="mt-1 break-all font-semibold text-ink-900">{outputFileName ?? t("tools.split-pdf.ui.outputNameInvalid")}</dd>
+              <dd className="mt-1 text-xs text-ink-500">
+                {outputExtension === "pdf" ? t("tools.split-pdf.ui.archivePdf") : t("tools.split-pdf.ui.archiveZip")}
+              </dd>
             </div>
           </dl>
 
@@ -486,7 +475,7 @@ export function SplitPdfTool() {
               className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm"
             >
               <Loader2 className="animate-spin text-accent-teal" size={16} />
-              {status === "reading" ? "Leyendo PDF..." : "Preparando descarga..."}
+              {status === "reading" ? t("toolUi.readingPdf") : t("tools.split-pdf.ui.preparing")}
             </p>
           ) : null}
 
@@ -500,18 +489,18 @@ export function SplitPdfTool() {
 
           {!metadata && status === "idle" ? (
             <p className="rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
-              Seleccioná un PDF para habilitar la división.
+              {t("tools.split-pdf.ui.pickFirst")}
             </p>
           ) : null}
 
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void splitPdf()} disabled={!canProcess}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Scissors size={16} />}
-              {modeContent[mode].button}
+              {t(modeKeys[mode].button)}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               {outputExtension === "zip" ? <FileArchive size={16} /> : <FileText size={16} />}
-              Seleccionar PDF
+              {t("toolUi.uploadPdf")}
             </Button>
             <Button
               type="button"
@@ -521,7 +510,7 @@ export function SplitPdfTool() {
               disabled={!file && status === "idle" && !hasCustomOutputBaseName}
             >
               <RotateCcw size={16} />
-              Limpiar
+              {t("toolUi.clear")}
             </Button>
           </div>
         </div>

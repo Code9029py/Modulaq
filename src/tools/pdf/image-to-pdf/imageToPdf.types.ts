@@ -1,4 +1,6 @@
-export type SupportedImageMimeType = "image/png" | "image/jpeg" | "image/webp";
+import type { BrowserImageMimeType } from "../../../shared/utils/imageFiles";
+
+export type SupportedImageMimeType = BrowserImageMimeType;
 
 export type ImageToPdfItem = {
   id: string;
