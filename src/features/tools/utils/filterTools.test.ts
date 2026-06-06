@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { ToolDefinition } from "../types/tool.types";
-import { orderToolsByFavoriteIds } from "./filterTools";
+import { filterTools, orderToolsByFavoriteIds } from "./filterTools";
 
-function createTool(id: string): ToolDefinition {
+function createTool(id: string, overrides: Partial<ToolDefinition> = {}): ToolDefinition {
   return {
     id,
     name: { es: id, en: id },
     slug: id,
     slugEn: id,
-    description: { es: `${id} description`, en: `${id} description` },
+    description: { es: `${id} descripcion`, en: `${id} description` },
     category: "pdf",
     tags: { es: [], en: [] },
     modes: ["online"],
@@ -18,8 +18,21 @@ function createTool(id: string): ToolDefinition {
     requiresBackend: false,
     requiresAI: false,
     apiStatus: "not-planned",
+    ...overrides,
   };
 }
+
+describe("filterTools", () => {
+  it("matches search in Spanish and English metadata", () => {
+    const tools = [
+      createTool("pdf", { name: { es: "Unir PDFs", en: "Merge PDFs" } }),
+      createTool("qr", { tags: { es: ["codigo"], en: ["code"] } }),
+    ];
+
+    expect(filterTools(tools, { search: "merge", category: "all", mode: "all", status: "all" })).toEqual([tools[0]]);
+    expect(filterTools(tools, { search: "codigo", category: "all", mode: "all", status: "all" })).toEqual([tools[1]]);
+  });
+});
 
 describe("orderToolsByFavoriteIds", () => {
   it("puts favorite tools first using the saved favorite order", () => {
