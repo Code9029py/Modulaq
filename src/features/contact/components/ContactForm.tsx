@@ -11,6 +11,8 @@ import {
 } from "../../../config/contact";
 import { Button } from "../../../shared/components/Button";
 import { TextLink } from "../../../shared/components/TextLink";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { inputClassName } from "../../../shared/styles/inputClassName";
 import { cn } from "../../../shared/utils/cn";
 
@@ -42,61 +44,62 @@ type Web3FormsResponse = {
   success?: boolean;
 };
 
-const contactTypeOptions: Array<{ label: string; value: ContactType }> = [
-  { label: "Consulta general", value: "general" },
-  { label: "Solicitar herramienta", value: "tool-request" },
-  { label: "Reportar problema", value: "bug-report" },
-  { label: "Enviar feedback", value: "feedback" },
-];
+const contactTypeKeys: Record<ContactType, TranslationKey> = {
+  general: "contact.type.general",
+  "tool-request": "contact.type.toolRequest",
+  "bug-report": "contact.type.bugReport",
+  feedback: "contact.type.feedback",
+};
 
-const copyByType: Record<
+const copyKeysByType: Record<
   ContactType,
   {
-    description: string;
-    detailLabel: string;
-    detailPlaceholder: string;
-    formTitle: string;
-    messageLabel: string;
-    messagePlaceholder: string;
+    description: TranslationKey;
+    detailLabel: TranslationKey;
+    detailPlaceholder: TranslationKey;
+    formTitle: TranslationKey;
+    messageLabel: TranslationKey;
+    messagePlaceholder: TranslationKey;
   }
 > = {
   general: {
-    formTitle: "Consulta general",
-    description: "Usá este canal para preguntas o comentarios sobre Modulaq.",
-    detailLabel: "Tema",
-    detailPlaceholder: "Ejemplo: duda sobre Modulaq",
-    messageLabel: "Mensaje",
-    messagePlaceholder: "Contame qué necesitás revisar o consultar...",
+    formTitle: "contact.copy.general.formTitle",
+    description: "contact.copy.general.description",
+    detailLabel: "contact.copy.general.detailLabel",
+    detailPlaceholder: "contact.copy.general.detailPlaceholder",
+    messageLabel: "contact.copy.general.messageLabel",
+    messagePlaceholder: "contact.copy.general.messagePlaceholder",
   },
   "tool-request": {
-    formTitle: "Solicitar herramienta",
-    description: "Contanos qué microherramienta te gustaría sumar al ecosistema.",
-    detailLabel: "Herramienta solicitada",
-    detailPlaceholder: "Ejemplo: convertir CSV a JSON",
-    messageLabel: "Descripción breve",
-    messagePlaceholder: "Qué debería resolver y cómo la usarías...",
+    formTitle: "contact.copy.toolRequest.formTitle",
+    description: "contact.copy.toolRequest.description",
+    detailLabel: "contact.copy.toolRequest.detailLabel",
+    detailPlaceholder: "contact.copy.toolRequest.detailPlaceholder",
+    messageLabel: "contact.copy.toolRequest.messageLabel",
+    messagePlaceholder: "contact.copy.toolRequest.messagePlaceholder",
   },
   "bug-report": {
-    formTitle: "Reportar problema",
-    description: "Ayudanos a detectar errores o comportamientos inesperados.",
-    detailLabel: "Dónde ocurre",
-    detailPlaceholder: "Ejemplo: catálogo, herramienta o navegación móvil",
-    messageLabel: "Qué pasó",
-    messagePlaceholder: "Describí el problema y los pasos para reproducirlo...",
+    formTitle: "contact.copy.bugReport.formTitle",
+    description: "contact.copy.bugReport.description",
+    detailLabel: "contact.copy.bugReport.detailLabel",
+    detailPlaceholder: "contact.copy.bugReport.detailPlaceholder",
+    messageLabel: "contact.copy.bugReport.messageLabel",
+    messagePlaceholder: "contact.copy.bugReport.messagePlaceholder",
   },
   feedback: {
-    formTitle: "Enviar feedback",
-    description: "Compartí tu experiencia con la beta y qué mejorarías.",
-    detailLabel: "Tema del feedback",
-    detailPlaceholder: "Ejemplo: facilidad de uso o resultado generado",
-    messageLabel: "Feedback",
-    messagePlaceholder: "Contanos qué funcionó bien o qué podríamos ajustar...",
+    formTitle: "contact.copy.feedback.formTitle",
+    description: "contact.copy.feedback.description",
+    detailLabel: "contact.copy.feedback.detailLabel",
+    detailPlaceholder: "contact.copy.feedback.detailPlaceholder",
+    messageLabel: "contact.copy.feedback.messageLabel",
+    messagePlaceholder: "contact.copy.feedback.messagePlaceholder",
   },
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function ContactForm({ initialType }: ContactFormProps) {
+  const { t } = useI18n();
   const [contactType, setContactType] = useState<ContactType>(initialType);
   const [isDesktopTypeListOpen, setIsDesktopTypeListOpen] = useState(true);
   const [name, setName] = useState("");
@@ -105,7 +108,18 @@ export function ContactForm({ initialType }: ContactFormProps) {
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>("idle");
-  const copy = useMemo(() => copyByType[contactType], [contactType]);
+  const copyKeys = copyKeysByType[contactType];
+  const copy = useMemo(
+    () => ({
+      formTitle: t(copyKeys.formTitle),
+      description: t(copyKeys.description),
+      detailLabel: t(copyKeys.detailLabel),
+      detailPlaceholder: t(copyKeys.detailPlaceholder),
+      messageLabel: t(copyKeys.messageLabel),
+      messagePlaceholder: t(copyKeys.messagePlaceholder),
+    }),
+    [copyKeys, t],
+  );
   const hasDirectSubmission = WEB3FORMS_ACCESS_KEY.length > 0;
   const isSubmitting = submissionStatus === "submitting";
 
@@ -115,11 +129,11 @@ export function ContactForm({ initialType }: ContactFormProps) {
     const trimmedMessage = message.trim();
 
     if (trimmedEmail && !emailPattern.test(trimmedEmail)) {
-      nextErrors.email = "Ingresá un correo válido o dejá este campo vacío.";
+      nextErrors.email = t("contact.form.emailInvalid");
     }
 
     if (!trimmedMessage) {
-      nextErrors.message = "Escribí un mensaje antes de continuar.";
+      nextErrors.message = t("contact.form.messageRequired");
     }
 
     setErrors(nextErrors);
@@ -206,7 +220,7 @@ export function ContactForm({ initialType }: ContactFormProps) {
       const result = (await response.json()) as Web3FormsResponse;
 
       if (!response.ok || !result.success) {
-        throw new Error("No se pudo enviar la consulta.");
+        throw new Error("Submission failed.");
       }
 
       setName("");
@@ -220,18 +234,22 @@ export function ContactForm({ initialType }: ContactFormProps) {
     }
   };
 
+  const contactTypeOptions: Array<{ label: string; value: ContactType }> = (
+    ["general", "tool-request", "bug-report", "feedback"] as ContactType[]
+  ).map((value) => ({ value, label: t(contactTypeKeys[value]) }));
+
   return (
     <div className={cn("grid gap-5", isDesktopTypeListOpen ? "lg:grid-cols-[240px_1fr]" : "lg:grid-cols-1")}>
       {isDesktopTypeListOpen ? (
         <aside className="hidden overflow-hidden rounded-2xl border border-surface-200/80 bg-surface-50/90 shadow-panel ring-1 ring-surface-50/80 backdrop-blur lg:block">
           <div className="flex min-h-12 items-center justify-between gap-3 border-b border-surface-200/80 bg-surface-50/70 px-4">
-            <p className="text-sm font-semibold text-ink-900">Tipo de mensaje</p>
+            <p className="text-sm font-semibold text-ink-900">{t("contact.aside.title")}</p>
             <button
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-700 transition hover:text-ink-900"
               type="button"
               onClick={() => setIsDesktopTypeListOpen(false)}
             >
-              Ocultar
+              {t("contact.aside.hide")}
               <ArrowLeft size={15} />
             </button>
           </div>
@@ -260,7 +278,7 @@ export function ContactForm({ initialType }: ContactFormProps) {
       ) : (
         <div className="hidden lg:block">
           <Button type="button" variant="secondary" onClick={() => setIsDesktopTypeListOpen(true)}>
-            Mostrar opciones
+            {t("contact.aside.show")}
             <ArrowRight className="ml-2" size={16} />
           </Button>
         </div>
@@ -268,7 +286,7 @@ export function ContactForm({ initialType }: ContactFormProps) {
 
       <div className="grid gap-5">
         <div className="rounded-2xl border border-surface-200/80 bg-surface-50/90 p-3 shadow-panel ring-1 ring-surface-50/80 lg:hidden">
-          <p className="mb-3 text-sm font-semibold text-ink-900">Tipo de mensaje</p>
+          <p className="mb-3 text-sm font-semibold text-ink-900">{t("contact.aside.title")}</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {contactTypeOptions.map((option) => (
               <button
@@ -304,12 +322,12 @@ export function ContactForm({ initialType }: ContactFormProps) {
           </div>
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700" htmlFor="contact-name">
-            Nombre
+            {t("contact.form.nameLabel")}
             <input
               className={inputClassName}
               disabled={isSubmitting}
               id="contact-name"
-              placeholder="Tu nombre"
+              placeholder={t("contact.form.namePlaceholder")}
               value={name}
               onChange={(event) => {
                 setName(event.target.value);
@@ -318,14 +336,14 @@ export function ContactForm({ initialType }: ContactFormProps) {
             />
           </label>
           <label className="grid gap-2 text-sm font-semibold text-ink-700" htmlFor="contact-email">
-            Email de respuesta (opcional)
+            {t("contact.form.emailLabel")}
             <input
               aria-describedby={errors.email ? "contact-email-error" : undefined}
               aria-invalid={Boolean(errors.email)}
               className={inputClassName}
               disabled={isSubmitting}
               id="contact-email"
-              placeholder="tu@email.com"
+              placeholder={t("contact.form.emailPlaceholder")}
               type="email"
               value={email}
               onChange={(event) => {
@@ -379,32 +397,37 @@ export function ContactForm({ initialType }: ContactFormProps) {
           <div className="lg:col-span-2">
             <Button disabled={isSubmitting} type="submit">
               <Send className="mr-2" size={17} />
-              {submissionStatus === "submitting" ? "Enviando..." : hasDirectSubmission ? "Enviar consulta" : "Abrir correo"}
+              {submissionStatus === "submitting"
+                ? t("contact.form.submitting")
+                : hasDirectSubmission
+                  ? t("contact.form.submit")
+                  : t("contact.form.submitMail")}
             </Button>
             <p className="mt-3 text-sm leading-6 text-ink-500">
               {hasDirectSubmission ? (
                 <>
-                  Tu mensaje se enviará a{" "}
-                  <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>. Si dejás tu email,
-                  responderemos a la brevedad posible.
+                  {t("contact.form.helperWebPre")}{" "}
+                  <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>
+                  {t("contact.form.helperWebPost")}
                 </>
               ) : (
                 <>
-                  Se abrirá tu aplicación de correo para enviar el mensaje a{" "}
-                  <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>.
+                  {t("contact.form.helperMailPre")}{" "}
+                  <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>
+                  {t("contact.form.helperMailPost")}
                 </>
               )}
             </p>
             {submissionStatus === "success" ? (
               <p aria-live="polite" className="mt-4 rounded-md border border-accent-teal/25 bg-accent-teal/10 px-3 py-2 text-sm text-ink-700" role="status">
-                Tu consulta fue enviada correctamente. Gracias por escribirnos.
+                {t("contact.form.successWeb")}
               </p>
             ) : null}
             {submissionStatus === "error" ? (
               <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-800" role="alert">
-                <p>No pudimos enviar tu consulta desde la web. Podés intentarlo nuevamente o enviarla desde tu aplicación de correo.</p>
+                <p>{t("contact.form.errorWeb")}</p>
                 <button className="mt-3 font-semibold underline underline-offset-2" type="button" onClick={openMailto}>
-                  Enviar por correo
+                  {t("contact.form.errorRetry")}
                 </button>
               </div>
             ) : null}

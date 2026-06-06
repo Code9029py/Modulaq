@@ -7,6 +7,8 @@ import { HeroBadge } from "../../shared/components/HeroBadge";
 import { HeroPanel } from "../../shared/components/HeroPanel";
 import { PageBackdrop } from "../../shared/components/PageBackdrop";
 import { TextLink } from "../../shared/components/TextLink";
+import { useI18n } from "../../shared/i18n/I18nProvider";
+import { localizedPath } from "../../shared/i18n/paths";
 import { PageHead } from "../../shared/seo/PageHead";
 
 function SummaryItem({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
@@ -54,120 +56,100 @@ function DetailCard({ icon: Icon, title, children }: { icon: LucideIcon; title: 
 }
 
 export function PrivacyPage() {
+  const { language, t } = useI18n();
+  const path = localizedPath("privacy", language);
+
   return (
     <section className="relative overflow-hidden">
       <PageBackdrop tone="cyan-violet" />
       <Container className="relative py-10 md:py-12">
         <PageHead
-          title="Privacidad"
-          description="Cómo trata Modulaq tus datos: los archivos se procesan localmente en tu navegador, las métricas son anónimas y sin cookies, y las consultas se envían vía Web3Forms. Sin cuentas ni venta de datos."
-          path="/privacidad"
+          title={t("privacy.head.title")}
+          description={t("privacy.head.description")}
+          path={path}
         />
 
         <HeroPanel>
-          <HeroBadge icon={ShieldCheck}>Privacidad</HeroBadge>
+          <HeroBadge icon={ShieldCheck}>{t("privacy.hero.badge")}</HeroBadge>
           <h1 className="max-w-4xl text-3xl font-semibold leading-tight text-ink-900 md:text-4xl">
-            Privacidad en Modulaq
+            {t("privacy.hero.h1")}
           </h1>
-          <p className="mt-3 max-w-4xl text-base leading-7 text-ink-500">
-            Información clara sobre procesamiento local, analítica, consultas y datos guardados en tu navegador.
-          </p>
+          <p className="mt-3 max-w-4xl text-base leading-7 text-ink-500">{t("privacy.hero.description")}</p>
         </HeroPanel>
 
         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <SummaryItem icon={HardDrive} title="Archivos en tu navegador">
-            Las herramientas de archivos procesan localmente cuando la herramienta lo permite.
+          <SummaryItem icon={HardDrive} title={t("privacy.summary.localTitle")}>
+            {t("privacy.summary.localBody")}
           </SummaryItem>
-          <SummaryItem icon={ShieldCheck} title="Sin cuentas">
-            En la versión actual no hay registro, login ni perfiles de usuario.
+          <SummaryItem icon={ShieldCheck} title={t("privacy.summary.noAccountsTitle")}>
+            {t("privacy.summary.noAccountsBody")}
           </SummaryItem>
-          <SummaryItem icon={Cookie} title="Sin cookies propias">
-            No usamos cookies propias y la analítica se mide de forma agregada.
+          <SummaryItem icon={Cookie} title={t("privacy.summary.noCookiesTitle")}>
+            {t("privacy.summary.noCookiesBody")}
           </SummaryItem>
-          <SummaryItem icon={BarChart3} title="No vendemos datos">
-            Modulaq no vende datos de uso, consultas ni información de archivos.
+          <SummaryItem icon={BarChart3} title={t("privacy.summary.noSellTitle")}>
+            {t("privacy.summary.noSellBody")}
           </SummaryItem>
         </section>
 
         <div className="mt-10 grid gap-10">
-          <TopicGroup
-            title="Datos y archivos"
-            description="Qué queda en tu navegador y qué ocurre cuando usás herramientas con archivos."
-          >
-            <DetailCard icon={HardDrive} title="Procesamiento local de archivos">
-              <p>
-                En las herramientas de archivos disponibles, el procesamiento ocurre dentro de tu navegador cuando la
-                herramienta lo permite. No subimos esos archivos a Modulaq para realizar esas operaciones.
-              </p>
-              <p>
-                Algunas herramientas usan librerías de código abierto que también se ejecutan en tu navegador, por
-                ejemplo para leer o generar PDFs e imágenes.
-              </p>
+          <TopicGroup title={t("privacy.group.dataTitle")} description={t("privacy.group.dataDescription")}>
+            <DetailCard icon={HardDrive} title={t("privacy.card.localFilesTitle")}>
+              <p>{t("privacy.card.localFilesP1")}</p>
+              <p>{t("privacy.card.localFilesP2")}</p>
             </DetailCard>
 
-            <DetailCard icon={ShieldCheck} title="Favoritos e historial local">
+            <DetailCard icon={ShieldCheck} title={t("privacy.card.localStorageTitle")}>
               <p>
-                Tus favoritos y herramientas usadas recientemente se guardan en el{" "}
-                <span className="font-medium text-ink-700">localStorage</span> de tu navegador.
+                {t("privacy.card.localStorageP1Pre")}{" "}
+                <span className="font-medium text-ink-700">localStorage</span>
+                {t("privacy.card.localStorageP1Post")}
               </p>
               <ul className="grid list-disc gap-1.5 pl-5 marker:text-ink-300">
-                <li>Incluyen solo identificadores de herramientas, como ids o slugs.</li>
-                <li>No incluyen contenido de tus archivos.</li>
-                <li>No se sincronizan entre dispositivos.</li>
-                <li>Podés borrarlos limpiando los datos del sitio en tu navegador.</li>
+                <li>{t("privacy.card.localStorageItem1")}</li>
+                <li>{t("privacy.card.localStorageItem2")}</li>
+                <li>{t("privacy.card.localStorageItem3")}</li>
+                <li>{t("privacy.card.localStorageItem4")}</li>
               </ul>
             </DetailCard>
           </TopicGroup>
 
-          <TopicGroup
-            title="Comunicación y medición"
-            description="Cómo recibimos consultas y qué métricas usamos para entender el sitio."
-          >
-            <DetailCard icon={MessageSquare} title="Consultas">
+          <TopicGroup title={t("privacy.group.commsTitle")} description={t("privacy.group.commsDescription")}>
+            <DetailCard icon={MessageSquare} title={t("privacy.card.consultationsTitle")}>
               <p>
-                Cuando enviás una consulta, usamos{" "}
-                <span className="font-medium text-ink-700">Web3Forms</span> para recibir tu mensaje por correo. Los
-                datos que escribís en el formulario se envían para poder responderte.
+                {t("privacy.card.consultationsP1Pre")}{" "}
+                <span className="font-medium text-ink-700">Web3Forms</span>{" "}
+                {t("privacy.card.consultationsP1Post")}
               </p>
               <p>
-                Usá ese canal solo para lo que quieras compartir con nosotros. También podés escribirnos a{" "}
-                <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>.
+                {t("privacy.card.consultationsP2Pre")}{" "}
+                <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>
+                {t("privacy.card.consultationsP2Post")}
               </p>
             </DetailCard>
 
-            <DetailCard icon={BarChart3} title="Analítica">
-              <p>
-                Usamos Cloudflare Web Analytics para entender, de forma agregada, las visitas, las rutas más usadas y el
-                rendimiento general del sitio.
-              </p>
+            <DetailCard icon={BarChart3} title={t("privacy.card.analyticsTitle")}>
+              <p>{t("privacy.card.analyticsP1")}</p>
               <ul className="grid list-disc gap-1.5 pl-5 marker:text-ink-300">
-                <li>No usamos cookies para la analítica.</li>
-                <li>No medimos nombres de archivos, contenido de PDFs o textos, emails ni mensajes de consultas.</li>
+                <li>{t("privacy.card.analyticsItem1")}</li>
+                <li>{t("privacy.card.analyticsItem2")}</li>
               </ul>
             </DetailCard>
           </TopicGroup>
 
-          <TopicGroup
-            title="Uso avanzado"
-            description="Información útil si copiás ejemplos o trabajás con archivos grandes."
-          >
-            <DetailCard icon={Code2} title="Código integrable">
-              <p>
-                Los snippets de código integrable son contenido documental para que los copies y uses bajo tu
-                responsabilidad. No ejecutan nada por sí solos: recién corren cuando los copiás y los usás en tu propio
-                proyecto.
-              </p>
+          <TopicGroup title={t("privacy.group.advancedTitle")} description={t("privacy.group.advancedDescription")}>
+            <DetailCard icon={Code2} title={t("privacy.card.integrableTitle")}>
+              <p>{t("privacy.card.integrableP1")}</p>
             </DetailCard>
 
-            <DetailCard icon={AlertTriangle} title="Límites de procesamiento">
+            <DetailCard icon={AlertTriangle} title={t("privacy.card.limitsTitle")}>
               <ul className="grid list-disc gap-1.5 pl-5 marker:text-ink-300">
-                <li>Algunas herramientas pueden usar memoria y CPU de tu navegador.</li>
-                <li>Los archivos grandes pueden tardar o fallar según tu equipo.</li>
-                <li>Los PDFs protegidos o con estructuras incompatibles pueden no procesarse.</li>
+                <li>{t("privacy.card.limitsItem1")}</li>
+                <li>{t("privacy.card.limitsItem2")}</li>
+                <li>{t("privacy.card.limitsItem3")}</li>
               </ul>
             </DetailCard>
           </TopicGroup>
-
         </div>
       </Container>
     </section>

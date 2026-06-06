@@ -1,10 +1,11 @@
 import { ArrowRight, Braces, FileText, Image, Layers3, QrCode, Sparkles, Table2, Type } from "lucide-react";
-import { buildToolPath } from "../../../app/routes/routePaths";
-import { getCategoryLabel } from "../../../config/categories";
-import { pricingLabels } from "../../../config/pricing";
 import { Button } from "../../../shared/components/Button";
 import { Tag } from "../../../shared/components/Tag";
-import type { ToolCategoryId, ToolMetadata } from "../types/tool.types";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { buildToolPathFor } from "../../../shared/i18n/paths";
+import type { ToolCategoryId, ToolDefinition } from "../types/tool.types";
+import { useTool } from "../utils/localizeTool";
 import { FavoriteToggleButton } from "./FavoriteToggleButton";
 import { ToolStatusBadge } from "./ToolStatusBadge";
 
@@ -19,8 +20,11 @@ const categoryIcons: Record<ToolCategoryId, typeof FileText> = {
   productivity: QrCode,
 };
 
-export function ToolCard({ tool }: { tool: ToolMetadata }) {
-  const Icon = categoryIcons[tool.category] ?? Layers3;
+export function ToolCard({ tool }: { tool: ToolDefinition }) {
+  const { language, t } = useI18n();
+  const localized = useTool(tool);
+  const Icon = categoryIcons[localized.category] ?? Layers3;
+  const href = buildToolPathFor(localized, language);
 
   return (
     <article className="group flex h-full flex-col rounded-xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/60 p-5 shadow-sm ring-1 ring-surface-50/70 transition hover:-translate-y-0.5 hover:border-accent-cyan/40 hover:from-surface-50 hover:to-surface-50/90 hover:shadow-soft motion-reduce:hover:translate-y-0">
@@ -29,22 +33,22 @@ export function ToolCard({ tool }: { tool: ToolMetadata }) {
           <Icon size={18} />
         </div>
         <div className="flex items-center gap-1.5">
-          <ToolStatusBadge status={tool.status} />
-          <FavoriteToggleButton toolId={tool.id} toolName={tool.name} />
+          <ToolStatusBadge status={localized.status} />
+          <FavoriteToggleButton toolId={localized.id} toolName={localized.name} />
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Tag>{getCategoryLabel(tool.category)}</Tag>
-        <Tag>{pricingLabels[tool.pricing]}</Tag>
+        <Tag>{t(`category.${localized.category}` as TranslationKey)}</Tag>
+        <Tag>{t(`toolDetail.pricing.${localized.pricing}` as TranslationKey)}</Tag>
       </div>
 
-      <h3 className="mt-4 text-lg font-semibold text-ink-900">{tool.name}</h3>
-      <p className="mt-2 flex-1 text-sm leading-6 text-ink-500">{tool.description}</p>
+      <h3 className="mt-4 text-lg font-semibold text-ink-900">{localized.name}</h3>
+      <p className="mt-2 flex-1 text-sm leading-6 text-ink-500">{localized.description}</p>
 
       <div className="mt-5 border-t border-surface-200/80 pt-4">
-        <Button href={buildToolPath(tool.slug)}>
-          Ver herramienta
+        <Button href={href}>
+          {t("catalog.toolCard.cta")}
           <ArrowRight className="ml-2" size={16} />
         </Button>
       </div>

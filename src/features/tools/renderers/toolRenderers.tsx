@@ -8,6 +8,18 @@ export type ToolRendererProps = {
 export type ToolRenderer = LazyExoticComponent<ComponentType<ToolRendererProps>>;
 
 const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
+  "image-base64": lazy(() =>
+    import("../../../tools/image/image-base64").then((module) => ({ default: module.ImageBase64Tool })),
+  ),
+  "image-compressor": lazy(() =>
+    import("../../../tools/image/image-compressor").then((module) => ({ default: module.ImageCompressorTool })),
+  ),
+  "image-converter": lazy(() =>
+    import("../../../tools/image/image-converter").then((module) => ({ default: module.ImageConverterTool })),
+  ),
+  "image-resizer": lazy(() =>
+    import("../../../tools/image/image-resizer").then((module) => ({ default: module.ImageResizerTool })),
+  ),
   "image-to-pdf": lazy(() =>
     import("../../../tools/pdf/image-to-pdf").then((module) => ({ default: module.ImageToPdfTool })),
   ),
