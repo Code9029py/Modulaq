@@ -1297,6 +1297,110 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "svg-to-png",
+    slug: "svg-a-png",
+    slugEn: "svg-to-png",
+    name: { es: "SVG a PNG", en: "SVG to PNG" },
+    description: {
+      es: "Convierte un archivo SVG a PNG desde tu navegador.",
+      en: "Convert an SVG file to PNG from your browser.",
+    },
+    category: "image",
+    tags: {
+      es: ["svg", "png", "imagen", "vector", "convertir"],
+      en: ["svg", "png", "image", "vector", "convert"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Convertir SVG a PNG online gratis",
+        description:
+          "Convierte SVG simple a PNG desde tu navegador. Ajusta tamano y fondo antes de descargar, sin backend ni subir archivos.",
+      },
+      en: {
+        title: "Convert SVG to PNG online free",
+        description:
+          "Convert simple SVG to PNG from your browser. Adjust size and background before downloading, with no backend or uploads.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "SVG a PNG convierte un archivo SVG o codigo SVG pegado en una imagen PNG generada localmente.",
+        howTo: [
+          "Selecciona un archivo SVG o pega codigo SVG.",
+          "Revisa el nombre, peso y dimensiones detectadas desde width/height o viewBox.",
+          "Ajusta ancho, alto, fondo transparente o color de fondo.",
+          "Convierte y descarga el PNG.",
+        ],
+        useCases: [
+          "Exportar un logo SVG como PNG.",
+          "Crear una version raster para compartir o usar en una pagina.",
+          "Probar rapidamente un SVG pegado como imagen PNG.",
+        ],
+        limits: [
+          "Algunos SVG con recursos externos o scripts pueden no procesarse.",
+          "Los scripts se rechazan.",
+          "Los SVG con recursos externos pueden no renderizarse igual.",
+          "Maximo 8000 px por lado y 64 megapixeles de salida.",
+        ],
+        privacy:
+          "Todo se procesa localmente en tu navegador; no subimos el SVG a Modulaq.",
+        commonErrors: [
+          "Contenido sin etiqueta SVG valida.",
+          "SVG con scripts.",
+          "Dimensiones de salida no validas o demasiado grandes.",
+          "SVG con recursos externos que el navegador no puede renderizar en canvas.",
+        ],
+        technicalNotes: [
+          "La conversion usa Blob SVG, Image, canvas y exportacion PNG en el navegador.",
+          "Solo exporta PNG.",
+          "No promete compatibilidad perfecta con todos los SVG.",
+        ],
+      },
+      en: {
+        summary:
+          "SVG to PNG converts an SVG file or pasted SVG code into a locally generated PNG image.",
+        howTo: [
+          "Select an SVG file or paste SVG code.",
+          "Review the detected name, size and dimensions from width/height or viewBox.",
+          "Adjust width, height, transparent background or background color.",
+          "Convert and download the PNG.",
+        ],
+        useCases: [
+          "Export an SVG logo as PNG.",
+          "Create a raster version to share or use on a page.",
+          "Quickly test pasted SVG as a PNG image.",
+        ],
+        limits: [
+          "Some SVGs with external resources or scripts may not process.",
+          "Scripts are rejected.",
+          "SVGs with external resources may not render the same.",
+          "Maximum 8000 px per side and 64 megapixels output.",
+        ],
+        privacy:
+          "Everything is processed locally in your browser; we don't upload the SVG to Modulaq.",
+        commonErrors: [
+          "Content without a valid SVG tag.",
+          "SVG with scripts.",
+          "Invalid or too large output dimensions.",
+          "SVG with external resources the browser cannot render into canvas.",
+        ],
+        technicalNotes: [
+          "Conversion uses an SVG Blob, Image, canvas and PNG export in the browser.",
+          "It only exports PNG.",
+          "It does not promise perfect compatibility with every SVG.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-watermark",
     slug: "agregar-marca-agua-imagen",
     slugEn: "add-image-watermark",

@@ -1,0 +1,1 @@
+export { SvgToPngTool } from "./SvgToPngTool";
