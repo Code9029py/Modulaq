@@ -569,6 +569,108 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-rotator",
+    slug: "rotar-imagen",
+    slugEn: "rotate-image",
+    name: { es: "Rotar imagen", en: "Rotate image" },
+    description: {
+      es: "Rota o voltea una imagen directamente en tu navegador.",
+      en: "Rotate or flip an image directly in your browser.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "rotar", "voltear", "png", "jpg", "webp"],
+      en: ["image", "rotate", "flip", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Rotar imagen online gratis",
+        description:
+          "Rota o voltea una imagen PNG, JPG o WebP desde tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Rotate image online free",
+        description:
+          "Rotate or flip a PNG, JPG or WebP image from your browser. No account and no uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Rotar imagen aplica rotaciones y volteos a una imagen local usando canvas, sin backend y sin subir archivos.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Aplica una o varias acciones: rotar 90 grados, rotar 180 grados o voltear.",
+          "Elige PNG, JPG o WebP si el navegador lo permite.",
+          "Prepara la imagen y descarga el resultado.",
+        ],
+        useCases: [
+          "Corregir la orientacion de una foto.",
+          "Reflejar una imagen horizontal o verticalmente.",
+          "Preparar una captura o recurso visual sin subirlo a un servidor.",
+        ],
+        limits: [
+          "JPG no conserva transparencia.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para rotarla.",
+        commonErrors: [
+          "Imagen danada o que el navegador no puede decodificar.",
+          "Archivo que no es PNG, JPG o WebP.",
+          "Formato de salida no disponible en el navegador actual.",
+        ],
+        technicalNotes: [
+          "La transformacion usa canvas en el navegador.",
+          "La rotacion 90/270 intercambia ancho y alto; 0/180 conserva dimensiones.",
+          "Los volteos horizontal y vertical conservan las dimensiones.",
+        ],
+      },
+      en: {
+        summary:
+          "Rotate image applies rotations and flips to a local image with canvas, without backend and without uploads.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Apply one or more actions: rotate 90 degrees, rotate 180 degrees or flip.",
+          "Choose PNG, JPG or WebP if the browser supports it.",
+          "Prepare the image and download the result.",
+        ],
+        useCases: [
+          "Fix a photo orientation.",
+          "Mirror an image horizontally or vertically.",
+          "Prepare a screenshot or visual asset without uploading it to a server.",
+        ],
+        limits: [
+          "JPG does not preserve transparency.",
+          "WebP appears if your browser can export it correctly.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to rotate it.",
+        commonErrors: [
+          "A damaged image or one the browser cannot decode.",
+          "A file that is not PNG, JPG or WebP.",
+          "Output format unavailable in the current browser.",
+        ],
+        technicalNotes: [
+          "The transformation uses browser canvas.",
+          "Rotation by 90/270 swaps width and height; 0/180 keeps dimensions.",
+          "Horizontal and vertical flips keep dimensions.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",
