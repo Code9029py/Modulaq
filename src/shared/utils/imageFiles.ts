@@ -13,6 +13,12 @@ export type BrowserImageExportOptions = {
   width?: number;
 };
 
+export type BrowserCanvasExportOptions = {
+  errorMessage?: string;
+  mimeType: BrowserImageMimeType;
+  quality?: number;
+};
+
 export type BrowserImageExportResult = {
   bytes: ArrayBuffer;
   height: number;
@@ -174,6 +180,38 @@ export async function loadBrowserImage(file: File, errorMessage = "No se pudo le
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
+}
+
+export async function exportBrowserCanvas(
+  canvas: HTMLCanvasElement,
+  { errorMessage = "No se pudo convertir la imagen.", mimeType, quality }: BrowserCanvasExportOptions,
+): Promise<BrowserImageExportResult> {
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (nextBlob) => {
+        if (nextBlob) {
+          resolve(nextBlob);
+          return;
+        }
+
+        reject(new Error(errorMessage));
+      },
+      mimeType,
+      mimeType === "image/png" ? undefined : normalizeImageQuality(quality),
+    );
+  });
+
+  if (blob.type && blob.type !== mimeType) {
+    throw new Error("El navegador no generó el formato de imagen esperado.");
+  }
+
+  return {
+    bytes: await blob.arrayBuffer(),
+    height: canvas.height,
+    mimeType,
+    size: blob.size,
+    width: canvas.width,
+  };
 }
 
 export async function exportBrowserImageFile(

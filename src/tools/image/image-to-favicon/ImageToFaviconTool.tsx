@@ -1,85 +1,98 @@
-import { Download, FileImage, ImagePlus, Loader2, RotateCcw, Upload } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, ChevronUp, Download, FileArchive, FileImage, Loader2, Package, RotateCcw, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
-import { OutputFormatSelector } from "../shared/OutputFormatSelector";
-import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
-  canExportBrowserImageFormat,
-  jpegQualityPercentToDecimal,
-} from "../../../shared/utils/imageFiles";
-import {
-  buildConvertedImageFileName,
-  convertImageFile,
+  buildFaviconZipFileName,
   defaultOutputBaseName,
   formatFileSize,
-  getImageFormatLabel,
+  generateFaviconPack,
+  getFaviconIconSpecs,
+  getFaviconOutputBaseName,
   getImageMimeLabel,
-  getImageOutputBaseName,
   readImageMetadata,
-} from "./imageConverter.service";
-import type {
-  ImageConverterMetadata,
-  ImageConverterOutputFormat,
-  ImageConverterResult,
-  ImageConverterStatus,
-} from "./imageConverter.types";
+} from "./imageToFavicon.service";
+import type { ImageToFaviconMetadata, ImageToFaviconResult, ImageToFaviconStatus } from "./imageToFavicon.types";
 
 const acceptedImageTypes = "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp";
 const inputClassName =
-  "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+const iconSpecs = getFaviconIconSpecs();
 
-type DownloadableResult = ImageConverterResult & {
+type DownloadableResult = ImageToFaviconResult & {
   url: string;
 };
 
-const baseOutputFormats: ImageConverterOutputFormat[] = ["png", "jpeg"];
+const copy = {
+  es: {
+    downloadPack: "Descargar ZIP",
+    downloadReady: "Pack de favicon listo",
+    outputIntro: "No genera archivo .ico clasico; descarga iconos PNG listos para usar.",
+    outputName: "Nombre del ZIP",
+    outputTitle: "Pack generado",
+    previewAlt: "Vista previa del icono",
+    processing: "Generando pack...",
+    readmeIncluded: "Incluye README.txt con ejemplos HTML.",
+    sourceIntro: "Genera un pack de iconos PNG para favicon, Apple touch icon y PWA.",
+    sourceTitle: "Imagen de origen",
+    transparencyHint: "Los PNG conservan transparencia cuando la imagen de origen la tiene.",
+    webLocal: "Todo se procesa localmente en tu navegador.",
+    willPrepareAs: "Se preparara como {{name}}",
+    zipContents: "Archivos dentro del ZIP",
+  },
+  en: {
+    downloadPack: "Download ZIP",
+    downloadReady: "Favicon pack ready",
+    outputIntro: "It does not create a classic .ico file; it downloads ready-to-use PNG icons.",
+    outputName: "ZIP name",
+    outputTitle: "Generated pack",
+    previewAlt: "Icon preview",
+    processing: "Generating pack...",
+    readmeIncluded: "Includes README.txt with HTML examples.",
+    sourceIntro: "Generate a PNG icon pack for favicon, Apple touch icon and PWA.",
+    sourceTitle: "Source image",
+    transparencyHint: "PNG output preserves transparency when the source image has it.",
+    webLocal: "Everything is processed locally in your browser.",
+    willPrepareAs: "Will prepare as {{name}}",
+    zipContents: "Files inside the ZIP",
+  },
+} as const;
 
-const formatDescKeys: Record<ImageConverterOutputFormat, TranslationKey> = {
-  png: "imageUi.png.desc",
-  jpeg: "imageUi.jpg.desc",
-  webp: "imageUi.webp.desc",
-};
+function formatTemplate(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce((result, [key, value]) => result.replace(`{{${key}}}`, value), template);
+}
 
-export function ImageConverterTool() {
+export function ImageToFaviconTool() {
   const { language, t } = useI18n();
+  const labels = copy[language];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [metadata, setMetadata] = useState<ImageConverterMetadata | null>(null);
+  const [metadata, setMetadata] = useState<ImageToFaviconMetadata | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [outputFormat, setOutputFormat] = useState<ImageConverterOutputFormat>("png");
-  const [qualityPercent, setQualityPercent] = useState(92);
   const [outputFileName, setOutputFileName] = useState(defaultOutputBaseName);
   const [hasCustomOutputFileName, setHasCustomOutputFileName] = useState(false);
-  const [webpSupported, setWebpSupported] = useState(false);
-  const [status, setStatus] = useState<ImageConverterStatus>("idle");
+  const [status, setStatus] = useState<ImageToFaviconStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<DownloadableResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isZipContentsOpen, setIsZipContentsOpen] = useState(true);
 
   useEffect(() => {
-    setWebpSupported(canExportBrowserImageFormat("webp"));
     return () => {
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       if (resultUrlRef.current) URL.revokeObjectURL(resultUrlRef.current);
     };
   }, []);
 
-  const outputFormats = useMemo(
-    () => (webpSupported ? [...baseOutputFormats, "webp" as const] : baseOutputFormats),
-    [webpSupported],
-  );
-  const finalOutputFileName = buildConvertedImageFileName(
+  const finalOutputFileName = buildFaviconZipFileName(
     outputFileName,
-    outputFormat,
-    metadata ? getImageOutputBaseName(metadata.fileName) : defaultOutputBaseName,
+    metadata ? getFaviconOutputBaseName(metadata.fileName) : defaultOutputBaseName,
   );
-  const shouldShowQuality = outputFormat === "jpeg" || outputFormat === "webp";
-  const canConvert = Boolean(file && metadata) && status !== "reading" && status !== "processing";
+  const canGenerate = Boolean(file && metadata) && status !== "reading" && status !== "processing";
 
   const clearResult = () => {
     if (resultUrlRef.current) {
@@ -126,7 +139,7 @@ export function ImageConverterTool() {
       setFile(nextFile);
       setMetadata(nextMetadata);
       if (!hasCustomOutputFileName) {
-        setOutputFileName(getImageOutputBaseName(nextFile.name));
+        setOutputFileName(getFaviconOutputBaseName(nextFile.name));
       }
       setStatus("ready");
     } catch (nextError) {
@@ -144,8 +157,6 @@ export function ImageConverterTool() {
     setFile(null);
     setMetadata(null);
     setPreviewUrl(null);
-    setOutputFormat("png");
-    setQualityPercent(92);
     setOutputFileName(defaultOutputBaseName);
     setHasCustomOutputFileName(false);
     setStatus("idle");
@@ -154,24 +165,21 @@ export function ImageConverterTool() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const convertImage = async () => {
-    if (!file || !canConvert) return;
+  const generatePack = async () => {
+    if (!file || !canGenerate) return;
     setStatus("processing");
     setError(null);
     clearResult();
+
     try {
-      const nextResult = await convertImageFile(file, {
-        outputBaseName: outputFileName,
-        outputFormat,
-        quality: shouldShowQuality ? jpegQualityPercentToDecimal(qualityPercent) : undefined,
-      });
+      const nextResult = await generateFaviconPack(file, { outputBaseName: outputFileName });
       const resultUrl = URL.createObjectURL(new Blob([nextResult.bytes], { type: nextResult.mimeType }));
       resultUrlRef.current = resultUrl;
       setResult({ ...nextResult, url: resultUrl });
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.image-converter.ui.couldNotConvert"));
+      setError(nextError instanceof Error ? nextError.message : "No se pudo generar el pack.");
     }
   };
 
@@ -184,12 +192,13 @@ export function ImageConverterTool() {
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,0.96fr)_minmax(310px,0.52fr)]">
-      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+    <div className="grid gap-5">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,0.96fr)_minmax(310px,0.52fr)]">
+        <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">{t("tools.image-converter.ui.sourceTitle")}</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.image-converter.ui.intro")}</p>
+            <h3 className="text-sm font-semibold text-ink-900">{labels.sourceTitle}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{labels.sourceIntro}</p>
           </div>
 
           <button
@@ -252,7 +261,7 @@ export function ImageConverterTool() {
               )}
               <dl className="grid min-w-0 gap-2 text-sm">
                 <div>
-                  <dt className="text-ink-500">{t("imageUi.originalFileName")}</dt>
+                  <dt className="text-ink-500">{t("imageUi.fileName")}</dt>
                   <dd className="truncate font-semibold text-ink-900">{metadata.fileName}</dd>
                 </div>
                 <div className="grid gap-2 sm:grid-cols-3">
@@ -261,19 +270,25 @@ export function ImageConverterTool() {
                     <dd className="font-semibold text-ink-900">{getImageMimeLabel(metadata.mimeType)}</dd>
                   </div>
                   <div>
-                    <dt className="text-ink-500">{t("imageUi.fileSize")}</dt>
+                    <dt className="text-ink-500">{t("imageUi.originalSize")}</dt>
                     <dd className="font-semibold text-ink-900">{formatFileSize(metadata.fileSize)}</dd>
                   </div>
                   <div>
                     <dt className="text-ink-500">{t("imageUi.dimensions")}</dt>
                     <dd className="font-semibold text-ink-900">
-                      {metadata.width} × {metadata.height}px
+                      {metadata.width} x {metadata.height}px
                     </dd>
                   </div>
                 </div>
               </dl>
             </div>
           ) : null}
+
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 text-sm shadow-sm">
+            <p className="leading-6 text-ink-600">{labels.outputIntro}</p>
+            <p className="leading-6 text-ink-600">{labels.webLocal}</p>
+            <p className="leading-6 text-ink-600">{labels.transparencyHint}</p>
+          </div>
 
           {status === "reading" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
@@ -288,52 +303,32 @@ export function ImageConverterTool() {
             </p>
           ) : null}
         </div>
-      </section>
+        </section>
 
-      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+        <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">{t("tools.image-converter.ui.outputTitle")}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.image-converter.ui.outputIntro")}</p>
+          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
+          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.readmeIncluded}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <OutputFormatSelector
-            description={t(formatDescKeys[outputFormat])}
-            formats={outputFormats}
-            getLabel={getImageFormatLabel}
-            label={language === "en" ? "Output format" : "Formato final"}
-            value={outputFormat}
-            onChange={(format) => {
-              setOutputFormat(format);
-              resetFeedback();
-            }}
-          />
-
-          {!webpSupported ? (
-            <p className="text-xs leading-5 text-ink-500">{t("imageUi.webpUnavailable")}</p>
-          ) : null}
-
-          {shouldShowQuality ? (
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
-              <input
-                className="w-full accent-accent-cyan"
-                min={10}
-                max={100}
-                step={1}
-                type="range"
-                value={qualityPercent}
-                onChange={(event) => {
-                  setQualityPercent(Number(event.target.value));
-                  resetFeedback();
-                }}
-              />
-              <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.qualityHelp")}</span>
-            </label>
-          ) : null}
+          <div className="mx-auto grid min-h-44 w-full max-w-72 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-4">
+            {previewUrl ? (
+              <div className="grid gap-3 text-center">
+                <div className="mx-auto grid h-28 w-28 place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-[linear-gradient(45deg,#eef2f7_25%,transparent_25%),linear-gradient(-45deg,#eef2f7_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#eef2f7_75%),linear-gradient(-45deg,transparent_75%,#eef2f7_75%)] bg-[length:16px_16px] bg-[position:0_0,0_8px,8px_-8px,-8px_0] shadow-sm">
+                  <img alt={labels.previewAlt} className="h-full w-full object-cover" src={previewUrl} />
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-sm text-ink-500">
+                <Package className="mx-auto text-accent-teal" size={32} />
+                <p className="mt-2 font-semibold text-ink-700">{t("imageUi.selectImage")}</p>
+              </div>
+            )}
+          </div>
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
-            {t("imageUi.outputName")}
+            {labels.outputName}
             <input
               className={cn(inputClassName, "w-full")}
               value={outputFileName}
@@ -344,23 +339,29 @@ export function ImageConverterTool() {
                 resetFeedback();
               }}
             />
-            <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.willPrepareAs", { name: finalOutputFileName })}</span>
+            <span className="text-xs font-normal leading-5 text-ink-500">
+              {formatTemplate(labels.willPrepareAs, { name: finalOutputFileName })}
+            </span>
           </label>
 
           {status === "processing" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
-              {t("tools.image-converter.ui.converting")}
+              {labels.processing}
             </p>
           ) : null}
 
           {result ? (
             <div className="grid gap-3 rounded-lg border border-accent-teal/25 bg-accent-teal/10 p-3 text-sm text-ink-700">
-              <p className="font-semibold text-ink-900">{t("tools.image-converter.ui.resultTitle")}</p>
+              <p className="font-semibold text-ink-900">{labels.downloadReady}</p>
               <dl className="grid gap-2 sm:grid-cols-2">
                 <div>
-                  <dt className="text-ink-500">{t("imageUi.finalFormat")}</dt>
-                  <dd className="font-semibold text-ink-900">{getImageFormatLabel(result.format)}</dd>
+                  <dt className="text-ink-500">ZIP</dt>
+                  <dd className="font-semibold text-ink-900">{result.fileName}</dd>
+                </div>
+                <div>
+                  <dt className="text-ink-500">{language === "en" ? "Icons" : "Iconos"}</dt>
+                  <dd className="font-semibold text-ink-900">{result.iconCount}</dd>
                 </div>
                 <div>
                   <dt className="text-ink-500">{t("imageUi.finalSize")}</dt>
@@ -369,15 +370,15 @@ export function ImageConverterTool() {
               </dl>
               <Button type="button" variant="secondary" className="gap-2" onClick={downloadResult}>
                 <Download size={16} />
-                {t("imageUi.downloadImage")}
+                {labels.downloadPack}
               </Button>
             </div>
           ) : null}
 
           <div className="grid gap-2 pt-1">
-            <Button type="button" className="gap-2" onClick={() => void convertImage()} disabled={!canConvert}>
-              {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <ImagePlus size={16} />}
-              {t("tools.image-converter.ui.convertCta")}
+            <Button type="button" className="gap-2" onClick={() => void generatePack()} disabled={!canGenerate}>
+              {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <FileArchive size={16} />}
+              {language === "en" ? "Generate favicon pack" : "Generar pack favicon"}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />
@@ -395,6 +396,33 @@ export function ImageConverterTool() {
             </Button>
           </div>
         </div>
+        </section>
+      </div>
+
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+        <details open={isZipContentsOpen} onToggle={(event) => setIsZipContentsOpen(event.currentTarget.open)}>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-ink-900">
+            <span>{labels.zipContents}</span>
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-md bg-surface-100 px-2 py-1 text-xs text-ink-600">
+              {language === "en" ? `${iconSpecs.length + 1} files included` : `${iconSpecs.length + 1} archivos incluidos`}
+              {isZipContentsOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </span>
+          </summary>
+          <ul className="mt-4 grid gap-2 text-sm text-ink-700 sm:grid-cols-2 lg:grid-cols-4">
+            {iconSpecs.map((icon) => (
+              <li key={icon.fileName} className="flex min-w-0 items-center justify-between gap-3 rounded-md border border-surface-200/70 bg-surface-50 px-3 py-2">
+                <span className="min-w-0 truncate">{icon.fileName}</span>
+                <span className="shrink-0 font-semibold text-ink-900">
+                  {icon.size} x {icon.size}
+                </span>
+              </li>
+            ))}
+            <li className="flex min-w-0 items-center justify-between gap-3 rounded-md border border-surface-200/70 bg-surface-50 px-3 py-2">
+              <span className="min-w-0 truncate">README.txt</span>
+              <span className="shrink-0 font-semibold text-ink-900">HTML</span>
+            </li>
+          </ul>
+        </details>
       </section>
     </div>
   );

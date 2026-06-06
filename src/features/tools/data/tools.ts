@@ -529,7 +529,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "La conversión usa canvas del navegador.",
-          "JPG no conserva transparencia; la herramienta usa fondo blanco al exportar.",
           "La calidad se aplica a JPG y WebP, no a PNG.",
         ],
       },
@@ -562,7 +561,934 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "Conversion uses the browser canvas.",
-          "JPG does not preserve transparency; the tool exports it over a white background.",
+          "Quality applies to JPG and WebP, not PNG.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-rotator",
+    slug: "rotar-imagen",
+    slugEn: "rotate-image",
+    name: { es: "Rotar imagen", en: "Rotate image" },
+    description: {
+      es: "Rota o voltea una imagen directamente en tu navegador.",
+      en: "Rotate or flip an image directly in your browser.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "rotar", "voltear", "png", "jpg", "webp"],
+      en: ["image", "rotate", "flip", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Rotar imagen online gratis",
+        description:
+          "Rota o voltea una imagen PNG, JPG o WebP desde tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Rotate image online free",
+        description:
+          "Rotate or flip a PNG, JPG or WebP image from your browser. No account and no uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Rotar imagen aplica rotaciones y volteos a una imagen local usando canvas, sin backend y sin subir archivos.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Aplica una o varias acciones: rotar 90 grados, rotar 180 grados o voltear.",
+          "Elige PNG, JPG o WebP si el navegador lo permite.",
+          "Prepara la imagen y descarga el resultado.",
+        ],
+        useCases: [
+          "Corregir la orientacion de una foto.",
+          "Reflejar una imagen horizontal o verticalmente.",
+          "Preparar una captura o recurso visual sin subirlo a un servidor.",
+        ],
+        limits: [
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para rotarla.",
+        commonErrors: [
+          "Imagen danada o que el navegador no puede decodificar.",
+          "Archivo que no es PNG, JPG o WebP.",
+          "Formato de salida no disponible en el navegador actual.",
+        ],
+        technicalNotes: [
+          "La transformacion usa canvas en el navegador.",
+          "La rotacion 90/270 intercambia ancho y alto; 0/180 conserva dimensiones.",
+          "Los volteos horizontal y vertical conservan las dimensiones.",
+        ],
+      },
+      en: {
+        summary:
+          "Rotate image applies rotations and flips to a local image with canvas, without backend and without uploads.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Apply one or more actions: rotate 90 degrees, rotate 180 degrees or flip.",
+          "Choose PNG, JPG or WebP if the browser supports it.",
+          "Prepare the image and download the result.",
+        ],
+        useCases: [
+          "Fix a photo orientation.",
+          "Mirror an image horizontally or vertically.",
+          "Prepare a screenshot or visual asset without uploading it to a server.",
+        ],
+        limits: [
+          "WebP appears if your browser can export it correctly.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to rotate it.",
+        commonErrors: [
+          "A damaged image or one the browser cannot decode.",
+          "A file that is not PNG, JPG or WebP.",
+          "Output format unavailable in the current browser.",
+        ],
+        technicalNotes: [
+          "The transformation uses browser canvas.",
+          "Rotation by 90/270 swaps width and height; 0/180 keeps dimensions.",
+          "Horizontal and vertical flips keep dimensions.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-cropper",
+    slug: "recortar-imagen",
+    slugEn: "crop-image",
+    name: { es: "Recortar imagen", en: "Crop image" },
+    description: {
+      es: "Recorta una imagen definiendo el area exacta.",
+      en: "Crop an image by defining the exact area.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "recortar", "crop", "png", "jpg", "webp"],
+      en: ["image", "crop", "trim", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Recortar imagen online gratis",
+        description:
+          "Recorta una imagen PNG, JPG o WebP definiendo X, Y, ancho y alto en tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Crop image online free",
+        description:
+          "Crop a PNG, JPG or WebP image by setting X, Y, width and height in your browser. No account and no uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Recortar imagen permite definir un area exacta por valores numericos y exportar el recorte localmente desde el navegador.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Define X, Y, ancho y alto. X/Y empiezan desde la esquina superior izquierda.",
+          "Usa los accesos rapidos si quieres imagen completa, recorte centrado o cuadrado centrado.",
+          "Elige PNG, JPG o WebP si el navegador lo permite y descarga el resultado.",
+        ],
+        useCases: [
+          "Recortar una zona exacta de una captura.",
+          "Preparar una miniatura cuadrada.",
+          "Extraer una parte de una foto sin subirla a un servidor.",
+        ],
+        limits: [
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Tamano maximo por imagen: 15 MB.",
+          "El area de recorte no puede salirse de la imagen.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para recortarla.",
+        commonErrors: [
+          "Valores no numericos o negativos.",
+          "Ancho o alto igual a cero.",
+          "Area de recorte fuera de los limites de la imagen.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "El recorte final tiene las dimensiones indicadas por ancho y alto.",
+          "La salida WebP depende del soporte real del navegador.",
+        ],
+      },
+      en: {
+        summary:
+          "Crop image lets you define an exact area with numeric values and export the crop locally from the browser.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Set X, Y, width and height. X/Y start from the top-left corner.",
+          "Use quick actions for full image, centered crop or centered square.",
+          "Choose PNG, JPG or WebP if the browser supports it and download the result.",
+        ],
+        useCases: [
+          "Crop an exact area from a screenshot.",
+          "Prepare a square thumbnail.",
+          "Extract part of a photo without uploading it to a server.",
+        ],
+        limits: [
+          "WebP appears if your browser can export it correctly.",
+          "Maximum image size: 15 MB.",
+          "The crop area cannot go outside the image.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to crop it.",
+        commonErrors: [
+          "Non-numeric or negative values.",
+          "Width or height equal to zero.",
+          "Crop area outside the image bounds.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "The final crop has the width and height you set.",
+          "WebP output depends on actual browser support.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-to-favicon",
+    slug: "imagen-a-favicon",
+    slugEn: "image-to-favicon",
+    name: { es: "Imagen a favicon", en: "Image to favicon" },
+    description: {
+      es: "Genera un pack de iconos PNG para favicon, Apple touch icon y PWA.",
+      en: "Generate a PNG icon pack for favicon, Apple touch icon and PWA.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "favicon", "iconos", "png", "pwa"],
+      en: ["image", "favicon", "icons", "png", "pwa"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Imagen a favicon online gratis",
+        description:
+          "Genera un ZIP con iconos PNG para favicon, Apple touch icon y PWA desde tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Image to favicon online free",
+        description:
+          "Generate a ZIP with PNG icons for favicon, Apple touch icon and PWA from your browser. No account and no uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Imagen a favicon crea un pack ZIP con iconos PNG en tamanos comunes para web y PWA. No genera un archivo .ico clasico.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "La herramienta prepara iconos PNG cuadrados en 16, 32, 48, 180, 192 y 512 px.",
+          "Opcional: ajusta el nombre del ZIP.",
+          "Genera el pack y descarga el ZIP.",
+        ],
+        useCases: [
+          "Preparar favicons PNG para un sitio web.",
+          "Crear apple-touch-icon.png desde una imagen de marca.",
+          "Generar iconos base para el manifest de una PWA.",
+        ],
+        limits: [
+          "No genera archivo .ico clasico.",
+          "Usa ajuste cover centrado: una imagen rectangular puede recortarse para llenar el cuadrado.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para crear favicons.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Imagen danada o que el navegador no puede decodificar.",
+          "Imagen con dimensiones invalidas o demasiado grande.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "Los iconos se exportan como PNG y se empaquetan con jszip.",
+          "El ZIP incluye un README.txt con ejemplos HTML.",
+        ],
+      },
+      en: {
+        summary:
+          "Image to favicon creates a ZIP pack with PNG icons in common web and PWA sizes. It does not generate a classic .ico file.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "The tool prepares square PNG icons at 16, 32, 48, 180, 192 and 512 px.",
+          "Optionally adjust the ZIP name.",
+          "Generate the pack and download the ZIP.",
+        ],
+        useCases: [
+          "Prepare PNG favicons for a website.",
+          "Create apple-touch-icon.png from a brand image.",
+          "Generate base icons for a PWA manifest.",
+        ],
+        limits: [
+          "It does not generate a classic .ico file.",
+          "It uses centered cover fit: a rectangular image may be cropped to fill the square.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to create favicons.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "A damaged image or one the browser cannot decode.",
+          "An image with invalid dimensions or too many pixels.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Icons are exported as PNG and bundled with jszip.",
+          "The ZIP includes a README.txt with HTML examples.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-joiner",
+    slug: "unir-imagenes",
+    slugEn: "join-images",
+    name: { es: "Unir imágenes", en: "Join images" },
+    description: {
+      es: "Une varias imágenes en una sola imagen vertical, horizontal o en cuadrícula.",
+      en: "Join multiple images into one vertical, horizontal or grid image.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "unir", "combinar", "cuadricula", "png", "jpg", "webp"],
+      en: ["image", "join", "combine", "grid", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Unir imágenes online gratis",
+        description:
+          "Une imágenes PNG, JPG o WebP en una sola imagen vertical, horizontal o en cuadrícula desde tu navegador. Sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Join images online free",
+        description:
+          "Join PNG, JPG or WebP images into one vertical, horizontal or grid image from your browser. No uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Unir imágenes combina varias imágenes locales en un solo canvas con modo vertical, horizontal o cuadrícula.",
+        howTo: [
+          "Agrega dos o más imágenes PNG, JPG/JPEG o WebP.",
+          "Revisa nombre, tipo, peso y dimensiones de cada imagen.",
+          "Ordena la lista con subir, bajar o eliminar.",
+          "Elige modo vertical, horizontal o cuadrícula. En cuadrícula, define columnas.",
+          "Ajusta separación, padding, color de fondo y formato de salida.",
+          "Une las imágenes y descarga el resultado.",
+        ],
+        useCases: [
+          "Crear una tira vertical de capturas.",
+          "Poner imágenes lado a lado.",
+          "Armar una cuadrícula simple sin subir archivos.",
+        ],
+        limits: [
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Hasta 30 imágenes, 15 MB por imagen y 100 MB en total.",
+          "Las imágenes se dibujan en sus dimensiones originales.",
+        ],
+        privacy:
+          "El procesamiento de estas imágenes ocurre en tu navegador; no las subimos a Modulaq para unirlas.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Imagen dañada o que el navegador no puede decodificar.",
+          "Canvas final demasiado grande para procesarlo localmente.",
+        ],
+        technicalNotes: [
+          "La exportación usa canvas en el navegador.",
+          "Vertical y horizontal centran cada imagen en el eje secundario.",
+          "La cuadrícula usa celdas uniformes y calcula filas automáticamente.",
+        ],
+      },
+      en: {
+        summary:
+          "Join images combines multiple local images into one canvas with vertical, horizontal or grid mode.",
+        howTo: [
+          "Add two or more PNG, JPG/JPEG or WebP images.",
+          "Review each image name, type, size and dimensions.",
+          "Order the list with move up, move down or remove.",
+          "Choose vertical, horizontal or grid mode. In grid mode, set columns.",
+          "Adjust spacing, padding, background color and output format.",
+          "Join the images and download the result.",
+        ],
+        useCases: [
+          "Create a vertical strip of screenshots.",
+          "Place images side by side.",
+          "Build a simple grid without uploading files.",
+        ],
+        limits: [
+          "WebP appears if your browser can export it correctly.",
+          "Up to 30 images, 15 MB each and 100 MB total.",
+          "Images are drawn at their original dimensions.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload these images to Modulaq to join them.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "A damaged image or one the browser cannot decode.",
+          "Final canvas too large to process locally.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Vertical and horizontal modes center each image on the secondary axis.",
+          "Grid mode uses uniform cells and calculates rows automatically.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-splitter",
+    slug: "dividir-imagen",
+    slugEn: "split-image",
+    name: { es: "Dividir imagen", en: "Split image" },
+    description: {
+      es: "Divide una imagen en varias partes por filas y columnas o por tamano fijo.",
+      en: "Split one image into multiple parts by rows and columns or by fixed size.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "dividir", "partes", "cuadricula", "zip", "png", "jpg", "webp"],
+      en: ["image", "split", "parts", "grid", "zip", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Dividir imagen online gratis",
+        description:
+          "Divide una imagen PNG, JPG o WebP en partes por filas y columnas o por tamano fijo. Descarga el resultado como ZIP sin subir archivos.",
+      },
+      en: {
+        title: "Split image online free",
+        description:
+          "Split a PNG, JPG or WebP image into parts by rows and columns or fixed size. Download the result as a ZIP with no uploads.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Dividir imagen separa una imagen local en varias partes y descarga los resultados en un ZIP.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Elige filas y columnas, o define ancho y alto fijo para cada parte.",
+          "Revisa la cantidad de partes y la vista previa.",
+          "Elige PNG, JPG o WebP si el navegador lo permite.",
+          "Divide la imagen y descarga el ZIP.",
+        ],
+        useCases: [
+          "Cortar una imagen grande en una cuadricula.",
+          "Preparar tiles de tamano fijo.",
+          "Separar una captura larga en partes manejables.",
+        ],
+        limits: [
+          "Maximo 100 partes por operacion.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para dividirla.",
+        commonErrors: [
+          "Filas, columnas, ancho o alto con valores no validos.",
+          "La division supera el limite de 100 partes.",
+          "Imagen danada o que el navegador no puede decodificar.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "Las partes se empaquetan en ZIP con jszip.",
+          "Si el tamano fijo no calza exacto, el borde derecho o inferior genera partes mas pequenas.",
+        ],
+      },
+      en: {
+        summary:
+          "Split image separates a local image into multiple parts and downloads the results in a ZIP.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Choose rows and columns, or set a fixed width and height for each part.",
+          "Review the part count and preview.",
+          "Choose PNG, JPG or WebP if the browser supports it.",
+          "Split the image and download the ZIP.",
+        ],
+        useCases: [
+          "Cut a large image into a grid.",
+          "Prepare fixed-size tiles.",
+          "Separate a long screenshot into manageable parts.",
+        ],
+        limits: [
+          "Maximum 100 parts per operation.",
+          "WebP appears if your browser can export it correctly.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to split it.",
+        commonErrors: [
+          "Rows, columns, width or height with invalid values.",
+          "The split exceeds the 100-part limit.",
+          "A damaged image or one the browser cannot decode.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Parts are bundled into a ZIP with jszip.",
+          "If fixed size does not fit exactly, the right or bottom edge creates smaller parts.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-color-extractor",
+    slug: "extraer-colores-imagen",
+    slugEn: "extract-image-colors",
+    name: { es: "Extraer colores de imagen", en: "Extract image colors" },
+    description: {
+      es: "Extrae una paleta aproximada de colores dominantes desde una imagen.",
+      en: "Extract an approximate palette of dominant colors from an image.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "colores", "paleta", "hex", "rgb"],
+      en: ["image", "colors", "palette", "hex", "rgb"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Extraer colores de imagen online gratis",
+        description:
+          "Extrae una paleta aproximada de colores dominantes desde una imagen PNG, JPG o WebP. Copia HEX/RGB y descarga TXT o JSON sin subir archivos.",
+      },
+      en: {
+        title: "Extract image colors online free",
+        description:
+          "Extract an approximate dominant color palette from a PNG, JPG or WebP image. Copy HEX/RGB and download TXT or JSON with no uploads.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Extraer colores de imagen analiza una imagen local y devuelve una paleta aproximada de colores dominantes.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Elige la cantidad de colores: 4, 6, 8 o 12.",
+          "Extrae la paleta y revisa HEX, RGB y porcentaje aproximado.",
+          "Copia valores individuales o descarga la paleta como TXT o JSON.",
+        ],
+        useCases: [
+          "Obtener colores base para una interfaz.",
+          "Tomar referencias HEX/RGB desde una imagen de marca.",
+          "Crear una paleta rapida desde una foto o captura.",
+        ],
+        limits: [
+          "Los colores son una estimacion basada en muestreo local.",
+          "No promete precision perfecta ni una paleta exacta.",
+          "Ignora pixeles totalmente transparentes.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para extraer colores.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Imagen danada o que el navegador no puede decodificar.",
+          "Imagen sin pixeles visibles luego de ignorar transparencia total.",
+        ],
+        technicalNotes: [
+          "El analisis usa canvas en el navegador.",
+          "Se muestrean hasta 50.000 pixeles.",
+          "La paleta se obtiene con cuantizacion RGB simple y orden por frecuencia.",
+        ],
+      },
+      en: {
+        summary:
+          "Extract image colors analyzes a local image and returns an approximate dominant color palette.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Choose the color count: 4, 6, 8 or 12.",
+          "Extract the palette and review HEX, RGB and approximate percentage.",
+          "Copy individual values or download the palette as TXT or JSON.",
+        ],
+        useCases: [
+          "Get base colors for an interface.",
+          "Pull HEX/RGB references from a brand image.",
+          "Create a quick palette from a photo or screenshot.",
+        ],
+        limits: [
+          "Colors are an estimate based on local sampling.",
+          "It does not promise perfect precision or an exact palette.",
+          "Fully transparent pixels are ignored.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to extract colors.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "A damaged image or one the browser cannot decode.",
+          "An image with no visible pixels after fully transparent pixels are ignored.",
+        ],
+        technicalNotes: [
+          "Analysis uses browser canvas.",
+          "Up to 50,000 pixels are sampled.",
+          "The palette uses simple RGB quantization and frequency ordering.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-placeholder",
+    slug: "generar-placeholder-imagen",
+    slugEn: "generate-placeholder-image",
+    name: { es: "Generar imagen placeholder", en: "Generate placeholder image" },
+    description: {
+      es: "Genera una imagen placeholder para disenos, pruebas o desarrollo web.",
+      en: "Generate a placeholder image for layouts, tests or web development.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "placeholder", "diseno", "desarrollo", "png", "jpg", "webp"],
+      en: ["image", "placeholder", "design", "development", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Generar imagen placeholder online gratis",
+        description:
+          "Genera una imagen placeholder configurando tamano, texto y colores. Exporta PNG, JPG o WebP desde tu navegador, sin backend.",
+      },
+      en: {
+        title: "Generate placeholder image online free",
+        description:
+          "Generate a placeholder image by setting size, text and colors. Export PNG, JPG or WebP from your browser, with no backend.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Generar imagen placeholder crea una imagen simple con tamano, texto y colores configurables desde el navegador.",
+        howTo: [
+          "Define ancho y alto.",
+          "Edita el texto o deja el texto automatico basado en las dimensiones.",
+          "Elige color de fondo y color de texto.",
+          "Selecciona PNG, JPG o WebP si el navegador lo permite.",
+          "Genera la imagen y descargala.",
+        ],
+        useCases: [
+          "Crear imagenes temporales para maquetas.",
+          "Probar layouts web con dimensiones reales.",
+          "Generar placeholders simples para desarrollo.",
+        ],
+        limits: [
+          "Maximo 8000 px por lado.",
+          "Maximo 64 megapixeles.",
+          "No es un editor avanzado: genera texto centrado sobre fondo plano.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+        ],
+        privacy:
+          "La imagen se genera localmente en tu navegador; no se sube nada a Modulaq.",
+        commonErrors: [
+          "Ancho o alto con valores no validos.",
+          "Dimensiones demasiado grandes para canvas.",
+          "Formato de salida no disponible en el navegador actual.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "La calidad aplica a JPG y WebP, no a PNG.",
+          "El nombre de salida se deriva de las dimensiones.",
+        ],
+      },
+      en: {
+        summary:
+          "Generate placeholder image creates a simple image with configurable size, text and colors from the browser.",
+        howTo: [
+          "Set width and height.",
+          "Edit the text or keep the automatic text based on dimensions.",
+          "Choose background color and text color.",
+          "Select PNG, JPG or WebP if the browser supports it.",
+          "Generate the image and download it.",
+        ],
+        useCases: [
+          "Create temporary images for mockups.",
+          "Test web layouts with real dimensions.",
+          "Generate simple placeholders for development.",
+        ],
+        limits: [
+          "Maximum 8000 px per side.",
+          "Maximum 64 megapixels.",
+          "It is not an advanced editor: it creates centered text over a flat background.",
+          "WebP appears if your browser can export it correctly.",
+        ],
+        privacy:
+          "The image is generated locally in your browser; nothing is uploaded to Modulaq.",
+        commonErrors: [
+          "Width or height with invalid values.",
+          "Dimensions too large for canvas.",
+          "Output format unavailable in the current browser.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Quality applies to JPG and WebP, not PNG.",
+          "The output name is derived from dimensions.",
+        ],
+      },
+    },
+  },
+  {
+    id: "svg-to-png",
+    slug: "svg-a-png",
+    slugEn: "svg-to-png",
+    name: { es: "SVG a PNG", en: "SVG to PNG" },
+    description: {
+      es: "Convierte un archivo SVG a PNG desde tu navegador.",
+      en: "Convert an SVG file to PNG from your browser.",
+    },
+    category: "image",
+    tags: {
+      es: ["svg", "png", "imagen", "vector", "convertir"],
+      en: ["svg", "png", "image", "vector", "convert"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Convertir SVG a PNG online gratis",
+        description:
+          "Convierte SVG simple a PNG desde tu navegador. Ajusta tamano y fondo antes de descargar, sin backend ni subir archivos.",
+      },
+      en: {
+        title: "Convert SVG to PNG online free",
+        description:
+          "Convert simple SVG to PNG from your browser. Adjust size and background before downloading, with no backend or uploads.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "SVG a PNG convierte un archivo SVG o codigo SVG pegado en una imagen PNG generada localmente.",
+        howTo: [
+          "Selecciona un archivo SVG o pega codigo SVG.",
+          "Revisa el nombre, peso y dimensiones detectadas desde width/height o viewBox.",
+          "Ajusta ancho, alto, fondo transparente o color de fondo.",
+          "Convierte y descarga el PNG.",
+        ],
+        useCases: [
+          "Exportar un logo SVG como PNG.",
+          "Crear una version raster para compartir o usar en una pagina.",
+          "Probar rapidamente un SVG pegado como imagen PNG.",
+        ],
+        limits: [
+          "Algunos SVG con recursos externos o scripts pueden no procesarse.",
+          "Los scripts se rechazan.",
+          "Los SVG con recursos externos pueden no renderizarse igual.",
+          "Maximo 8000 px por lado y 64 megapixeles de salida.",
+        ],
+        privacy:
+          "Todo se procesa localmente en tu navegador; no subimos el SVG a Modulaq.",
+        commonErrors: [
+          "Contenido sin etiqueta SVG valida.",
+          "SVG con scripts.",
+          "Dimensiones de salida no validas o demasiado grandes.",
+          "SVG con recursos externos que el navegador no puede renderizar en canvas.",
+        ],
+        technicalNotes: [
+          "La conversion usa Blob SVG, Image, canvas y exportacion PNG en el navegador.",
+          "Solo exporta PNG.",
+          "No promete compatibilidad perfecta con todos los SVG.",
+        ],
+      },
+      en: {
+        summary:
+          "SVG to PNG converts an SVG file or pasted SVG code into a locally generated PNG image.",
+        howTo: [
+          "Select an SVG file or paste SVG code.",
+          "Review the detected name, size and dimensions from width/height or viewBox.",
+          "Adjust width, height, transparent background or background color.",
+          "Convert and download the PNG.",
+        ],
+        useCases: [
+          "Export an SVG logo as PNG.",
+          "Create a raster version to share or use on a page.",
+          "Quickly test pasted SVG as a PNG image.",
+        ],
+        limits: [
+          "Some SVGs with external resources or scripts may not process.",
+          "Scripts are rejected.",
+          "SVGs with external resources may not render the same.",
+          "Maximum 8000 px per side and 64 megapixels output.",
+        ],
+        privacy:
+          "Everything is processed locally in your browser; we don't upload the SVG to Modulaq.",
+        commonErrors: [
+          "Content without a valid SVG tag.",
+          "SVG with scripts.",
+          "Invalid or too large output dimensions.",
+          "SVG with external resources the browser cannot render into canvas.",
+        ],
+        technicalNotes: [
+          "Conversion uses an SVG Blob, Image, canvas and PNG export in the browser.",
+          "It only exports PNG.",
+          "It does not promise perfect compatibility with every SVG.",
+        ],
+      },
+    },
+  },
+  {
+    id: "image-watermark",
+    slug: "agregar-marca-agua-imagen",
+    slugEn: "add-image-watermark",
+    name: { es: "Agregar marca de agua", en: "Add image watermark" },
+    description: {
+      es: "Agrega una marca de agua de texto sobre una imagen.",
+      en: "Add a text watermark over an image.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "marca de agua", "texto", "png", "jpg", "webp"],
+      en: ["image", "watermark", "text", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Agregar marca de agua a imagen online gratis",
+        description:
+          "Agrega una marca de agua de texto o logo a una imagen PNG, JPG o WebP. Configura posición, margen y opacidad desde tu navegador.",
+      },
+      en: {
+        title: "Add image watermark online free",
+        description:
+          "Add a text watermark to a PNG, JPG or WebP image. Configure text, position, color and opacity from your browser.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Agregar marca de agua permite superponer texto o un logo sobre una imagen local y exportar el resultado desde el navegador.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa nombre, tipo, peso y dimensiones originales.",
+          "Escribe el texto de la marca de agua.",
+          "Configura tamano de fuente, color, opacidad, posicion y margen.",
+          "Elige PNG, JPG o WebP si el navegador lo permite.",
+          "Agrega la marca y descarga la imagen.",
+        ],
+        useCases: [
+          "Agregar una firma o nombre a una imagen.",
+          "Marcar capturas o recursos visuales de trabajo.",
+          "Preparar una imagen con texto sobrepuesto sin subirla a un servidor.",
+        ],
+        limits: [
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "No promete proteccion real contra copia o uso no autorizado.",
+          "No incluye marca de agua con otra imagen ni drag visual.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para agregar la marca.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Texto vacio para la marca de agua.",
+          "Valores invalidos de opacidad, tamano de fuente o margen.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "La marca se dibuja con texto, globalAlpha y posicion calculada.",
+          "La calidad aplica a JPG y WebP, no a PNG.",
+        ],
+      },
+      en: {
+        summary:
+          "Add image watermark overlays text on a local image and exports the result from the browser.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the original name, type, size and dimensions.",
+          "Enter the watermark text.",
+          "Configure font size, color, opacity, position and margin.",
+          "Choose PNG, JPG or WebP if the browser supports it.",
+          "Add the watermark and download the image.",
+        ],
+        useCases: [
+          "Add a signature or name to an image.",
+          "Mark screenshots or work visuals.",
+          "Prepare an image with overlaid text without uploading it to a server.",
+        ],
+        limits: [
+          "WebP appears if your browser can export it correctly.",
+          "It does not promise real protection against copying or unauthorized use.",
+          "It does not include image watermarks or visual drag editing.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to add the watermark.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "Empty watermark text.",
+          "Invalid opacity, font size or margin values.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "The watermark is drawn with text, globalAlpha and calculated position.",
           "Quality applies to JPG and WebP, not PNG.",
         ],
       },
@@ -631,7 +1557,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "La exportación usa canvas.toBlob.",
-          "JPG no conserva transparencia; la herramienta exporta sobre fondo blanco.",
           "PNG no usa control de calidad y puede no reducir peso.",
         ],
       },
@@ -664,7 +1589,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "Export uses canvas.toBlob.",
-          "JPG does not preserve transparency; the tool exports over a white background.",
           "PNG has no quality control and may not reduce file size.",
         ],
       },
@@ -733,7 +1657,6 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "La redimensión usa canvas del navegador.",
-          "JPG no conserva transparencia; la herramienta exporta sobre fondo blanco.",
           "La salida WebP depende del soporte real del navegador.",
         ],
       },
@@ -766,20 +1689,19 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         ],
         technicalNotes: [
           "Resizing uses the browser canvas.",
-          "JPG does not preserve transparency; the tool exports over a white background.",
           "WebP output depends on actual browser support.",
         ],
       },
     },
   },
   {
-    id: "image-base64",
-    slug: "imagen-base64",
-    slugEn: "image-base64",
-    name: { es: "Imagen ↔ Base64", en: "Image ↔ Base64" },
+    id: "image-to-base64",
+    slug: "imagen-a-base64",
+    slugEn: "image-to-base64",
+    name: { es: "Imagen a Base64", en: "Image to Base64" },
     description: {
-      es: "Convierte imágenes a Base64 y reconstruye imágenes desde Base64 o Data URL.",
-      en: "Convert images to Base64 and rebuild images from Base64 or Data URLs.",
+      es: "Convierte una imagen en texto Base64 o Data URL. Todo se procesa localmente en tu navegador.",
+      en: "Convert an image into Base64 text or a Data URL. Everything runs locally in your browser.",
     },
     category: "image",
     tags: {
@@ -795,81 +1717,179 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Imagen a Base64 y Base64 a imagen online",
+        title: "Imagen a Base64 online",
         description:
-          "Convertí una imagen a Base64 o reconstruí una imagen desde Base64/Data URL. Todo se procesa localmente en tu navegador.",
+          "Convierte una imagen PNG, JPG o WebP a Base64 puro o Data URL. Todo se procesa localmente en tu navegador.",
       },
       en: {
-        title: "Image to Base64 and Base64 to image online",
+        title: "Image to Base64 online",
         description:
-          "Convert an image to Base64 or rebuild an image from Base64/Data URL. Everything runs locally in your browser.",
+          "Convert a PNG, JPG or WebP image to plain Base64 or a Data URL. Everything runs locally in your browser.",
       },
     },
     doc: {
       es: {
         summary:
-          "Imagen ↔ Base64 ofrece dos modos internos: convertir una imagen a Base64/Data URL y reconstruir una imagen desde texto Base64.",
+          "Imagen a Base64 convierte un archivo PNG, JPG/JPEG o WebP en texto Base64 puro y Data URL completa.",
         howTo: [
-          "Elegí el modo Imagen a Base64 o Base64 a imagen.",
-          "Para imagen a Base64, cargá una imagen PNG, JPG/JPEG o WebP.",
-          "Copiá Base64 puro o Data URL completa, o descargá el resultado como TXT.",
-          "Para Base64 a imagen, pegá Base64 puro o una Data URL.",
-          "Si pegás Base64 puro, elegí el tipo de imagen esperado antes de reconstruir.",
+          "Carga una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa nombre, tipo, peso original y extension detectada.",
+          "Copia Base64 puro o Data URL completa.",
+          "Descarga el resultado como TXT si necesitas guardarlo.",
         ],
         useCases: [
-          "Incrustar una imagen pequeña en HTML, CSS o JSON.",
-          "Probar payloads Base64 en desarrollo.",
-          "Recuperar una imagen a partir de una Data URL.",
+          "Incrustar una imagen pequena en HTML, CSS o JSON.",
+          "Preparar una Data URL para pruebas frontend.",
+          "Compartir un payload Base64 sin backend.",
         ],
         limits: [
-          "Base64 suele ocupar más que el archivo binario original.",
+          "Base64 suele ocupar mas que el archivo binario original.",
           "No comprime, optimiza ni convierte formato de imagen.",
-          "Una cadena Base64 válida puede no representar una imagen previsualizable.",
+          "Las imagenes grandes generan textos largos dificiles de revisar manualmente.",
         ],
         privacy:
-          "La conversión y reconstrucción ocurren en tu navegador; no subimos estos datos a Modulaq.",
+          "La conversion ocurre en tu navegador; no subimos esta imagen a Modulaq.",
         commonErrors: [
-          "Base64 inválido o incompleto.",
-          "Data URL sin MIME válido.",
-          "Base64 válido que no corresponde a una imagen del tipo elegido.",
+          "Archivo que no es PNG, JPG/JPEG o WebP.",
+          "Imagen danada o que el navegador no puede leer.",
+          "Archivo demasiado grande para procesar con estabilidad.",
         ],
         technicalNotes: [
-          "Imagen a Base64 usa FileReader.readAsDataURL.",
-          "Base64 a imagen decodifica con atob y genera un Blob local.",
+          "Usa FileReader.readAsDataURL.",
+          "El Base64 puro se obtiene removiendo el prefijo Data URL.",
           "Los MIME admitidos son image/png, image/jpeg e image/webp.",
         ],
       },
       en: {
         summary:
-          "Image ↔ Base64 provides two internal modes: convert an image to Base64/Data URL and rebuild an image from Base64 text.",
+          "Image to Base64 converts a PNG, JPG/JPEG or WebP file into plain Base64 text and a full Data URL.",
         howTo: [
-          "Choose Image to Base64 or Base64 to image.",
-          "For image to Base64, upload a PNG, JPG/JPEG or WebP image.",
-          "Copy the plain Base64 or full Data URL, or download the result as TXT.",
-          "For Base64 to image, paste plain Base64 or a Data URL.",
-          "If you paste plain Base64, choose the expected image type before rebuilding.",
+          "Upload a PNG, JPG/JPEG or WebP image.",
+          "Review name, type, original size and detected extension.",
+          "Copy the plain Base64 or the full Data URL.",
+          "Download the result as TXT if you need to save it.",
         ],
         useCases: [
           "Embed a small image in HTML, CSS or JSON.",
-          "Test Base64 payloads during development.",
-          "Recover an image from a Data URL.",
+          "Prepare a Data URL for frontend testing.",
+          "Share a Base64 payload without a backend.",
         ],
         limits: [
           "Base64 usually takes more space than the original binary file.",
           "It does not compress, optimize or convert the image format.",
-          "A valid Base64 string may not represent a previewable image.",
+          "Large images generate long text that is hard to inspect manually.",
         ],
         privacy:
-          "Conversion and rebuilding happen in your browser; we don't upload this data to Modulaq.",
+          "Conversion happens in your browser; we don't upload this image to Modulaq.",
+        commonErrors: [
+          "A file that is not PNG, JPG/JPEG or WebP.",
+          "A damaged image or one the browser cannot read.",
+          "A file too large to process reliably.",
+        ],
+        technicalNotes: [
+          "Uses FileReader.readAsDataURL.",
+          "Plain Base64 is obtained by removing the Data URL prefix.",
+          "Supported MIME types are image/png, image/jpeg and image/webp.",
+        ],
+      },
+    },
+  },
+  {
+    id: "base64-to-image",
+    slug: "base64-a-imagen",
+    slugEn: "base64-to-image",
+    name: { es: "Base64 a imagen", en: "Base64 to image" },
+    description: {
+      es: "Reconstruye una imagen desde Base64 o Data URL. Una cadena Base64 valida no siempre representa una imagen.",
+      en: "Rebuild an image from Base64 or a Data URL. A valid Base64 string does not always represent an image.",
+    },
+    category: "image",
+    tags: {
+      es: ["base64", "imagen", "data url", "png", "jpg", "webp"],
+      en: ["base64", "image", "data url", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Base64 a imagen online",
+        description:
+          "Pega Base64 puro o una Data URL y descarga la imagen reconstruida como PNG, JPG o WebP. El proceso ocurre localmente.",
+      },
+      en: {
+        title: "Base64 to image online",
+        description:
+          "Paste plain Base64 or a Data URL and download the rebuilt image as PNG, JPG or WebP. Processing happens locally.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Base64 a imagen reconstruye un archivo descargable desde Base64 puro o una Data URL con MIME de imagen.",
+        howTo: [
+          "Pega Base64 puro o una Data URL.",
+          "Si pegas Base64 puro, elige el tipo esperado: PNG, JPG o WebP.",
+          "Define el nombre de salida.",
+          "Reconstruye la imagen y descargala si la previsualizacion es valida.",
+        ],
+        useCases: [
+          "Recuperar una imagen desde una Data URL.",
+          "Validar payloads Base64 recibidos en desarrollo.",
+          "Convertir texto Base64 en un archivo descargable.",
+        ],
+        limits: [
+          "Una cadena Base64 valida puede no representar una imagen previsualizable.",
+          "Data URL debe usar image/png, image/jpeg o image/webp.",
+          "No corrige contenido danado ni cambia la imagen real.",
+        ],
+        privacy:
+          "La reconstruccion ocurre en tu navegador; no subimos este texto a Modulaq.",
+        commonErrors: [
+          "Base64 invalido o incompleto.",
+          "Data URL invalida o con MIME no soportado.",
+          "Base64 valido que no corresponde a una imagen del tipo elegido.",
+        ],
+        technicalNotes: [
+          "Decodifica con atob y genera un Blob local.",
+          "Si el texto es Data URL, se usa el MIME detectado.",
+          "Si el texto es Base64 puro, se usa el MIME elegido por el usuario.",
+        ],
+      },
+      en: {
+        summary:
+          "Base64 to image rebuilds a downloadable file from plain Base64 or a Data URL with an image MIME type.",
+        howTo: [
+          "Paste plain Base64 or a Data URL.",
+          "If you paste plain Base64, choose the expected type: PNG, JPG or WebP.",
+          "Set the output name.",
+          "Rebuild the image and download it if the preview is valid.",
+        ],
+        useCases: [
+          "Recover an image from a Data URL.",
+          "Validate Base64 payloads during development.",
+          "Turn Base64 text into a downloadable file.",
+        ],
+        limits: [
+          "A valid Base64 string may not represent a previewable image.",
+          "Data URLs must use image/png, image/jpeg or image/webp.",
+          "It does not repair damaged content or change the actual image.",
+        ],
+        privacy:
+          "Rebuilding happens in your browser; we don't upload this text to Modulaq.",
         commonErrors: [
           "Invalid or incomplete Base64.",
-          "Data URL without a valid MIME type.",
+          "Invalid Data URL or unsupported MIME type.",
           "Valid Base64 that does not match the selected image type.",
         ],
         technicalNotes: [
-          "Image to Base64 uses FileReader.readAsDataURL.",
-          "Base64 to image decodes with atob and creates a local Blob.",
-          "Supported MIME types are image/png, image/jpeg and image/webp.",
+          "Decodes with atob and creates a local Blob.",
+          "If the text is a Data URL, the detected MIME is used.",
+          "If the text is plain Base64, the user-selected MIME is used.",
         ],
       },
     },

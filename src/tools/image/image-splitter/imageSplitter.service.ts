@@ -1,0 +1,294 @@
+import JSZip from "jszip";
+import { formatFileSize } from "../../../shared/utils/file";
+import {
+  buildImageZipDownloadFileName,
+  canExportBrowserImageFormat,
+  exportBrowserCanvas,
+  getBrowserImageMimeType,
+  getBrowserImageOutputExtension,
+  getBrowserImageOutputMimeType,
+  getImageDownloadBaseName,
+  isBrowserImageFile,
+  loadBrowserImage,
+} from "../../../shared/utils/imageFiles";
+import type {
+  ImageDimensions,
+  ImageSplitPart,
+  ImageSplitterMetadata,
+  ImageSplitterOptions,
+  ImageSplitterOutputFormat,
+  SplitImageOptions,
+  ImageSplitterResult,
+} from "./imageSplitter.types";
+
+export const defaultOutputBaseName = "imagen-dividida";
+export const maxSplitParts = 100;
+
+export { formatFileSize };
+
+export function isSplittableImageFile(file: File) {
+  return isBrowserImageFile(file);
+}
+
+export function getImageFormatLabel(format: ImageSplitterOutputFormat) {
+  if (format === "jpeg") {
+    return "JPG";
+  }
+
+  if (format === "webp") {
+    return "WebP";
+  }
+
+  return "PNG";
+}
+
+export function getImageMimeLabel(mimeType: string) {
+  if (mimeType === "image/jpeg") {
+    return "JPG";
+  }
+
+  if (mimeType === "image/webp") {
+    return "WebP";
+  }
+
+  if (mimeType === "image/png") {
+    return "PNG";
+  }
+
+  return mimeType || "Desconocido";
+}
+
+export function getSplitImageOutputBaseName(fileName: string) {
+  const baseName = getImageDownloadBaseName(fileName, defaultOutputBaseName);
+  return `${baseName}-partes`;
+}
+
+export function buildSplitImageZipFileName(baseName: string, fallbackBaseName = defaultOutputBaseName) {
+  return buildImageZipDownloadFileName(baseName, fallbackBaseName);
+}
+
+function hasValidImageDimensions(imageDimensions: ImageDimensions) {
+  return (
+    Number.isInteger(imageDimensions.width) &&
+    Number.isInteger(imageDimensions.height) &&
+    imageDimensions.width > 0 &&
+    imageDimensions.height > 0
+  );
+}
+
+function validatePositiveInteger(value: number, label: string) {
+  if (!Number.isFinite(value)) {
+    return `${label} debe ser un numero valido.`;
+  }
+
+  if (!Number.isInteger(value)) {
+    return `${label} debe ser un numero entero.`;
+  }
+
+  if (value <= 0) {
+    return `${label} debe ser mayor que cero.`;
+  }
+
+  return null;
+}
+
+export function getSplitPartFileName(row: number, column: number, outputFormat: ImageSplitterOutputFormat) {
+  return `parte-f${row}-c${column}.${getBrowserImageOutputExtension(outputFormat)}`;
+}
+
+function calculateGridParts(
+  imageDimensions: ImageDimensions,
+  rows: number,
+  columns: number,
+  outputFormat: ImageSplitterOutputFormat,
+) {
+  const parts: ImageSplitPart[] = [];
+
+  for (let row = 0; row < rows; row += 1) {
+    const y = Math.floor((row * imageDimensions.height) / rows);
+    const nextY = Math.floor(((row + 1) * imageDimensions.height) / rows);
+
+    for (let column = 0; column < columns; column += 1) {
+      const x = Math.floor((column * imageDimensions.width) / columns);
+      const nextX = Math.floor(((column + 1) * imageDimensions.width) / columns);
+
+      parts.push({
+        column: column + 1,
+        fileName: getSplitPartFileName(row + 1, column + 1, outputFormat),
+        height: nextY - y,
+        index: parts.length + 1,
+        row: row + 1,
+        width: nextX - x,
+        x,
+        y,
+      });
+    }
+  }
+
+  return parts;
+}
+
+function calculateFixedSizeParts(
+  imageDimensions: ImageDimensions,
+  partWidth: number,
+  partHeight: number,
+  outputFormat: ImageSplitterOutputFormat,
+) {
+  const rows = Math.ceil(imageDimensions.height / partHeight);
+  const columns = Math.ceil(imageDimensions.width / partWidth);
+  const parts: ImageSplitPart[] = [];
+
+  for (let row = 0; row < rows; row += 1) {
+    for (let column = 0; column < columns; column += 1) {
+      const x = column * partWidth;
+      const y = row * partHeight;
+
+      parts.push({
+        column: column + 1,
+        fileName: getSplitPartFileName(row + 1, column + 1, outputFormat),
+        height: Math.min(partHeight, imageDimensions.height - y),
+        index: parts.length + 1,
+        row: row + 1,
+        width: Math.min(partWidth, imageDimensions.width - x),
+        x,
+        y,
+      });
+    }
+  }
+
+  return parts;
+}
+
+export function calculateImageSplitParts(
+  imageDimensions: ImageDimensions,
+  options: ImageSplitterOptions,
+  outputFormat: ImageSplitterOutputFormat = "png",
+) {
+  if (options.mode === "fixed-size") {
+    return calculateFixedSizeParts(imageDimensions, options.partWidth, options.partHeight, outputFormat);
+  }
+
+  return calculateGridParts(imageDimensions, options.rows, options.columns, outputFormat);
+}
+
+export function validateImageSplitterOptions(imageDimensions: ImageDimensions, options: ImageSplitterOptions) {
+  if (!hasValidImageDimensions(imageDimensions)) {
+    return "La imagen debe tener dimensiones validas.";
+  }
+
+  if (options.mode === "grid") {
+    const rowsError = validatePositiveInteger(options.rows, "Las filas");
+    if (rowsError) return rowsError;
+
+    const columnsError = validatePositiveInteger(options.columns, "Las columnas");
+    if (columnsError) return columnsError;
+  } else {
+    const widthError = validatePositiveInteger(options.partWidth, "El ancho de cada parte");
+    if (widthError) return widthError;
+
+    const heightError = validatePositiveInteger(options.partHeight, "El alto de cada parte");
+    if (heightError) return heightError;
+  }
+
+  const parts = calculateImageSplitParts(imageDimensions, options);
+  if (parts.some((part) => part.width <= 0 || part.height <= 0)) {
+    return "Cada parte debe tener ancho y alto mayores que cero.";
+  }
+
+  if (parts.length > maxSplitParts) {
+    return `La division supera el limite de ${maxSplitParts} partes.`;
+  }
+
+  return null;
+}
+
+export async function readImageMetadata(file: File): Promise<ImageSplitterMetadata> {
+  const mimeType = getBrowserImageMimeType(file);
+
+  if (!mimeType) {
+    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+  }
+
+  try {
+    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+
+    if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+      throw new Error("La imagen no tiene dimensiones validas.");
+    }
+
+    return {
+      fileName: file.name,
+      fileSize: file.size,
+      height: image.naturalHeight,
+      mimeType,
+      width: image.naturalWidth,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("No se pudo leer la imagen.");
+  }
+}
+
+export async function splitImageFile(file: File, options: SplitImageOptions): Promise<ImageSplitterResult> {
+  if (!isSplittableImageFile(file)) {
+    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+  }
+
+  if (!canExportBrowserImageFormat(options.outputFormat)) {
+    throw new Error(`Este navegador no permite exportar imagenes como ${getImageFormatLabel(options.outputFormat)}.`);
+  }
+
+  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const imageDimensions = { height: image.naturalHeight, width: image.naturalWidth };
+  const validationError = validateImageSplitterOptions(imageDimensions, options);
+
+  if (validationError) {
+    throw new Error(validationError);
+  }
+
+  const parts = calculateImageSplitParts(imageDimensions, options, options.outputFormat);
+  const mimeType = getBrowserImageOutputMimeType(options.outputFormat);
+  const zip = new JSZip();
+
+  for (const part of parts) {
+    const canvas = document.createElement("canvas");
+    canvas.width = part.width;
+    canvas.height = part.height;
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      throw new Error("No se pudo preparar una parte de la imagen.");
+    }
+
+    if (options.outputFormat === "jpeg") {
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    context.drawImage(image, part.x, part.y, part.width, part.height, 0, 0, part.width, part.height);
+
+    const result = await exportBrowserCanvas(canvas, {
+      errorMessage: "No se pudo exportar una parte de la imagen.",
+      mimeType,
+      quality: options.quality,
+    });
+    zip.file(part.fileName, result.bytes);
+  }
+
+  try {
+    const bytes = await zip.generateAsync({ type: "arraybuffer" });
+    return {
+      bytes,
+      fileName: buildSplitImageZipFileName(options.outputBaseName, getSplitImageOutputBaseName(file.name)),
+      mimeType: "application/zip",
+      partCount: parts.length,
+      parts,
+      size: bytes.byteLength,
+    };
+  } catch {
+    throw new Error("No se pudo preparar la descarga ZIP.");
+  }
+}

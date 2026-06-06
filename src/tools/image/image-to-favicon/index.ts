@@ -1,0 +1,1 @@
+export { ImageToFaviconTool } from "./ImageToFaviconTool";

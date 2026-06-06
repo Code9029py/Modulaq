@@ -1,6 +1,7 @@
 import { Download, FileImage, Loader2, RotateCcw, SlidersHorizontal, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
@@ -26,7 +27,7 @@ import type {
 
 const acceptedImageTypes = "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp";
 const inputClassName =
-  "min-h-11 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
+  "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 type DownloadableResult = ImageCompressorResult & {
   url: string;
@@ -41,7 +42,7 @@ const formatDescKeys: Record<ImageCompressorOutputFormat, TranslationKey> = {
 };
 
 export function ImageCompressorTool() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
@@ -78,10 +79,6 @@ export function ImageCompressorTool() {
     metadata ? getCompressedImageOutputBaseName(metadata.fileName) : defaultOutputBaseName,
   );
   const shouldShowQuality = outputFormat === "jpeg" || outputFormat === "webp";
-  const transparencyWarning =
-    outputFormat === "jpeg" && metadata?.mimeType !== "image/jpeg"
-      ? t("imageUi.transparencyWarning")
-      : null;
   const canCompress = Boolean(file && metadata) && status !== "reading" && status !== "processing";
 
   // Compute the size-change label inline using t() so we don't depend on
@@ -316,27 +313,17 @@ export function ImageCompressorTool() {
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <div className="grid gap-2">
-            {outputFormats.map((format) => (
-              <button
-                key={format}
-                type="button"
-                className={cn(
-                  "rounded-md border p-3 text-left transition",
-                  outputFormat === format
-                    ? "border-accent-cyan/45 bg-accent-cyan/10"
-                    : "border-surface-200/80 bg-surface-50/90 hover:border-accent-cyan/35",
-                )}
-                onClick={() => {
-                  setOutputFormat(format);
-                  resetFeedback();
-                }}
-              >
-                <span className="block text-sm font-semibold text-ink-900">{getImageFormatLabel(format)}</span>
-                <span className="mt-1 block text-xs leading-5 text-ink-500">{t(formatDescKeys[format])}</span>
-              </button>
-            ))}
-          </div>
+          <OutputFormatSelector
+            description={t(formatDescKeys[outputFormat])}
+            formats={outputFormats}
+            getLabel={getImageFormatLabel}
+            label={language === "en" ? "Output format" : "Formato final"}
+            value={outputFormat}
+            onChange={(format) => {
+              setOutputFormat(format);
+              resetFeedback();
+            }}
+          />
 
           {!webpSupported ? (
             <p className="text-xs leading-5 text-ink-500">{t("imageUi.webpUnavailable")}</p>
@@ -357,16 +344,7 @@ export function ImageCompressorTool() {
                   resetFeedback();
                 }}
               />
-              <span className="text-xs font-normal leading-5 text-ink-500">{t("tools.image-compressor.ui.qualityNote")}</span>
             </label>
-          ) : (
-            <p className="text-xs leading-5 text-ink-500">{t("tools.image-compressor.ui.pngNoQuality")}</p>
-          )}
-
-          {transparencyWarning ? (
-            <p className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              {transparencyWarning}
-            </p>
           ) : null}
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
