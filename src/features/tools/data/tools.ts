@@ -1297,6 +1297,112 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-watermark",
+    slug: "agregar-marca-agua-imagen",
+    slugEn: "add-image-watermark",
+    name: { es: "Agregar marca de agua", en: "Add image watermark" },
+    description: {
+      es: "Agrega una marca de agua de texto sobre una imagen.",
+      en: "Add a text watermark over an image.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "marca de agua", "texto", "png", "jpg", "webp"],
+      en: ["image", "watermark", "text", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Agregar marca de agua a imagen online gratis",
+        description:
+          "Agrega una marca de agua de texto a una imagen PNG, JPG o WebP. Configura texto, posicion, color y opacidad desde tu navegador.",
+      },
+      en: {
+        title: "Add image watermark online free",
+        description:
+          "Add a text watermark to a PNG, JPG or WebP image. Configure text, position, color and opacity from your browser.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Agregar marca de agua permite superponer texto sobre una imagen local y exportar el resultado desde el navegador.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa nombre, tipo, peso y dimensiones originales.",
+          "Escribe el texto de la marca de agua.",
+          "Configura tamano de fuente, color, opacidad, posicion y margen.",
+          "Elige PNG, JPG o WebP si el navegador lo permite.",
+          "Agrega la marca y descarga la imagen.",
+        ],
+        useCases: [
+          "Agregar una firma o nombre a una imagen.",
+          "Marcar capturas o recursos visuales de trabajo.",
+          "Preparar una imagen con texto sobrepuesto sin subirla a un servidor.",
+        ],
+        limits: [
+          "JPG no conserva transparencia.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "No promete proteccion real contra copia o uso no autorizado.",
+          "No incluye marca de agua con otra imagen ni drag visual.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para agregar la marca.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Texto vacio para la marca de agua.",
+          "Valores invalidos de opacidad, tamano de fuente o margen.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "La marca se dibuja con texto, globalAlpha y posicion calculada.",
+          "La calidad aplica a JPG y WebP, no a PNG.",
+        ],
+      },
+      en: {
+        summary:
+          "Add image watermark overlays text on a local image and exports the result from the browser.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the original name, type, size and dimensions.",
+          "Enter the watermark text.",
+          "Configure font size, color, opacity, position and margin.",
+          "Choose PNG, JPG or WebP if the browser supports it.",
+          "Add the watermark and download the image.",
+        ],
+        useCases: [
+          "Add a signature or name to an image.",
+          "Mark screenshots or work visuals.",
+          "Prepare an image with overlaid text without uploading it to a server.",
+        ],
+        limits: [
+          "JPG does not preserve transparency.",
+          "WebP appears if your browser can export it correctly.",
+          "It does not promise real protection against copying or unauthorized use.",
+          "It does not include image watermarks or visual drag editing.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to add the watermark.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "Empty watermark text.",
+          "Invalid opacity, font size or margin values.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "The watermark is drawn with text, globalAlpha and calculated position.",
+          "Quality applies to JPG and WebP, not PNG.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",

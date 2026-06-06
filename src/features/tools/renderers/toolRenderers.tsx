@@ -37,6 +37,9 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "image-splitter": lazy(() =>
     import("../../../tools/image/image-splitter").then((module) => ({ default: module.ImageSplitterTool })),
   ),
+  "image-watermark": lazy(() =>
+    import("../../../tools/image/image-watermark").then((module) => ({ default: module.ImageWatermarkTool })),
+  ),
   "image-rotator": lazy(() =>
     import("../../../tools/image/image-rotator").then((module) => ({ default: module.ImageRotatorTool })),
   ),
