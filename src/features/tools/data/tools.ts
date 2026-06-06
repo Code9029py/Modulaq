@@ -983,6 +983,112 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-splitter",
+    slug: "dividir-imagen",
+    slugEn: "split-image",
+    name: { es: "Dividir imagen", en: "Split image" },
+    description: {
+      es: "Divide una imagen en varias partes por filas y columnas o por tamano fijo.",
+      en: "Split one image into multiple parts by rows and columns or by fixed size.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "dividir", "partes", "cuadricula", "zip", "png", "jpg", "webp"],
+      en: ["image", "split", "parts", "grid", "zip", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Dividir imagen online gratis",
+        description:
+          "Divide una imagen PNG, JPG o WebP en partes por filas y columnas o por tamano fijo. Descarga el resultado como ZIP sin subir archivos.",
+      },
+      en: {
+        title: "Split image online free",
+        description:
+          "Split a PNG, JPG or WebP image into parts by rows and columns or fixed size. Download the result as a ZIP with no uploads.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Dividir imagen separa una imagen local en varias partes y descarga los resultados en un ZIP.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Elige filas y columnas, o define ancho y alto fijo para cada parte.",
+          "Revisa la cantidad de partes y la vista previa.",
+          "Elige PNG, JPG o WebP si el navegador lo permite.",
+          "Divide la imagen y descarga el ZIP.",
+        ],
+        useCases: [
+          "Cortar una imagen grande en una cuadricula.",
+          "Preparar tiles de tamano fijo.",
+          "Separar una captura larga en partes manejables.",
+        ],
+        limits: [
+          "Maximo 100 partes por operacion.",
+          "JPG no conserva transparencia.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para dividirla.",
+        commonErrors: [
+          "Filas, columnas, ancho o alto con valores no validos.",
+          "La division supera el limite de 100 partes.",
+          "Imagen danada o que el navegador no puede decodificar.",
+        ],
+        technicalNotes: [
+          "La exportacion usa canvas en el navegador.",
+          "Las partes se empaquetan en ZIP con jszip.",
+          "Si el tamano fijo no calza exacto, el borde derecho o inferior genera partes mas pequenas.",
+        ],
+      },
+      en: {
+        summary:
+          "Split image separates a local image into multiple parts and downloads the results in a ZIP.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Choose rows and columns, or set a fixed width and height for each part.",
+          "Review the part count and preview.",
+          "Choose PNG, JPG or WebP if the browser supports it.",
+          "Split the image and download the ZIP.",
+        ],
+        useCases: [
+          "Cut a large image into a grid.",
+          "Prepare fixed-size tiles.",
+          "Separate a long screenshot into manageable parts.",
+        ],
+        limits: [
+          "Maximum 100 parts per operation.",
+          "JPG does not preserve transparency.",
+          "WebP appears if your browser can export it correctly.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to split it.",
+        commonErrors: [
+          "Rows, columns, width or height with invalid values.",
+          "The split exceeds the 100-part limit.",
+          "A damaged image or one the browser cannot decode.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Parts are bundled into a ZIP with jszip.",
+          "If fixed size does not fit exactly, the right or bottom edge creates smaller parts.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",
