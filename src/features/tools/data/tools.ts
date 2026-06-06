@@ -877,6 +877,112 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-joiner",
+    slug: "unir-imagenes",
+    slugEn: "join-images",
+    name: { es: "Unir imÃ¡genes", en: "Join images" },
+    description: {
+      es: "Une varias imÃ¡genes en una sola imagen vertical, horizontal o en cuadrÃ­cula.",
+      en: "Join multiple images into one vertical, horizontal or grid image.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "unir", "combinar", "cuadricula", "png", "jpg", "webp"],
+      en: ["image", "join", "combine", "grid", "png", "jpg", "webp"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Unir imÃ¡genes online gratis",
+        description:
+          "Une imÃ¡genes PNG, JPG o WebP en una sola imagen vertical, horizontal o en cuadrÃ­cula desde tu navegador. Sin subir archivos a Modulaq.",
+      },
+      en: {
+        title: "Join images online free",
+        description:
+          "Join PNG, JPG or WebP images into one vertical, horizontal or grid image from your browser. No uploads to Modulaq.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Unir imÃ¡genes combina varias imÃ¡genes locales en un solo canvas con modo vertical, horizontal o cuadrÃ­cula.",
+        howTo: [
+          "Agrega dos o mÃ¡s imÃ¡genes PNG, JPG/JPEG o WebP.",
+          "Revisa nombre, tipo, peso y dimensiones de cada imagen.",
+          "Ordena la lista con subir, bajar o eliminar.",
+          "Elige modo vertical, horizontal o cuadrÃ­cula. En cuadrÃ­cula, define columnas.",
+          "Ajusta separaciÃ³n, padding, color de fondo y formato de salida.",
+          "Une las imÃ¡genes y descarga el resultado.",
+        ],
+        useCases: [
+          "Crear una tira vertical de capturas.",
+          "Poner imÃ¡genes lado a lado.",
+          "Armar una cuadrÃ­cula simple sin subir archivos.",
+        ],
+        limits: [
+          "JPG no conserva transparencia.",
+          "WebP aparece si tu navegador permite exportarlo correctamente.",
+          "Hasta 30 imÃ¡genes, 15 MB por imagen y 100 MB en total.",
+          "Las imÃ¡genes se dibujan en sus dimensiones originales.",
+        ],
+        privacy:
+          "El procesamiento de estas imÃ¡genes ocurre en tu navegador; no las subimos a Modulaq para unirlas.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Imagen daÃ±ada o que el navegador no puede decodificar.",
+          "Canvas final demasiado grande para procesarlo localmente.",
+        ],
+        technicalNotes: [
+          "La exportaciÃ³n usa canvas en el navegador.",
+          "Vertical y horizontal centran cada imagen en el eje secundario.",
+          "La cuadrÃ­cula usa celdas uniformes y calcula filas automÃ¡ticamente.",
+        ],
+      },
+      en: {
+        summary:
+          "Join images combines multiple local images into one canvas with vertical, horizontal or grid mode.",
+        howTo: [
+          "Add two or more PNG, JPG/JPEG or WebP images.",
+          "Review each image name, type, size and dimensions.",
+          "Order the list with move up, move down or remove.",
+          "Choose vertical, horizontal or grid mode. In grid mode, set columns.",
+          "Adjust spacing, padding, background color and output format.",
+          "Join the images and download the result.",
+        ],
+        useCases: [
+          "Create a vertical strip of screenshots.",
+          "Place images side by side.",
+          "Build a simple grid without uploading files.",
+        ],
+        limits: [
+          "JPG does not preserve transparency.",
+          "WebP appears if your browser can export it correctly.",
+          "Up to 30 images, 15 MB each and 100 MB total.",
+          "Images are drawn at their original dimensions.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload these images to Modulaq to join them.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "A damaged image or one the browser cannot decode.",
+          "Final canvas too large to process locally.",
+        ],
+        technicalNotes: [
+          "Export uses browser canvas.",
+          "Vertical and horizontal modes center each image on the secondary axis.",
+          "Grid mode uses uniform cells and calculates rows automatically.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",

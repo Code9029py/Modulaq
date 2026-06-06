@@ -23,6 +23,9 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "image-to-favicon": lazy(() =>
     import("../../../tools/image/image-to-favicon").then((module) => ({ default: module.ImageToFaviconTool })),
   ),
+  "image-joiner": lazy(() =>
+    import("../../../tools/image/image-joiner").then((module) => ({ default: module.ImageJoinerTool })),
+  ),
   "image-rotator": lazy(() =>
     import("../../../tools/image/image-rotator").then((module) => ({ default: module.ImageRotatorTool })),
   ),
