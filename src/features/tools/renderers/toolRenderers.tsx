@@ -14,6 +14,11 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "image-compressor": lazy(() =>
     import("../../../tools/image/image-compressor").then((module) => ({ default: module.ImageCompressorTool })),
   ),
+  "image-color-extractor": lazy(() =>
+    import("../../../tools/image/image-color-extractor").then((module) => ({
+      default: module.ImageColorExtractorTool,
+    })),
+  ),
   "image-converter": lazy(() =>
     import("../../../tools/image/image-converter").then((module) => ({ default: module.ImageConverterTool })),
   ),

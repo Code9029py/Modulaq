@@ -1089,6 +1089,110 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
   },
   {
+    id: "image-color-extractor",
+    slug: "extraer-colores-imagen",
+    slugEn: "extract-image-colors",
+    name: { es: "Extraer colores de imagen", en: "Extract image colors" },
+    description: {
+      es: "Extrae una paleta aproximada de colores dominantes desde una imagen.",
+      en: "Extract an approximate palette of dominant colors from an image.",
+    },
+    category: "image",
+    tags: {
+      es: ["imagen", "colores", "paleta", "hex", "rgb"],
+      en: ["image", "colors", "palette", "hex", "rgb"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Extraer colores de imagen online gratis",
+        description:
+          "Extrae una paleta aproximada de colores dominantes desde una imagen PNG, JPG o WebP. Copia HEX/RGB y descarga TXT o JSON sin subir archivos.",
+      },
+      en: {
+        title: "Extract image colors online free",
+        description:
+          "Extract an approximate dominant color palette from a PNG, JPG or WebP image. Copy HEX/RGB and download TXT or JSON with no uploads.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Extraer colores de imagen analiza una imagen local y devuelve una paleta aproximada de colores dominantes.",
+        howTo: [
+          "Selecciona una imagen PNG, JPG/JPEG o WebP.",
+          "Revisa el tipo, peso y dimensiones originales.",
+          "Elige la cantidad de colores: 4, 6, 8 o 12.",
+          "Extrae la paleta y revisa HEX, RGB y porcentaje aproximado.",
+          "Copia valores individuales o descarga la paleta como TXT o JSON.",
+        ],
+        useCases: [
+          "Obtener colores base para una interfaz.",
+          "Tomar referencias HEX/RGB desde una imagen de marca.",
+          "Crear una paleta rapida desde una foto o captura.",
+        ],
+        limits: [
+          "Los colores son una estimacion basada en muestreo local.",
+          "No promete precision perfecta ni una paleta exacta.",
+          "Ignora pixeles totalmente transparentes.",
+          "Tamano maximo por imagen: 15 MB.",
+        ],
+        privacy:
+          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para extraer colores.",
+        commonErrors: [
+          "Archivo que no es una imagen PNG, JPG o WebP.",
+          "Imagen danada o que el navegador no puede decodificar.",
+          "Imagen sin pixeles visibles luego de ignorar transparencia total.",
+        ],
+        technicalNotes: [
+          "El analisis usa canvas en el navegador.",
+          "Se muestrean hasta 50.000 pixeles.",
+          "La paleta se obtiene con cuantizacion RGB simple y orden por frecuencia.",
+        ],
+      },
+      en: {
+        summary:
+          "Extract image colors analyzes a local image and returns an approximate dominant color palette.",
+        howTo: [
+          "Select a PNG, JPG/JPEG or WebP image.",
+          "Review the detected type, size and dimensions.",
+          "Choose the color count: 4, 6, 8 or 12.",
+          "Extract the palette and review HEX, RGB and approximate percentage.",
+          "Copy individual values or download the palette as TXT or JSON.",
+        ],
+        useCases: [
+          "Get base colors for an interface.",
+          "Pull HEX/RGB references from a brand image.",
+          "Create a quick palette from a photo or screenshot.",
+        ],
+        limits: [
+          "Colors are an estimate based on local sampling.",
+          "It does not promise perfect precision or an exact palette.",
+          "Fully transparent pixels are ignored.",
+          "Maximum image size: 15 MB.",
+        ],
+        privacy:
+          "Processing happens in your browser; we don't upload this image to Modulaq to extract colors.",
+        commonErrors: [
+          "A file that is not PNG, JPG or WebP.",
+          "A damaged image or one the browser cannot decode.",
+          "An image with no visible pixels after fully transparent pixels are ignored.",
+        ],
+        technicalNotes: [
+          "Analysis uses browser canvas.",
+          "Up to 50,000 pixels are sampled.",
+          "The palette uses simple RGB quantization and frequency ordering.",
+        ],
+      },
+    },
+  },
+  {
     id: "image-compressor",
     slug: "comprimir-imagen",
     slugEn: "compress-image",
