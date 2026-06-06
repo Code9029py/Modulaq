@@ -1,0 +1,1 @@
+export { ImageColorExtractorTool } from "./ImageColorExtractorTool";

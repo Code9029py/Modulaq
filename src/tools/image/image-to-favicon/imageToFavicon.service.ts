@@ -1,0 +1,218 @@
+import JSZip from "jszip";
+import { formatFileSize } from "../../../shared/utils/file";
+import {
+  buildImageZipDownloadFileName,
+  exportBrowserCanvas,
+  getBrowserImageMimeType,
+  getImageDownloadBaseName,
+  isBrowserImageFile,
+  loadBrowserImage,
+} from "../../../shared/utils/imageFiles";
+import type {
+  FaviconIconSpec,
+  ImageDimensions,
+  ImageToFaviconMetadata,
+  ImageToFaviconOptions,
+  ImageToFaviconResult,
+  ImageToFaviconResultIcon,
+} from "./imageToFavicon.types";
+
+export const defaultOutputBaseName = "pack-favicon";
+export const maxFaviconSourcePixels = 64_000_000;
+
+export const faviconIconSpecs = [
+  { fileName: "favicon-16x16.png", label: "Favicon 16x16", size: 16 },
+  { fileName: "favicon-32x32.png", label: "Favicon 32x32", size: 32 },
+  { fileName: "favicon-48x48.png", label: "Favicon 48x48", size: 48 },
+  { fileName: "apple-touch-icon.png", label: "Apple touch icon", size: 180 },
+  { fileName: "icon-192.png", label: "PWA icon 192", size: 192 },
+  { fileName: "icon-512.png", label: "PWA icon 512", size: 512 },
+] as const satisfies readonly FaviconIconSpec[];
+
+export { formatFileSize };
+
+export function isFaviconSourceImageFile(file: File) {
+  return isBrowserImageFile(file);
+}
+
+export function getImageMimeLabel(mimeType: string) {
+  if (mimeType === "image/jpeg") {
+    return "JPG";
+  }
+
+  if (mimeType === "image/webp") {
+    return "WebP";
+  }
+
+  if (mimeType === "image/png") {
+    return "PNG";
+  }
+
+  return mimeType || "Desconocido";
+}
+
+export function getFaviconOutputBaseName(fileName: string) {
+  const baseName = getImageDownloadBaseName(fileName, defaultOutputBaseName);
+  return `${baseName}-favicon`;
+}
+
+export function buildFaviconZipFileName(baseName: string, fallbackBaseName = defaultOutputBaseName) {
+  return buildImageZipDownloadFileName(baseName, fallbackBaseName);
+}
+
+export function getFaviconIconSpecs() {
+  return faviconIconSpecs.map((icon) => ({ ...icon }));
+}
+
+export function validateFaviconSourceDimensions(imageDimensions: ImageDimensions) {
+  if (!Number.isFinite(imageDimensions.width) || !Number.isFinite(imageDimensions.height)) {
+    return "La imagen debe tener dimensiones validas.";
+  }
+
+  if (!Number.isInteger(imageDimensions.width) || !Number.isInteger(imageDimensions.height)) {
+    return "La imagen debe tener dimensiones enteras en pixeles.";
+  }
+
+  if (imageDimensions.width <= 0 || imageDimensions.height <= 0) {
+    return "La imagen debe tener ancho y alto mayores que cero.";
+  }
+
+  if (imageDimensions.width * imageDimensions.height > maxFaviconSourcePixels) {
+    return "La imagen supera el limite de 64 megapixeles.";
+  }
+
+  return null;
+}
+
+export function createFaviconPackReadme(iconSpecs: readonly FaviconIconSpec[] = faviconIconSpecs) {
+  const iconList = iconSpecs.map((icon) => `- ${icon.fileName}: ${icon.size}x${icon.size}px`).join("\n");
+
+  return [
+    "Imagen a favicon - Modulaq",
+    "",
+    "Este ZIP contiene iconos PNG. No incluye un archivo .ico clasico.",
+    "",
+    "Archivos:",
+    iconList,
+    "",
+    "Ejemplos HTML:",
+    '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">',
+    '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
+    "",
+    "Manifest/PWA:",
+    '{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }',
+    '{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }',
+  ].join("\n");
+}
+
+export async function readImageMetadata(file: File): Promise<ImageToFaviconMetadata> {
+  const mimeType = getBrowserImageMimeType(file);
+
+  if (!mimeType) {
+    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+  }
+
+  try {
+    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const validationError = validateFaviconSourceDimensions({
+      height: image.naturalHeight,
+      width: image.naturalWidth,
+    });
+
+    if (validationError) {
+      throw new Error(validationError);
+    }
+
+    return {
+      fileName: file.name,
+      fileSize: file.size,
+      height: image.naturalHeight,
+      mimeType,
+      width: image.naturalWidth,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("No se pudo leer la imagen.");
+  }
+}
+
+function drawCoveredSquareImage(canvas: HTMLCanvasElement, image: HTMLImageElement, size: number) {
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("No se pudo preparar el icono.");
+  }
+
+  canvas.width = size;
+  canvas.height = size;
+  context.clearRect(0, 0, size, size);
+
+  const scale = Math.max(size / image.naturalWidth, size / image.naturalHeight);
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+  const drawX = (size - drawWidth) / 2;
+  const drawY = (size - drawHeight) / 2;
+
+  context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+}
+
+async function createFaviconIcon(image: HTMLImageElement, iconSpec: FaviconIconSpec): Promise<ImageToFaviconResultIcon & { bytes: ArrayBuffer }> {
+  const canvas = document.createElement("canvas");
+  drawCoveredSquareImage(canvas, image, iconSpec.size);
+
+  const result = await exportBrowserCanvas(canvas, {
+    errorMessage: "No se pudo exportar un icono PNG.",
+    mimeType: "image/png",
+  });
+
+  return {
+    ...iconSpec,
+    byteSize: result.size,
+    bytes: result.bytes,
+  };
+}
+
+export async function generateFaviconPack(
+  file: File,
+  { outputBaseName }: ImageToFaviconOptions,
+): Promise<ImageToFaviconResult> {
+  if (!isFaviconSourceImageFile(file)) {
+    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+  }
+
+  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const validationError = validateFaviconSourceDimensions({
+    height: image.naturalHeight,
+    width: image.naturalWidth,
+  });
+
+  if (validationError) {
+    throw new Error(validationError);
+  }
+
+  const zip = new JSZip();
+  const iconResults = await Promise.all(faviconIconSpecs.map((iconSpec) => createFaviconIcon(image, iconSpec)));
+
+  for (const icon of iconResults) {
+    zip.file(icon.fileName, icon.bytes);
+  }
+
+  zip.file("README.txt", createFaviconPackReadme());
+
+  try {
+    const bytes = await zip.generateAsync({ type: "arraybuffer" });
+    return {
+      bytes,
+      fileName: buildFaviconZipFileName(outputBaseName, getFaviconOutputBaseName(file.name)),
+      iconCount: faviconIconSpecs.length,
+      icons: iconResults.map(({ bytes: _bytes, ...icon }) => icon),
+      mimeType: "application/zip",
+      size: bytes.byteLength,
+    };
+  } catch {
+    throw new Error("No se pudo preparar la descarga ZIP.");
+  }
+}

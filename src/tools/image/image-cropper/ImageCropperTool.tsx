@@ -1,4 +1,4 @@
-import { Download, FileImage, Loader2, Maximize2, RotateCcw, Upload } from "lucide-react";
+import { Crop, Download, FileImage, Loader2, Maximize2, RotateCcw, Scan, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { OutputFormatSelector } from "../shared/OutputFormatSelector";
@@ -8,69 +8,137 @@ import { cn } from "../../../shared/utils/cn";
 import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   canExportBrowserImageFormat,
-  jpegQualityPercentToDecimal,
   jpegQualityDecimalToPercent,
+  jpegQualityPercentToDecimal,
 } from "../../../shared/utils/imageFiles";
 import {
-  buildResizedImageFileName,
-  calculateResizeDimensions,
+  buildCroppedImageFileName,
+  createCenteredCropRect,
+  createCenteredSquareCropRect,
+  createFullImageCropRect,
+  cropImageFile,
   defaultOutputBaseName,
   formatFileSize,
+  getCroppedImageOutputBaseName,
+  getCropOutputDimensions,
   getImageFormatLabel,
   getImageMimeLabel,
-  getResizedImageOutputBaseName,
-  maxImageDimension,
   readImageMetadata,
-  resizeImageFile,
-  validateImageDimensions,
-} from "./imageResizer.service";
+  validateCropRect,
+} from "./imageCropper.service";
 import type {
-  ImageDimensions,
-  ImageResizerMetadata,
-  ImageResizerOutputFormat,
-  ImageResizerResult,
-  ImageResizerStatus,
-} from "./imageResizer.types";
+  ImageCropperMetadata,
+  ImageCropperOutputFormat,
+  ImageCropperResult,
+  ImageCropperStatus,
+  ImageCropRect,
+} from "./imageCropper.types";
 
 const acceptedImageTypes = "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp";
 const inputClassName =
   "min-h-11 w-full min-w-0 rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
-type DownloadableResult = ImageResizerResult & {
+type DownloadableResult = ImageCropperResult & {
   url: string;
 };
 
-const baseOutputFormats: ImageResizerOutputFormat[] = ["png", "jpeg"];
+const baseOutputFormats: ImageCropperOutputFormat[] = ["png", "jpeg"];
 
-const formatDescKeys: Record<ImageResizerOutputFormat, TranslationKey> = {
+const formatDescKeys: Record<ImageCropperOutputFormat, TranslationKey> = {
   png: "imageUi.png.desc",
   jpeg: "imageUi.jpg.desc",
-  webp: "tools.image-resizer.ui.webp.desc",
+  webp: "imageUi.webp.desc",
 };
 
-function toPositiveInteger(value: string) {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? Math.round(numberValue) : Number.NaN;
+const copy = {
+  es: {
+    centerCrop: "Centrar recorte",
+    cropHelp: "X e Y ubican el inicio del recorte; ancho y alto definen su tamano.",
+    cropSummary: "Recorte desde (X: {{x}}, Y: {{y}}), tamano {{width}} x {{height}} px",
+    cropTitle: "Area de recorte",
+    downloadReady: "Imagen recortada lista",
+    fullImage: "Imagen completa",
+    heightLabel: "Alto del recorte",
+    invalidPreview: "Ajusta el recorte para ver la vista previa.",
+    outputIntro: "El resultado se genera desde un canvas local.",
+    outputTitle: "Vista previa y salida",
+    previewAlt: "Vista previa del recorte",
+    processing: "Recortando imagen...",
+    sourceIntro: "Recorta una imagen definiendo el area exacta.",
+    sourceTitle: "Archivo y recorte",
+    squareCrop: "Cuadrado centrado",
+    widthLabel: "Ancho del recorte",
+    webpHint: "WebP aparece si tu navegador permite exportarlo correctamente.",
+    xHelp: "X indica cuantos pixeles se avanza desde el borde izquierdo.",
+    xLabel: "X / izquierda",
+    yHelp: "Y indica cuantos pixeles se baja desde el borde superior.",
+    yLabel: "Y / arriba",
+  },
+  en: {
+    centerCrop: "Center crop",
+    cropHelp: "X and Y place the crop start; width and height define its size.",
+    cropSummary: "Crop from (X: {{x}}, Y: {{y}}), size {{width}} x {{height}} px",
+    cropTitle: "Crop area",
+    downloadReady: "Cropped image ready",
+    fullImage: "Full image",
+    heightLabel: "Crop height",
+    invalidPreview: "Adjust the crop to see the preview.",
+    outputIntro: "The result is generated from a local canvas.",
+    outputTitle: "Preview and output",
+    previewAlt: "Crop preview",
+    processing: "Cropping image...",
+    sourceIntro: "Crop an image by defining the exact area.",
+    sourceTitle: "File and crop",
+    squareCrop: "Centered square",
+    widthLabel: "Crop width",
+    webpHint: "WebP appears if your browser can export it correctly.",
+    xHelp: "X indicates how many pixels to move from the left edge.",
+    xLabel: "X / left",
+    yHelp: "Y indicates how many pixels to move down from the top edge.",
+    yLabel: "Y / top",
+  },
+} as const;
+
+function formatTemplate(template: string, values: Record<string, string>) {
+  return Object.entries(values).reduce((result, [key, value]) => result.replace(`{{${key}}}`, value), template);
 }
 
-export function ImageResizerTool() {
+function parseNumberInput(value: string) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : Number.NaN;
+}
+
+function stringifyCropValue(value: number) {
+  return String(Math.max(0, Math.round(value)));
+}
+
+function getCropPreviewImageStyle(metadata: ImageCropperMetadata, cropRect: ImageCropRect) {
+  return {
+    maxWidth: "none",
+    transform: `translate(-${(cropRect.x / metadata.width) * 100}%, -${(cropRect.y / metadata.height) * 100}%)`,
+    width: `${(metadata.width / cropRect.width) * 100}%`,
+  };
+}
+
+export function ImageCropperTool() {
   const { language, t } = useI18n();
+  const labels = copy[language];
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [metadata, setMetadata] = useState<ImageResizerMetadata | null>(null);
+  const [metadata, setMetadata] = useState<ImageCropperMetadata | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [xInput, setXInput] = useState("0");
+  const [yInput, setYInput] = useState("0");
   const [widthInput, setWidthInput] = useState("");
   const [heightInput, setHeightInput] = useState("");
-  const [scaleInput, setScaleInput] = useState("100");
-  const [maintainAspectRatio, setMaintainAspectRatio] = useState(true);
-  const [outputFormat, setOutputFormat] = useState<ImageResizerOutputFormat>("png");
+  const [outputFormat, setOutputFormat] = useState<ImageCropperOutputFormat>("png");
   const [qualityPercent, setQualityPercent] = useState(jpegQualityDecimalToPercent(0.92));
   const [outputFileName, setOutputFileName] = useState(defaultOutputBaseName);
   const [hasCustomOutputFileName, setHasCustomOutputFileName] = useState(false);
   const [webpSupported, setWebpSupported] = useState(false);
-  const [status, setStatus] = useState<ImageResizerStatus>("idle");
+  const [status, setStatus] = useState<ImageCropperStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<DownloadableResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -87,27 +155,24 @@ export function ImageResizerTool() {
     () => (webpSupported ? [...baseOutputFormats, "webp" as const] : baseOutputFormats),
     [webpSupported],
   );
-  const targetDimensions: ImageDimensions = {
-    width: toPositiveInteger(widthInput),
-    height: toPositiveInteger(heightInput),
-  };
-  const dimensionsError = metadata ? validateImageDimensions(targetDimensions) : null;
+  const cropRect = useMemo<ImageCropRect>(
+    () => ({
+      height: parseNumberInput(heightInput),
+      width: parseNumberInput(widthInput),
+      x: parseNumberInput(xInput),
+      y: parseNumberInput(yInput),
+    }),
+    [heightInput, widthInput, xInput, yInput],
+  );
+  const cropError = metadata ? validateCropRect(cropRect, metadata) : null;
+  const outputDimensions = metadata && !cropError ? getCropOutputDimensions(cropRect) : null;
   const shouldShowQuality = outputFormat === "jpeg" || outputFormat === "webp";
-  const finalOutputFileName = buildResizedImageFileName(
+  const finalOutputFileName = buildCroppedImageFileName(
     outputFileName,
     outputFormat,
-    metadata ? getResizedImageOutputBaseName(metadata.fileName) : defaultOutputBaseName,
+    metadata ? getCroppedImageOutputBaseName(metadata.fileName) : defaultOutputBaseName,
   );
-  const canResize = Boolean(file && metadata) && !dimensionsError && status !== "reading" && status !== "processing";
-
-  const deltaLabel = (() => {
-    if (!result) return null;
-    if (result.sizeDeltaBytes === 0) return t("tools.image-resizer.ui.sameSize");
-    const absSize = formatFileSize(Math.abs(result.sizeDeltaBytes));
-    const percent = Math.abs(result.sizeDeltaPercent).toFixed(1);
-    if (result.sizeDeltaBytes > 0) return t("imageUi.increaseLabel", { size: absSize, percent });
-    return t("imageUi.reductionLabel", { size: absSize, percent });
-  })();
+  const canCrop = Boolean(file && metadata) && !cropError && status !== "reading" && status !== "processing";
 
   const clearResult = () => {
     if (resultUrlRef.current) {
@@ -125,41 +190,12 @@ export function ImageResizerTool() {
     }
   };
 
-  const applyDimensions = (dimensions: ImageDimensions) => {
-    setWidthInput(String(dimensions.width));
-    setHeightInput(String(dimensions.height));
-  };
-
-  const updateWidth = (value: string) => {
-    setWidthInput(value);
+  const applyCropRect = (nextCropRect: ImageCropRect) => {
+    setXInput(stringifyCropValue(nextCropRect.x));
+    setYInput(stringifyCropValue(nextCropRect.y));
+    setWidthInput(stringifyCropValue(nextCropRect.width));
+    setHeightInput(stringifyCropValue(nextCropRect.height));
     resetFeedback();
-    if (!metadata || !maintainAspectRatio) return;
-    const width = toPositiveInteger(value);
-    if (Number.isFinite(width) && width > 0) {
-      applyDimensions(calculateResizeDimensions(metadata, "width", width, true));
-      setScaleInput(String(Math.round((width / metadata.width) * 100)));
-    }
-  };
-
-  const updateHeight = (value: string) => {
-    setHeightInput(value);
-    resetFeedback();
-    if (!metadata || !maintainAspectRatio) return;
-    const height = toPositiveInteger(value);
-    if (Number.isFinite(height) && height > 0) {
-      applyDimensions(calculateResizeDimensions(metadata, "height", height, true));
-      setScaleInput(String(Math.round((height / metadata.height) * 100)));
-    }
-  };
-
-  const updateScale = (value: string) => {
-    setScaleInput(value);
-    resetFeedback();
-    if (!metadata) return;
-    const scale = Number(value);
-    if (Number.isFinite(scale) && scale > 0) {
-      applyDimensions(calculateResizeDimensions(metadata, "scale", scale, true));
-    }
   };
 
   const processFile = async (nextFile: File | undefined) => {
@@ -190,11 +226,12 @@ export function ImageResizerTool() {
       setPreviewUrl(nextPreviewUrl);
       setFile(nextFile);
       setMetadata(nextMetadata);
+      setXInput("0");
+      setYInput("0");
       setWidthInput(String(nextMetadata.width));
       setHeightInput(String(nextMetadata.height));
-      setScaleInput("100");
       if (!hasCustomOutputFileName) {
-        setOutputFileName(getResizedImageOutputBaseName(nextFile.name));
+        setOutputFileName(getCroppedImageOutputBaseName(nextFile.name));
       }
       setStatus("ready");
     } catch (nextError) {
@@ -212,10 +249,10 @@ export function ImageResizerTool() {
     setFile(null);
     setMetadata(null);
     setPreviewUrl(null);
+    setXInput("0");
+    setYInput("0");
     setWidthInput("");
     setHeightInput("");
-    setScaleInput("100");
-    setMaintainAspectRatio(true);
     setOutputFormat("png");
     setQualityPercent(jpegQualityDecimalToPercent(0.92));
     setOutputFileName(defaultOutputBaseName);
@@ -226,18 +263,17 @@ export function ImageResizerTool() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const resizeImage = async () => {
-    if (!file || !canResize) return;
+  const cropImage = async () => {
+    if (!file || !canCrop) return;
     setStatus("processing");
     setError(null);
     clearResult();
     try {
-      const nextResult = await resizeImageFile(file, {
-        height: targetDimensions.height,
+      const nextResult = await cropImageFile(file, {
+        cropRect,
         outputBaseName: outputFileName,
         outputFormat,
         quality: shouldShowQuality ? jpegQualityPercentToDecimal(qualityPercent) : undefined,
-        width: targetDimensions.width,
       });
       const resultUrl = URL.createObjectURL(new Blob([nextResult.bytes], { type: nextResult.mimeType }));
       resultUrlRef.current = resultUrl;
@@ -245,7 +281,7 @@ export function ImageResizerTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.image-resizer.ui.couldNotResize"));
+      setError(nextError instanceof Error ? nextError.message : "No se pudo exportar la imagen.");
     }
   };
 
@@ -262,8 +298,8 @@ export function ImageResizerTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div className="grid gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-900">{t("tools.image-resizer.ui.sourceTitle")}</h3>
-            <p className="mt-1 text-sm leading-6 text-ink-500">{t("tools.image-resizer.ui.intro")}</p>
+            <h3 className="text-sm font-semibold text-ink-900">{labels.sourceTitle}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-500">{labels.sourceIntro}</p>
           </div>
 
           <button
@@ -298,7 +334,7 @@ export function ImageResizerTool() {
               <span className="mt-2 block text-sm leading-6 text-ink-500">{t("imageUi.dropImageHint")}</span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{t("tools.image-resizer.ui.maxLimits", { px: maxImageDimension })}</p>
+          <p className="text-xs leading-5 text-ink-600">{t("imageUi.maxSize")}</p>
 
           <input
             ref={fileInputRef}
@@ -341,7 +377,7 @@ export function ImageResizerTool() {
                   <div>
                     <dt className="text-ink-500">{t("imageUi.dimensions")}</dt>
                     <dd className="font-semibold text-ink-900">
-                      {metadata.width} × {metadata.height}px
+                      {metadata.width} x {metadata.height}px
                     </dd>
                   </div>
                 </div>
@@ -349,76 +385,81 @@ export function ImageResizerTool() {
             </div>
           ) : null}
 
-          {status === "reading" ? (
-            <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
-              <Loader2 className="animate-spin text-accent-teal" size={16} />
-              {t("imageUi.reading")}
-            </p>
-          ) : null}
-
-          {status === "error" && error ? (
-            <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              {error}
-            </p>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
-        <div>
-          <h3 className="text-sm font-semibold text-ink-900">{t("tools.image-resizer.ui.outputTitle")}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.image-resizer.ui.outputIntro")}</p>
-        </div>
-
-        <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
-          <label className="flex items-center gap-2 text-sm font-semibold text-ink-700">
-            <input
-              checked={maintainAspectRatio}
-              className="h-4 w-4 accent-accent-cyan"
-              type="checkbox"
-              onChange={(event) => {
-                setMaintainAspectRatio(event.target.checked);
-                resetFeedback();
-              }}
-            />
-            {t("tools.image-resizer.ui.maintainRatio")}
-          </label>
-
-          <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {t("tools.image-resizer.ui.width")}
-              <input className={inputClassName} inputMode="numeric" value={widthInput} onChange={(event) => updateWidth(event.target.value)} />
-            </label>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {t("tools.image-resizer.ui.height")}
-              <input className={inputClassName} inputMode="numeric" value={heightInput} onChange={(event) => updateHeight(event.target.value)} />
-            </label>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
-              {t("tools.image-resizer.ui.scale")}
-              <input className={inputClassName} inputMode="numeric" value={scaleInput} onChange={(event) => updateScale(event.target.value)} />
-            </label>
+          <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{labels.cropTitle}</p>
+              <p className="mt-1 text-xs leading-5 text-ink-500">{labels.cropHelp}</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-4">
+              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                {labels.xLabel}
+                <input className={inputClassName} inputMode="numeric" value={xInput} onChange={(event) => { setXInput(event.target.value); resetFeedback(); }} />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                {labels.yLabel}
+                <input className={inputClassName} inputMode="numeric" value={yInput} onChange={(event) => { setYInput(event.target.value); resetFeedback(); }} />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                {labels.widthLabel}
+                <input className={inputClassName} inputMode="numeric" value={widthInput} onChange={(event) => { setWidthInput(event.target.value); resetFeedback(); }} />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold text-ink-700">
+                {labels.heightLabel}
+                <input className={inputClassName} inputMode="numeric" value={heightInput} onChange={(event) => { setHeightInput(event.target.value); resetFeedback(); }} />
+              </label>
+            </div>
+            <div className="grid gap-1 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-xs leading-5 text-ink-500">
+              <p>{labels.xHelp}</p>
+              <p>{labels.yHelp}</p>
+              {!cropError && outputDimensions ? (
+                <p className="font-semibold text-ink-700">
+                  {formatTemplate(labels.cropSummary, {
+                    height: String(outputDimensions.height),
+                    width: String(outputDimensions.width),
+                    x: stringifyCropValue(cropRect.x),
+                    y: stringifyCropValue(cropRect.y),
+                  })}
+                </p>
+              ) : null}
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <Button
+                type="button"
+                variant="secondary"
+                className="gap-2"
+                disabled={!metadata}
+                onClick={() => metadata && applyCropRect(createFullImageCropRect(metadata))}
+              >
+                <Maximize2 size={16} />
+                {labels.fullImage}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                className="gap-2"
+                disabled={!metadata || Boolean(cropError)}
+                onClick={() => metadata && applyCropRect(createCenteredCropRect(metadata, cropRect))}
+              >
+                <Scan size={16} />
+                {labels.centerCrop}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                className="gap-2"
+                disabled={!metadata}
+                onClick={() => metadata && applyCropRect(createCenteredSquareCropRect(metadata))}
+              >
+                <Crop size={16} />
+                {labels.squareCrop}
+              </Button>
+            </div>
+            {cropError ? (
+              <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
+                {cropError}
+              </p>
+            ) : null}
           </div>
-
-          {dimensionsError ? (
-            <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-              {dimensionsError}
-            </p>
-          ) : null}
-
-          <label className="grid gap-2 text-sm font-semibold text-ink-700">
-            {t("imageUi.outputName")}
-            <input
-              className={cn(inputClassName, "w-full")}
-              value={outputFileName}
-              placeholder={defaultOutputBaseName}
-              onChange={(event) => {
-                setOutputFileName(event.target.value);
-                setHasCustomOutputFileName(true);
-                resetFeedback();
-              }}
-            />
-            <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.willPrepareAs", { name: finalOutputFileName })}</span>
-          </label>
 
           <div className="grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-3 shadow-sm">
             <OutputFormatSelector
@@ -432,6 +473,7 @@ export function ImageResizerTool() {
                 resetFeedback();
               }}
             />
+
             {shouldShowQuality ? (
               <label className="grid gap-2 text-sm font-semibold text-ink-700">
                 {t("imageUi.qualityLabel", { format: getImageFormatLabel(outputFormat), percent: qualityPercent })}
@@ -451,21 +493,86 @@ export function ImageResizerTool() {
             ) : null}
           </div>
 
+          {status === "reading" ? (
+            <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
+              <Loader2 className="animate-spin text-accent-teal" size={16} />
+              {t("imageUi.reading")}
+            </p>
+          ) : null}
+
+          {status === "error" && error ? (
+            <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
+              {error}
+            </p>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
+        <div>
+          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
+          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.outputIntro}</p>
+        </div>
+
+        <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
+          <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">
+            {previewUrl && metadata && !cropError ? (
+              <div className="w-full max-w-md overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50 shadow-sm" style={{ aspectRatio: `${cropRect.width} / ${cropRect.height}` }}>
+                <img
+                  alt={labels.previewAlt}
+                  className="origin-top-left"
+                  src={previewUrl}
+                  style={getCropPreviewImageStyle(metadata, cropRect)}
+                />
+              </div>
+            ) : (
+              <div className="text-center text-sm text-ink-500">
+                <FileImage className="mx-auto text-accent-teal" size={32} />
+                <p className="mt-2 font-semibold text-ink-700">{metadata ? labels.invalidPreview : t("imageUi.selectImage")}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 text-sm shadow-sm">
+            <p className="text-ink-500">{t("imageUi.finalDimensions")}</p>
+            <p className="mt-1 font-semibold text-ink-900">
+              {outputDimensions ? `${outputDimensions.width} x ${outputDimensions.height}px` : "-"}
+            </p>
+          </div>
+
+
+
+
+          <label className="grid gap-2 text-sm font-semibold text-ink-700">
+            {t("imageUi.outputName")}
+            <input
+              className={cn(inputClassName, "w-full")}
+              value={outputFileName}
+              placeholder={defaultOutputBaseName}
+              onChange={(event) => {
+                setOutputFileName(event.target.value);
+                setHasCustomOutputFileName(true);
+                resetFeedback();
+              }}
+            />
+            <span className="text-xs font-normal leading-5 text-ink-500">{t("imageUi.willPrepareAs", { name: finalOutputFileName })}</span>
+          </label>
+
           {status === "processing" ? (
             <p className="flex items-center gap-2 rounded-lg border border-surface-200/80 bg-surface-50/90 px-3 py-2 text-sm text-ink-600 shadow-sm">
               <Loader2 className="animate-spin text-accent-teal" size={16} />
-              {t("tools.image-resizer.ui.resizing")}
+              {labels.processing}
             </p>
           ) : null}
 
           {result ? (
             <div className="grid gap-3 rounded-lg border border-accent-teal/25 bg-accent-teal/10 p-3 text-sm text-ink-700">
-              <p className="font-semibold text-ink-900">{t("tools.image-resizer.ui.resultTitle")}</p>
+              <p className="font-semibold text-ink-900">{labels.downloadReady}</p>
               <dl className="grid gap-2 sm:grid-cols-2">
                 <div>
                   <dt className="text-ink-500">{t("imageUi.finalDimensions")}</dt>
                   <dd className="font-semibold text-ink-900">
-                    {result.width} × {result.height}px
+                    {result.width} x {result.height}px
                   </dd>
                 </div>
                 <div>
@@ -476,10 +583,6 @@ export function ImageResizerTool() {
                   <dt className="text-ink-500">{t("imageUi.finalSize")}</dt>
                   <dd className="font-semibold text-ink-900">{formatFileSize(result.size)}</dd>
                 </div>
-                <div>
-                  <dt className="text-ink-500">{t("imageUi.difference")}</dt>
-                  <dd className="font-semibold text-ink-900">{deltaLabel}</dd>
-                </div>
               </dl>
               <Button type="button" variant="secondary" className="gap-2" onClick={downloadResult}>
                 <Download size={16} />
@@ -489,9 +592,9 @@ export function ImageResizerTool() {
           ) : null}
 
           <div className="grid gap-2 pt-1">
-            <Button type="button" className="gap-2" onClick={() => void resizeImage()} disabled={!canResize}>
-              {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Maximize2 size={16} />}
-              {t("tools.image-resizer.ui.resizeCta")}
+            <Button type="button" className="gap-2" onClick={() => void cropImage()} disabled={!canCrop}>
+              {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Crop size={16} />}
+              {language === "en" ? "Crop image" : "Recortar imagen"}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />

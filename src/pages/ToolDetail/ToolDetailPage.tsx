@@ -55,6 +55,8 @@ const relatedToolIds: Record<string, string[]> = {
   "split-pdf": ["merge-pdf", "reorder-pdf-pages"],
   "reorder-pdf-pages": ["merge-pdf", "split-pdf"],
   "image-to-pdf": ["merge-pdf"],
+  "image-to-base64": ["base64-to-image"],
+  "base64-to-image": ["image-to-base64"],
 };
 
 function isDefinition(tool: ToolDefinition | undefined): tool is ToolDefinition {

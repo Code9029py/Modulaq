@@ -4,6 +4,7 @@ import {
   getBase64TextSize,
   inferExtensionFromMime,
   isValidBase64,
+  parseBase64ImageInput,
   parseDataUrl,
   stripDataUrlPrefix,
 } from "./imageBase64.service";
@@ -51,5 +52,28 @@ describe("imageBase64.service", () => {
   it("calculates generated text size", () => {
     expect(getBase64TextSize(pngBase64)).toBe(pngBase64.length);
     expect(getBase64TextSize(pngBase64, "image/png")).toBe(pngDataUrl.length);
+  });
+
+  it("rebuilds an image result from a Data URL using the detected MIME", () => {
+    const result = parseBase64ImageInput(pngDataUrl, "image/jpeg");
+
+    expect(result.mimeType).toBe("image/png");
+    expect(result.base64).toBe(pngBase64);
+    expect(result.fileName).toBe("imagen-reconstruida.png");
+    expect(result.dataUrl).toBe(pngDataUrl);
+  });
+
+  it("rebuilds an image result from plain Base64 using the selected MIME", () => {
+    const result = parseBase64ImageInput(pngBase64, "image/webp");
+
+    expect(result.mimeType).toBe("image/webp");
+    expect(result.extension).toBe("webp");
+    expect(result.fileName).toBe("imagen-reconstruida.webp");
+  });
+
+  it("rejects unsupported Data URL MIME types", () => {
+    expect(() => parseBase64ImageInput(`data:text/plain;base64,${pngBase64}`, "image/png")).toThrow(
+      "La Data URL debe usar image/png, image/jpeg o image/webp.",
+    );
   });
 });
