@@ -1,7 +1,9 @@
 import { Code, Download, FileCode, Image as ImageIcon, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
 import { cn } from "../../../shared/utils/cn";
 import {
   analyzeSvgSource,
@@ -31,6 +33,7 @@ const copy = {
   es: {
     background: "Color de fondo",
     code: "Codigo SVG",
+    convertCta: "Convertir a PNG",
     codePlaceholder: '<svg width="320" height="180" viewBox="0 0 320 180">...</svg>',
     dimensionsHelp: "Podes ajustar tamano y fondo antes de descargar.",
     downloadReady: "PNG listo",
@@ -52,6 +55,7 @@ const copy = {
   en: {
     background: "Background color",
     code: "SVG code",
+    convertCta: "Convert to PNG",
     codePlaceholder: '<svg width="320" height="180" viewBox="0 0 320 180">...</svg>',
     dimensionsHelp: "You can adjust size and background before downloading.",
     downloadReady: "PNG ready",
@@ -190,7 +194,7 @@ export function SvgToPngTool() {
       setMetadata(null);
       clearPreview();
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo leer el SVG.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.svgReadFailed"));
     }
   };
 
@@ -224,7 +228,7 @@ export function SvgToPngTool() {
       setMetadata(null);
       clearPreview();
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo leer el SVG.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.svgReadFailed"));
     }
   };
 
@@ -266,7 +270,7 @@ export function SvgToPngTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo convertir el SVG a PNG.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.svgConversionFailed"));
     }
   };
 
@@ -452,7 +456,7 @@ export function SvgToPngTool() {
 
             {dimensionError ? (
               <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-                {dimensionError}
+                {t(dimensionError.code as TranslationKey, dimensionError.vars)}
               </p>
             ) : null}
           </div>
@@ -551,7 +555,7 @@ export function SvgToPngTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void convertToPng()} disabled={!canConvert}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Code size={16} />}
-              {language === "en" ? "Convert to PNG" : "Convertir a PNG"}
+              {labels.convertCta}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />

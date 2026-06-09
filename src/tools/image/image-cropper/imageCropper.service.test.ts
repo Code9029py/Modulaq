@@ -14,18 +14,30 @@ describe("imageCropper.service", () => {
   });
 
   it("rejects negative X or Y", () => {
-    expect(validateCropRect({ x: -1, y: 0, width: 400, height: 300 }, imageDimensions)).toMatch(/negativos/);
-    expect(validateCropRect({ x: 0, y: -1, width: 400, height: 300 }, imageDimensions)).toMatch(/negativos/);
+    expect(validateCropRect({ x: -1, y: 0, width: 400, height: 300 }, imageDimensions)).toEqual({
+      code: "tools.errors.cropNegativeOrigin",
+    });
+    expect(validateCropRect({ x: 0, y: -1, width: 400, height: 300 }, imageDimensions)).toEqual({
+      code: "tools.errors.cropNegativeOrigin",
+    });
   });
 
   it("rejects zero width or height", () => {
-    expect(validateCropRect({ x: 0, y: 0, width: 0, height: 300 }, imageDimensions)).toMatch(/mayores que cero/);
-    expect(validateCropRect({ x: 0, y: 0, width: 400, height: 0 }, imageDimensions)).toMatch(/mayores que cero/);
+    expect(validateCropRect({ x: 0, y: 0, width: 0, height: 300 }, imageDimensions)).toEqual({
+      code: "tools.errors.cropNotPositive",
+    });
+    expect(validateCropRect({ x: 0, y: 0, width: 400, height: 0 }, imageDimensions)).toEqual({
+      code: "tools.errors.cropNotPositive",
+    });
   });
 
   it("rejects crop rectangles outside image bounds", () => {
-    expect(validateCropRect({ x: 900, y: 0, width: 400, height: 300 }, imageDimensions)).toMatch(/salirse/);
-    expect(validateCropRect({ x: 0, y: 700, width: 400, height: 300 }, imageDimensions)).toMatch(/salirse/);
+    expect(validateCropRect({ x: 900, y: 0, width: 400, height: 300 }, imageDimensions)).toEqual({
+      code: "tools.errors.cropExceedsImage",
+    });
+    expect(validateCropRect({ x: 0, y: 700, width: 400, height: 300 }, imageDimensions)).toEqual({
+      code: "tools.errors.cropExceedsImage",
+    });
   });
 
   it("creates a centered square crop", () => {

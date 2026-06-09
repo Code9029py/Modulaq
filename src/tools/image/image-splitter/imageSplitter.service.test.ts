@@ -26,20 +26,34 @@ describe("imageSplitter.service", () => {
   });
 
   it("validates rows and columns", () => {
-    expect(validateImageSplitterOptions(imageDimensions, { mode: "grid", rows: 0, columns: 2 })).toMatch(/filas/i);
-    expect(validateImageSplitterOptions(imageDimensions, { mode: "grid", rows: 2, columns: 0 })).toMatch(/columnas/i);
+    expect(validateImageSplitterOptions(imageDimensions, { mode: "grid", rows: 0, columns: 2 })).toEqual({
+      code: "tools.errors.splitterRowsNotPositive",
+    });
+    expect(validateImageSplitterOptions(imageDimensions, { mode: "grid", rows: 2, columns: 0 })).toEqual({
+      code: "tools.errors.splitterColumnsNotPositive",
+    });
     expect(validateImageSplitterOptions(imageDimensions, { mode: "grid", rows: 2, columns: 2 })).toBeNull();
   });
 
   it("validates fixed width and height", () => {
-    expect(validateImageSplitterOptions(imageDimensions, { mode: "fixed-size", partWidth: 0, partHeight: 300 })).toMatch(/ancho/i);
-    expect(validateImageSplitterOptions(imageDimensions, { mode: "fixed-size", partWidth: 300, partHeight: 0 })).toMatch(/alto/i);
+    expect(validateImageSplitterOptions(imageDimensions, { mode: "fixed-size", partWidth: 0, partHeight: 300 })).toEqual({
+      code: "tools.errors.splitterPartWidthNotPositive",
+    });
+    expect(validateImageSplitterOptions(imageDimensions, { mode: "fixed-size", partWidth: 300, partHeight: 0 })).toEqual({
+      code: "tools.errors.splitterPartHeightNotPositive",
+    });
     expect(validateImageSplitterOptions(imageDimensions, { mode: "fixed-size", partWidth: 300, partHeight: 300 })).toBeNull();
   });
 
   it("limits the maximum number of parts", () => {
-    expect(validateImageSplitterOptions(imageDimensions, { mode: "grid", rows: 10, columns: 11 })).toMatch(/100 partes/);
-    expect(validateImageSplitterOptions(imageDimensions, { mode: "fixed-size", partWidth: 10, partHeight: 10 })).toMatch(/100 partes/);
+    expect(validateImageSplitterOptions(imageDimensions, { mode: "grid", rows: 10, columns: 11 })).toEqual({
+      code: "tools.errors.splitterExceedsParts",
+      vars: { max: 100 },
+    });
+    expect(validateImageSplitterOptions(imageDimensions, { mode: "fixed-size", partWidth: 10, partHeight: 10 })).toEqual({
+      code: "tools.errors.splitterExceedsParts",
+      vars: { max: 100 },
+    });
   });
 
   it("generates part names with the correct extension", () => {

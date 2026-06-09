@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { EncryptedPDFError, PDFDocument } from "pdf-lib";
+import { ToolError } from "../../../shared/errors/ToolError";
 import { buildDownloadFileName, getSuggestedDownloadBaseName, sanitizeDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { CompressPdfDownload, CompressPdfMetadata, CompressPdfResult } from "./compressPdf.types";
@@ -9,9 +10,6 @@ export { formatFileSize, isPdfFile };
 export const defaultOutputBaseName = "pdf-comprimido";
 const minimumSignificantReductionBytes = 1024;
 const minimumSignificantReductionPercentage = 1;
-const encryptedPdfMessage = "Este PDF está protegido o encriptado y no se puede comprimir desde esta herramienta.";
-const unreadablePdfMessage =
-  "No se pudo procesar este PDF con la librería actual. Puede estar protegido, usar una estructura no compatible o estar incompleto.";
 
 export function formatSizeDifference(bytes: number) {
   return bytes > 0 ? `-${formatFileSize(bytes)}` : "Sin reducción";
@@ -37,17 +35,17 @@ async function loadPdfDocument(bytes: ArrayBuffer) {
     });
   } catch (error) {
     if (error instanceof EncryptedPDFError) {
-      throw new Error(encryptedPdfMessage);
+      throw new ToolError("tools.errors.encryptedPdf");
     }
 
     console.error("[Comprimir PDF] pdf-lib no pudo cargar el documento.", error);
-    throw new Error(unreadablePdfMessage);
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 }
 
 export async function readPdfMetadata(file: File): Promise<CompressPdfMetadata> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   const pdfDocument = await loadPdfDocument(await file.arrayBuffer());
@@ -61,7 +59,7 @@ export async function readPdfMetadata(file: File): Promise<CompressPdfMetadata> 
 
 export async function compressPdf(file: File): Promise<CompressPdfResult> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   const originalBuffer = await file.arrayBuffer();
@@ -97,7 +95,7 @@ export async function compressPdf(file: File): Promise<CompressPdfResult> {
       preservedOriginal: !isSmaller,
     };
   } catch {
-    throw new Error("No se pudo optimizar este PDF. Probá nuevamente con otro archivo.");
+    throw new ToolError("tools.errors.pdfCompressFailed");
   }
 }
 
@@ -127,7 +125,7 @@ export async function createCompressedDownload(
   fallbackBaseName = defaultOutputBaseName,
 ): Promise<CompressPdfDownload> {
   if (results.length === 0) {
-    throw new Error("No hay resultados para descargar.");
+    throw new ToolError("tools.errors.pdfNoCompressResults");
   }
 
   if (results.length === 1 && !forceZip) {

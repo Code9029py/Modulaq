@@ -2,6 +2,7 @@ import { Download, FileImage, Loader2, RotateCcw } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
 import { cn } from "../../../shared/utils/cn";
 import type { BrowserImageMimeType } from "../../../shared/utils/imageFiles";
 import {
@@ -25,7 +26,7 @@ type ReconstructedImage = Base64ImageResult & {
 };
 
 export function Base64ToImageTool() {
-  const { language, t } = useI18n();
+  const { t } = useI18n();
   const previewUrlRef = useRef<string | null>(null);
   const [status, setStatus] = useState<ImageBase64Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -34,14 +35,8 @@ export function Base64ToImageTool() {
   const [imageOutputBaseName, setImageOutputBaseName] = useState(defaultImageOutputBaseName);
   const [reconstructedImage, setReconstructedImage] = useState<ReconstructedImage | null>(null);
 
-  const intro =
-    language === "en"
-      ? "Rebuild an image from Base64 or a Data URL."
-      : "Reconstruye una imagen desde Base64 o Data URL.";
-  const warning =
-    language === "en"
-      ? "A valid Base64 string does not always represent an image."
-      : "Una cadena Base64 válida no siempre representa una imagen.";
+  const intro = t("tools.image-base64.ui.base64ToImageHeadIntro");
+  const warning = t("tools.image-base64.ui.base64ToImageWarning");
 
   const clearPreviewUrl = () => {
     if (previewUrlRef.current) {
@@ -75,7 +70,7 @@ export function Base64ToImageTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.image-base64.ui.couldNotReconstruct"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.image-base64.ui.couldNotReconstruct"));
     }
   };
 

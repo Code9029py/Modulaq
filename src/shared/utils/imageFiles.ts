@@ -1,3 +1,4 @@
+import { ToolError } from "../errors/ToolError";
 import { sanitizeDownloadBaseName } from "./downloadFileName";
 
 export type ImageOutputFormat = "png" | "jpeg";
@@ -6,7 +7,8 @@ export type BrowserImageMimeType = "image/png" | "image/jpeg" | "image/webp";
 
 export type BrowserImageExportOptions = {
   backgroundColor?: string;
-  errorMessage?: string;
+  loadError?: ToolError;
+  canvasError?: ToolError;
   height?: number;
   mimeType: BrowserImageMimeType;
   quality?: number;
@@ -14,7 +16,7 @@ export type BrowserImageExportOptions = {
 };
 
 export type BrowserCanvasExportOptions = {
-  errorMessage?: string;
+  canvasError?: ToolError;
   mimeType: BrowserImageMimeType;
   quality?: number;
 };
@@ -163,7 +165,7 @@ export function canExportBrowserImageFormat(format: BrowserImageOutputFormat) {
   return canExportBrowserImageMimeType(getBrowserImageOutputMimeType(format));
 }
 
-export async function loadBrowserImage(file: File, errorMessage = "No se pudo leer la imagen.") {
+export async function loadBrowserImage(file: File, loadError?: ToolError) {
   const imageUrl = URL.createObjectURL(file);
 
   try {
@@ -172,7 +174,7 @@ export async function loadBrowserImage(file: File, errorMessage = "No se pudo le
 
     await new Promise<void>((resolve, reject) => {
       image.onload = () => resolve();
-      image.onerror = () => reject(new Error(errorMessage));
+      image.onerror = () => reject(loadError ?? new ToolError("tools.errors.imageLoadFailed"));
       image.src = imageUrl;
     });
 
@@ -184,7 +186,7 @@ export async function loadBrowserImage(file: File, errorMessage = "No se pudo le
 
 export async function exportBrowserCanvas(
   canvas: HTMLCanvasElement,
-  { errorMessage = "No se pudo convertir la imagen.", mimeType, quality }: BrowserCanvasExportOptions,
+  { canvasError, mimeType, quality }: BrowserCanvasExportOptions,
 ): Promise<BrowserImageExportResult> {
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
@@ -194,7 +196,7 @@ export async function exportBrowserCanvas(
           return;
         }
 
-        reject(new Error(errorMessage));
+        reject(canvasError ?? new ToolError("tools.errors.canvasGenericFailed"));
       },
       mimeType,
       mimeType === "image/png" ? undefined : normalizeImageQuality(quality),
@@ -202,7 +204,7 @@ export async function exportBrowserCanvas(
   });
 
   if (blob.type && blob.type !== mimeType) {
-    throw new Error("El navegador no generó el formato de imagen esperado.");
+    throw new ToolError("tools.errors.canvasUnexpectedFormat");
   }
 
   return {
@@ -216,9 +218,9 @@ export async function exportBrowserCanvas(
 
 export async function exportBrowserImageFile(
   file: File,
-  { backgroundColor, errorMessage, height, mimeType, quality, width }: BrowserImageExportOptions,
+  { backgroundColor, loadError, canvasError, height, mimeType, quality, width }: BrowserImageExportOptions,
 ): Promise<BrowserImageExportResult> {
-  const image = await loadBrowserImage(file, errorMessage);
+  const image = await loadBrowserImage(file, loadError);
   const canvas = document.createElement("canvas");
   canvas.width = width ?? image.naturalWidth;
   canvas.height = height ?? image.naturalHeight;
@@ -226,7 +228,7 @@ export async function exportBrowserImageFile(
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar la conversión de imagen.");
+    throw new ToolError("tools.errors.canvasContextFailed");
   }
 
   if (backgroundColor) {
@@ -244,7 +246,7 @@ export async function exportBrowserImageFile(
           return;
         }
 
-        reject(new Error("No se pudo convertir la imagen."));
+        reject(canvasError ?? new ToolError("tools.errors.canvasGenericFailed"));
       },
       mimeType,
       mimeType === "image/png" ? undefined : normalizeImageQuality(quality),
@@ -252,7 +254,7 @@ export async function exportBrowserImageFile(
   });
 
   if (blob.type && blob.type !== mimeType) {
-    throw new Error("El navegador no generó el formato de imagen esperado.");
+    throw new ToolError("tools.errors.canvasUnexpectedFormat");
   }
 
   return {

@@ -2,8 +2,9 @@ import { Download, FileArchive, FileText, Loader2, Minimize2, RotateCcw, Trash2,
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { fileProcessingLimitLabels, getPdfFileSizeLimitError, getTotalPdfSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   compressPdf,
   createCompressedDownload,
@@ -51,6 +52,7 @@ function resetItemResult(item: CompressionItem): CompressionItem {
 
 export function CompressPdfTool() {
   const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [items, setItems] = useState<CompressionItem[]>([]);
   const [download, setDownload] = useState<CompressPdfDownload | null>(null);
@@ -94,8 +96,8 @@ export function CompressPdfTool() {
     setStatus("reading");
 
     for (const nextFile of pdfFiles) {
-      const fileLimitError = getPdfFileSizeLimitError(nextFile);
-      const totalLimitError = getTotalPdfSizeLimitError(acceptedTotalSize + nextFile.size);
+      const fileLimitError = limitLabels.getPdfFileSizeLimitError(nextFile);
+      const totalLimitError = limitLabels.getTotalPdfSizeLimitError(acceptedTotalSize + nextFile.size);
 
       if (fileLimitError || totalLimitError) {
         readErrors.push(`${nextFile.name}: ${fileLimitError ?? totalLimitError}`);
@@ -108,7 +110,7 @@ export function CompressPdfTool() {
         acceptedTotalSize += nextItem.metadata.fileSize;
       } catch (nextError) {
         readErrors.push(
-          `${nextFile.name}: ${nextError instanceof Error ? nextError.message : t("tools.compress-pdf.ui.couldNotReadItem")}`,
+          `${nextFile.name}: ${resolveToolErrorMessage(nextError, t, "tools.compress-pdf.ui.couldNotReadItem")}`,
         );
       }
     }
@@ -174,7 +176,7 @@ export function CompressPdfTool() {
           ),
         );
       } catch (nextError) {
-        const message = nextError instanceof Error ? nextError.message : t("tools.compress-pdf.ui.couldNotCompressItem");
+        const message = resolveToolErrorMessage(nextError, t, "tools.compress-pdf.ui.couldNotCompressItem");
         processErrors.push(`${item.metadata.fileName}: ${message}`);
         setItems((currentItems) =>
           currentItems.map((currentItem) =>
@@ -195,7 +197,7 @@ export function CompressPdfTool() {
       setError(processErrors.length > 0 ? processErrors.join(" ") : null);
       setStatus("success");
     } catch (nextError) {
-      setError(nextError instanceof Error ? nextError.message : t("tools.compress-pdf.ui.couldNotPrepare"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.compress-pdf.ui.couldNotPrepare"));
       setStatus("error");
     }
   };
@@ -257,7 +259,7 @@ export function CompressPdfTool() {
               <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.compress-pdf.ui.dropHintMany")}</span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfMultiple}</p>
+          <p className="text-xs leading-5 text-ink-600">{limitLabels.pdfMultiple}</p>
 
           <input
             ref={fileInputRef}

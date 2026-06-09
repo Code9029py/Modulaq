@@ -2,6 +2,7 @@
 // Preserva la API histórica del service (mergePdfFiles, readPdfMetadata, sanitizePdfFileName,
 // formatFileSize, isPdfFile, getBaseFileName, defaultOutputFileName).
 import { countPdfPages as coreCountPdfPages, mergePdfs as coreMergePdfs } from "@modulaq/core/pdf";
+import { ToolError } from "../../../shared/errors/ToolError";
 import { buildDownloadFileName, getBaseFileName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { MergePdfFileMetadata, MergePdfOptions, MergePdfResult } from "./mergePdf.types";
@@ -16,25 +17,25 @@ export function sanitizePdfFileName(fileName: string) {
 
 export async function readPdfMetadata(file: File): Promise<MergePdfFileMetadata> {
   if (!isPdfFile(file)) {
-    throw new Error(`"${file.name}" no es un archivo PDF válido.`);
+    throw new ToolError("tools.errors.invalidPdfNamed", { name: file.name });
   }
 
   try {
     const pageCount = await coreCountPdfPages(file);
     return { fileName: file.name, fileSize: file.size, pageCount };
   } catch {
-    throw new Error(`No se pudo leer "${file.name}". Puede estar dañado, protegido o incompleto.`);
+    throw new ToolError("tools.errors.unreadablePdfNamed", { name: file.name });
   }
 }
 
 export async function mergePdfFiles(files: File[], options: MergePdfOptions = {}): Promise<MergePdfResult> {
   if (files.length < 2) {
-    throw new Error("Agregá al menos dos PDFs para unirlos.");
+    throw new ToolError("tools.errors.pdfMergeNeedTwo");
   }
 
   for (const file of files) {
     if (!isPdfFile(file)) {
-      throw new Error(`"${file.name}" no es un archivo PDF válido.`);
+      throw new ToolError("tools.errors.invalidPdfNamed", { name: file.name });
     }
   }
 
@@ -42,7 +43,7 @@ export async function mergePdfFiles(files: File[], options: MergePdfOptions = {}
   try {
     bytes = await coreMergePdfs(files);
   } catch {
-    throw new Error("No se pudo generar el PDF final. Probá quitar el archivo problemático e intentá de nuevo.");
+    throw new ToolError("tools.errors.pdfMergeFailed");
   }
 
   // Recalculamos el pageCount sobre el resultado para reflejar la realidad

@@ -4,8 +4,9 @@ import { Button } from "../../../shared/components/Button";
 import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   canExportBrowserImageFormat,
   jpegQualityDecimalToPercent,
@@ -55,6 +56,7 @@ const copy = {
     centerCrop: "Centrar recorte",
     cropHelp: "X e Y ubican el inicio del recorte; ancho y alto definen su tamano.",
     cropSummary: "Recorte desde (X: {{x}}, Y: {{y}}), tamano {{width}} x {{height}} px",
+    cropCta: "Recortar imagen",
     cropTitle: "Area de recorte",
     downloadReady: "Imagen recortada lista",
     fullImage: "Imagen completa",
@@ -78,6 +80,7 @@ const copy = {
     centerCrop: "Center crop",
     cropHelp: "X and Y place the crop start; width and height define its size.",
     cropSummary: "Crop from (X: {{x}}, Y: {{y}}), size {{width}} x {{height}} px",
+    cropCta: "Crop image",
     cropTitle: "Crop area",
     downloadReady: "Cropped image ready",
     fullImage: "Full image",
@@ -123,6 +126,7 @@ function getCropPreviewImageStyle(metadata: ImageCropperMetadata, cropRect: Imag
 export function ImageCropperTool() {
   const { language, t } = useI18n();
   const labels = copy[language];
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
@@ -212,7 +216,7 @@ export function ImageCropperTool() {
       setPreviewUrl(null);
     }
 
-    const fileLimitError = getImageFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getImageFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -236,7 +240,7 @@ export function ImageCropperTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("imageUi.couldNotRead"));
+      setError(resolveToolErrorMessage(nextError, t, "imageUi.couldNotRead"));
     }
   };
 
@@ -281,7 +285,7 @@ export function ImageCropperTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo exportar la imagen.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.imageExportFailed"));
     }
   };
 
@@ -456,7 +460,7 @@ export function ImageCropperTool() {
             </div>
             {cropError ? (
               <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-                {cropError}
+                {t(cropError.code as TranslationKey, cropError.vars)}
               </p>
             ) : null}
           </div>
@@ -466,7 +470,7 @@ export function ImageCropperTool() {
               description={t(formatDescKeys[outputFormat])}
               formats={outputFormats}
               getLabel={getImageFormatLabel}
-              label={language === "en" ? "Output format" : "Formato final"}
+              label={t("imageUi.finalFormat")}
               value={outputFormat}
               onChange={(format) => {
                 setOutputFormat(format);
@@ -594,7 +598,7 @@ export function ImageCropperTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void cropImage()} disabled={!canCrop}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Crop size={16} />}
-              {language === "en" ? "Crop image" : "Recortar imagen"}
+              {labels.cropCta}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />

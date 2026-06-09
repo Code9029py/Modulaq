@@ -1,3 +1,5 @@
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -35,13 +37,13 @@ export function hasExternalSvgResources(content: string) {
   return externalResourcePattern.test(content) || externalUrlPattern.test(content);
 }
 
-export function validateSvgContent(content: string) {
+export function validateSvgContent(content: string): PageSelectionError | null {
   if (!looksLikeSvg(content)) {
-    return "El contenido debe incluir una etiqueta SVG valida.";
+    return { code: "tools.errors.invalidSvg" };
   }
 
   if (hasSvgScript(content)) {
-    return "No se admiten SVG con scripts.";
+    return { code: "tools.errors.svgContainsScript" };
   }
 
   return null;
@@ -105,27 +107,25 @@ export function getDefaultSvgOutputDimensions(dimensions: SvgDimensions) {
   };
 }
 
-export function validateSvgOutputDimensions(width: number, height: number) {
+export function validateSvgOutputDimensions(
+  width: number,
+  height: number,
+): PageSelectionError | null {
   if (!Number.isFinite(width) || !Number.isFinite(height)) {
-    return "El ancho y el alto deben ser numeros validos.";
+    return { code: "tools.errors.dimensionsNotNumeric" };
   }
-
   if (!Number.isInteger(width) || !Number.isInteger(height)) {
-    return "El ancho y el alto deben ser numeros enteros.";
+    return { code: "tools.errors.dimensionsNotInteger" };
   }
-
   if (width <= 0 || height <= 0) {
-    return "El ancho y el alto deben ser mayores que cero.";
+    return { code: "tools.errors.dimensionsNotPositive" };
   }
-
   if (width > maxSvgOutputSide || height > maxSvgOutputSide) {
-    return `El ancho y el alto no pueden superar ${maxSvgOutputSide}px.`;
+    return { code: "tools.errors.dimensionsExceedMax", vars: { max: maxSvgOutputSide } };
   }
-
   if (width * height > maxSvgOutputPixels) {
-    return "La imagen supera el limite de 64 megapixeles.";
+    return { code: "tools.errors.placeholderPixelLimit" };
   }
-
   return null;
 }
 
@@ -161,7 +161,7 @@ export function buildSvgPngFileName(baseName: string, fallbackBaseName = default
 export function analyzeSvgSource(content: string, fileName: string | null = null): SvgToPngMetadata {
   const validationError = validateSvgContent(content);
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   return {
@@ -187,12 +187,12 @@ function createSvgFile(content: string) {
 export async function convertSvgToPng(content: string, options: SvgToPngOptions): Promise<SvgToPngResult> {
   const validationError = validateSvgContent(content);
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   const dimensionError = validateSvgOutputDimensions(options.width, options.height);
   if (dimensionError) {
-    throw new Error(dimensionError);
+    throw new ToolError(dimensionError.code, dimensionError.vars);
   }
 
   const canvas = document.createElement("canvas");
@@ -201,7 +201,7 @@ export async function convertSvgToPng(content: string, options: SvgToPngOptions)
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("No se pudo preparar el PNG.");
+    throw new ToolError("tools.errors.svgPrepareFailed");
   }
 
   if (!options.transparentBackground) {
@@ -210,10 +210,10 @@ export async function convertSvgToPng(content: string, options: SvgToPngOptions)
   }
 
   try {
-    const image = await loadBrowserImage(createSvgFile(content), "No se pudo renderizar el SVG.");
+    const image = await loadBrowserImage(createSvgFile(content), new ToolError("tools.errors.svgReadFailed"));
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     const result = await exportBrowserCanvas(canvas, {
-      errorMessage: "No se pudo exportar el PNG.",
+      canvasError: new ToolError("tools.errors.svgConversionFailed"),
       mimeType: "image/png",
     });
 
@@ -230,6 +230,6 @@ export async function convertSvgToPng(content: string, options: SvgToPngOptions)
       throw error;
     }
 
-    throw new Error("No se pudo convertir el SVG a PNG.");
+    throw new ToolError("tools.errors.svgConversionFailed");
   }
 }

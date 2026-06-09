@@ -2,8 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   buildPaletteFileName,
   colorCountOptions,
@@ -101,6 +102,7 @@ function downloadTextFile(fileName: string, text: string, type: string) {
 export function ImageColorExtractorTool() {
   const { language, t } = useI18n();
   const labels = copy[language];
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -161,7 +163,7 @@ export function ImageColorExtractorTool() {
       setPreviewUrl(null);
     }
 
-    const fileLimitError = getImageFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getImageFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -181,7 +183,7 @@ export function ImageColorExtractorTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("imageUi.couldNotRead"));
+      setError(resolveToolErrorMessage(nextError, t, "imageUi.couldNotRead"));
     }
   };
 
@@ -218,7 +220,7 @@ export function ImageColorExtractorTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo extraer la paleta.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.colorPaletteFailed"));
     }
   };
 
@@ -227,7 +229,7 @@ export function ImageColorExtractorTool() {
       await navigator.clipboard.writeText(value);
       setCopiedValue(value);
     } catch {
-      setError(language === "en" ? "Could not copy to clipboard." : "No se pudo copiar al portapapeles.");
+      setError(t("tools.errors.colorCopyFailed"));
     }
   };
 

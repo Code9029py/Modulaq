@@ -17,12 +17,11 @@ import { Button } from "../../../shared/components/Button";
 import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { ToolError } from "../../../shared/errors/ToolError";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import {
-  fileProcessingLimits,
-  getImageFileSizeLimitError,
-  getTotalImageSizeLimitError,
-} from "../../../shared/utils/fileProcessingLimits";
+import { fileProcessingLimits } from "../../../shared/utils/fileProcessingLimits";
 import {
   canExportBrowserImageFormat,
   jpegQualityDecimalToPercent,
@@ -82,6 +81,7 @@ const copy = {
     emptyList: "Agrega al menos dos imagenes para preparar la union.",
     grid: "Cuadricula",
     horizontal: "Horizontal",
+    joinCta: "Unir imagenes",
     layoutTitle: "Orden y composicion",
     mode: "Modo de union",
     outputIntro: "Todo se procesa localmente en tu navegador.",
@@ -104,6 +104,7 @@ const copy = {
     emptyList: "Add at least two images to prepare the join.",
     grid: "Grid",
     horizontal: "Horizontal",
+    joinCta: "Join images",
     layoutTitle: "Order and composition",
     mode: "Join mode",
     outputIntro: "Everything is processed locally in your browser.",
@@ -151,6 +152,7 @@ function getPreviewImageStyle(position: { height: number; width: number; x: numb
 export function ImageJoinerTool() {
   const { language, t } = useI18n();
   const labels = copy[language];
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const resultUrlRef = useRef<string | null>(null);
   const itemsRef = useRef<ImageJoinerItem[]>([]);
@@ -241,12 +243,12 @@ export function ImageJoinerTool() {
     const totalCount = items.length + nextFiles.length;
     if (totalCount > fileProcessingLimits.maxImageFileCount) {
       setStatus(items.length > 0 ? "ready" : "error");
-      setError("Puedes cargar hasta 30 imagenes.");
+      setError(t("tools.errors.tooManyImagesGeneric"));
       return;
     }
 
     const nextTotalSize = items.reduce((total, item) => total + item.file.size, 0) + nextFiles.reduce((total, file) => total + file.size, 0);
-    const totalSizeError = getTotalImageSizeLimitError(nextTotalSize);
+    const totalSizeError = limitLabels.getTotalImageSizeLimitError(nextTotalSize);
     if (totalSizeError) {
       setStatus(items.length > 0 ? "ready" : "error");
       setError(totalSizeError);
@@ -254,15 +256,17 @@ export function ImageJoinerTool() {
     }
 
     const preparedItems: ImageJoinerItem[] = [];
+    let preparedError: string | null = null;
     try {
       for (const [index, file] of nextFiles.entries()) {
-        const fileLimitError = getImageFileSizeLimitError(file);
+        const fileLimitError = limitLabels.getImageFileSizeLimitError(file);
         if (fileLimitError) {
-          throw new Error(fileLimitError);
+          preparedError = fileLimitError;
+          break;
         }
 
         if (!isJoinableImageFile(file)) {
-          throw new Error("Selecciona imagenes PNG, JPG o WebP validas.");
+          throw new ToolError("tools.errors.invalidImages");
         }
 
         const id = createEntryId(file, items.length + index);
@@ -272,6 +276,15 @@ export function ImageJoinerTool() {
           metadata,
           previewUrl: URL.createObjectURL(file),
         });
+      }
+
+      if (preparedError) {
+        for (const item of preparedItems) {
+          URL.revokeObjectURL(item.previewUrl);
+        }
+        setStatus(items.length > 0 ? "ready" : "error");
+        setError(preparedError);
+        return;
       }
 
       setItems((currentItems) => {
@@ -287,7 +300,7 @@ export function ImageJoinerTool() {
         URL.revokeObjectURL(item.previewUrl);
       }
       setStatus(items.length > 0 ? "ready" : "error");
-      setError(nextError instanceof Error ? nextError.message : t("imageUi.couldNotRead"));
+      setError(resolveToolErrorMessage(nextError, t, "imageUi.couldNotRead"));
     }
   };
 
@@ -358,7 +371,7 @@ export function ImageJoinerTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo unir las imagenes.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.joinerFailed"));
     }
   };
 
@@ -580,7 +593,7 @@ export function ImageJoinerTool() {
 
             {layoutError ? (
               <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-                {layoutError}
+                {t(layoutError.code as TranslationKey, layoutError.vars)}
               </p>
             ) : null}
           </div>
@@ -649,7 +662,7 @@ export function ImageJoinerTool() {
               description={t(formatDescKeys[outputFormat])}
               formats={outputFormats}
               getLabel={getImageFormatLabel}
-              label={language === "en" ? "Output format" : "Formato final"}
+              label={t("imageUi.finalFormat")}
               value={outputFormat}
               onChange={(format) => {
                 setOutputFormat(format);
@@ -727,7 +740,7 @@ export function ImageJoinerTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void joinImages()} disabled={!canJoin}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Images size={16} />}
-              {language === "en" ? "Join images" : "Unir imagenes"}
+              {labels.joinCta}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />

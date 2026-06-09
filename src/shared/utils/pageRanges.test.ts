@@ -14,27 +14,27 @@ describe("validateParts (shared/utils/pageRanges)", () => {
   it("una parte vacía es error claro", () => {
     const result = validateParts(["1-2", "", "4-5"], 5);
     expect(result.isValid).toBe(false);
-    expect(result.error).toMatch(/vacía/);
+    expect(result.error?.code).toBe("tools.errors.partEmpty");
   });
 
   it("páginas repetidas entre partes son error", () => {
     const result = validateParts(["1-3", "3-5"], 5);
     expect(result.isValid).toBe(false);
-    expect(result.error).toMatch(/asignada/);
+    expect(result.error?.code).toBe("tools.errors.partsPageOverAssigned");
     expect(result.repeatedPages).toContain(3);
   });
 
   it("falta una página → error", () => {
     const result = validateParts(["1-2", "4-5"], 5);
     expect(result.isValid).toBe(false);
-    expect(result.error).toMatch(/Falta/);
+    expect(result.error?.code).toBe("tools.errors.partsPageMissing");
     expect(result.missingPages).toEqual([3]);
   });
 
   it("faltan varias páginas → mensaje plural", () => {
     const result = validateParts(["1"], 5);
     expect(result.isValid).toBe(false);
-    expect(result.error).toMatch(/Falta(n)?\s+asignar:/);
+    expect(result.error?.code).toBe("tools.errors.partsPagesMissing");
     expect(result.missingPages).toEqual([2, 3, 4, 5]);
   });
 
@@ -47,6 +47,6 @@ describe("validateParts (shared/utils/pageRanges)", () => {
   it("una parte con duplicado interno (rejectDuplicates) → error", () => {
     const result = validateParts(["1,1", "2-5"], 5);
     expect(result.isValid).toBe(false);
-    expect(result.error).toMatch(/repetida/i);
+    expect(result.error?.code).toBe("tools.errors.pageRepeatedInPart");
   });
 });

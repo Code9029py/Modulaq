@@ -5,6 +5,7 @@ import {
   configurePdfWorker,
   extractPdfText as coreExtractPdfText,
 } from "@modulaq/core/pdf-render";
+import { ToolError } from "../../../shared/errors/ToolError";
 import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
 import type {
@@ -21,7 +22,6 @@ import type {
 // comparten esta misma configuración del singleton GlobalWorkerOptions.
 configurePdfWorker(pdfWorkerUrl);
 
-const readPdfErrorMessage = "No se pudo leer el PDF. Verificá que el archivo no esté dañado o protegido.";
 const minimumSelectableCharacters = 3;
 const suspiciousSymbolPattern = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\uE000-\uF8FF\uFFFD]|\p{Co}/gu;
 export const defaultOutputBaseName = "texto-extraido";
@@ -52,14 +52,14 @@ export function getTextFileName(outputBaseName: string, fallbackBaseName = defau
 
 async function loadPdfDocument(file: File): Promise<PDFDocumentProxy> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   try {
     const data = new Uint8Array(await file.arrayBuffer());
     return await pdfjsLib.getDocument({ data }).promise;
   } catch {
-    throw new Error(readPdfErrorMessage);
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 }
 
@@ -239,7 +239,7 @@ async function extractWithLayout(
     }
     return buildExtractResult(pages, pdf.numPages, file);
   } catch {
-    throw new Error("No se pudo extraer el texto del PDF.");
+    throw new ToolError("tools.errors.pdfTextExtractFailed");
   } finally {
     await pdf.destroy();
   }
@@ -259,7 +259,7 @@ async function extractSimple(
     onProgress?.({ current: pages.length, total: pages.length });
     return buildExtractResult(pages, pages.length, file);
   } catch {
-    throw new Error("No se pudo extraer el texto del PDF.");
+    throw new ToolError("tools.errors.pdfTextExtractFailed");
   }
 }
 

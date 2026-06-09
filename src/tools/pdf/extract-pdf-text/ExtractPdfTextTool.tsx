@@ -2,6 +2,7 @@ import { Clipboard, Download, FileText, Loader2, RotateCcw, Upload } from "lucid
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
 import { cn } from "../../../shared/utils/cn";
 import {
   defaultOutputBaseName,
@@ -68,7 +69,7 @@ export function ExtractPdfTextTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
+      setError(resolveToolErrorMessage(nextError, t, "toolUi.couldNotReadFile"));
     }
   };
 
@@ -101,7 +102,7 @@ export function ExtractPdfTextTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.extract-pdf-text.ui.couldNotExtract"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.extract-pdf-text.ui.couldNotExtract"));
     }
   };
 

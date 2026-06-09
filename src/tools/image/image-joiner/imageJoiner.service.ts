@@ -1,3 +1,5 @@
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -83,22 +85,39 @@ function hasValidImageDimensions(image: ImageDimensions) {
   );
 }
 
-function validateNonNegativeInteger(value: number, label: string, maxValue: number) {
-  if (!Number.isFinite(value)) {
-    return `${label} debe ser un numero valido.`;
-  }
+type JoinerIntegerField = "spacing" | "padding";
 
-  if (!Number.isInteger(value)) {
-    return `${label} debe ser un numero entero.`;
-  }
+const integerFieldCodes: Record<JoinerIntegerField, {
+  notNumber: string;
+  notInteger: string;
+  negative: string;
+  exceeds: string;
+}> = {
+  spacing: {
+    notNumber: "tools.errors.joinerSpacingNotNumber",
+    notInteger: "tools.errors.joinerSpacingNotInteger",
+    negative: "tools.errors.joinerSpacingNegative",
+    exceeds: "tools.errors.joinerSpacingExceeds",
+  },
+  padding: {
+    notNumber: "tools.errors.joinerPaddingNotNumber",
+    notInteger: "tools.errors.joinerPaddingNotInteger",
+    negative: "tools.errors.joinerPaddingNegative",
+    exceeds: "tools.errors.joinerPaddingExceeds",
+  },
+};
 
-  if (value < 0) {
-    return `${label} no puede ser negativo.`;
-  }
+function validateNonNegativeInteger(
+  value: number,
+  field: JoinerIntegerField,
+  maxValue: number,
+): PageSelectionError | null {
+  const codes = integerFieldCodes[field];
 
-  if (value > maxValue) {
-    return `${label} supera el limite permitido.`;
-  }
+  if (!Number.isFinite(value)) return { code: codes.notNumber };
+  if (!Number.isInteger(value)) return { code: codes.notInteger };
+  if (value < 0) return { code: codes.negative };
+  if (value > maxValue) return { code: codes.exceeds };
 
   return null;
 }
@@ -106,47 +125,47 @@ function validateNonNegativeInteger(value: number, label: string, maxValue: numb
 export function validateImageJoinerOptions(
   images: readonly ImageJoinerSource[],
   { backgroundColor, columns, mode, padding, spacing }: ImageJoinerLayoutOptions,
-) {
+): PageSelectionError | null {
   if (images.length < 2) {
-    return "Agrega al menos dos imagenes para unir.";
+    return { code: "tools.errors.joinerNeedTwo" };
   }
 
   if (!/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(backgroundColor)) {
-    return "El color de fondo debe ser hexadecimal.";
+    return { code: "tools.errors.joinerInvalidBgColor" };
   }
 
   if (images.some((image) => !hasValidImageDimensions(image))) {
-    return "Todas las imagenes deben tener dimensiones validas.";
+    return { code: "tools.errors.joinerInvalidImageDims" };
   }
 
-  const spacingError = validateNonNegativeInteger(spacing, "La separacion", maxSpacing);
+  const spacingError = validateNonNegativeInteger(spacing, "spacing", maxSpacing);
   if (spacingError) return spacingError;
 
-  const paddingError = validateNonNegativeInteger(padding, "El padding", maxPadding);
+  const paddingError = validateNonNegativeInteger(padding, "padding", maxPadding);
   if (paddingError) return paddingError;
 
   if (mode === "grid") {
     if (!Number.isFinite(columns) || !Number.isInteger(columns)) {
-      return "Las columnas deben ser un numero entero.";
+      return { code: "tools.errors.joinerColumnsNotInteger" };
     }
 
     if (columns < 1) {
-      return "La cuadricula necesita al menos una columna.";
+      return { code: "tools.errors.joinerColumnsTooFew" };
     }
 
     if (columns > images.length) {
-      return "Las columnas no pueden superar la cantidad de imagenes.";
+      return { code: "tools.errors.joinerColumnsExceed" };
     }
   }
 
   const layout = calculateImageJoinerLayout(images, { columns, mode, padding, spacing, backgroundColor: "#ffffff" });
 
   if (layout.width > maxCanvasSide || layout.height > maxCanvasSide) {
-    return "La imagen final supera el tamano maximo de canvas.";
+    return { code: "tools.errors.joinerCanvasTooLarge" };
   }
 
   if (layout.width * layout.height > maxJoinedCanvasPixels) {
-    return "La imagen final supera el limite de 100 megapixeles.";
+    return { code: "tools.errors.joinerCanvasExceedsPixels" };
   }
 
   return null;
@@ -250,14 +269,14 @@ export async function readImageMetadata(file: File, id: string): Promise<ImageJo
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Selecciona imagenes PNG, JPG o WebP validas.");
+    throw new ToolError("tools.errors.invalidImages");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar una imagen en este navegador.");
+    const image = await loadBrowserImage(file, new ToolError("tools.errors.imageLoadOneFailed"));
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones validas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -273,13 +292,15 @@ export async function readImageMetadata(file: File, id: string): Promise<ImageJo
       throw error;
     }
 
-    throw new Error("No se pudo leer una imagen.");
+    throw new ToolError("tools.errors.imageLoadOneFailed");
   }
 }
 
 function ensureOutputFormatSupported(outputFormat: ImageJoinerOutputFormat) {
   if (!canExportBrowserImageFormat(outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imagenes como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 }
 
@@ -287,7 +308,7 @@ function fillCanvasBackground(canvas: HTMLCanvasElement, backgroundColor: string
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar la imagen final.");
+    throw new ToolError("tools.errors.joinerOutputFailed");
   }
 
   context.fillStyle = backgroundColor;
@@ -297,12 +318,12 @@ function fillCanvasBackground(canvas: HTMLCanvasElement, backgroundColor: string
 
 export async function joinImageFiles(files: readonly File[], options: JoinImagesOptions): Promise<ImageJoinerResult> {
   if (files.length < 2) {
-    throw new Error("Agrega al menos dos imagenes para unir.");
+    throw new ToolError("tools.errors.joinerNeedTwo");
   }
 
   for (const file of files) {
     if (!isJoinableImageFile(file)) {
-      throw new Error("Selecciona imagenes PNG, JPG o WebP validas.");
+      throw new ToolError("tools.errors.invalidImages");
     }
   }
 
@@ -310,7 +331,7 @@ export async function joinImageFiles(files: readonly File[], options: JoinImages
 
   const loadedImages = await Promise.all(
     files.map(async (file, index) => {
-      const image = await loadBrowserImage(file, "No se pudo decodificar una imagen en este navegador.");
+      const image = await loadBrowserImage(file, new ToolError("tools.errors.imageLoadOneFailed"));
       return {
         file,
         id: String(index),
@@ -324,7 +345,7 @@ export async function joinImageFiles(files: readonly File[], options: JoinImages
   const validationError = validateImageJoinerOptions(sources, options);
 
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   const layout = calculateImageJoinerLayout(sources, options);
@@ -341,7 +362,7 @@ export async function joinImageFiles(files: readonly File[], options: JoinImages
 
   const mimeType = getBrowserImageOutputMimeType(options.outputFormat);
   const result = await exportBrowserCanvas(canvas, {
-    errorMessage: "No se pudo exportar la imagen unida.",
+    canvasError: new ToolError("tools.errors.joinerFailed"),
     mimeType,
     quality: options.quality,
   });

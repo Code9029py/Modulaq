@@ -1,3 +1,4 @@
+import { ToolError } from "../../../shared/errors/ToolError";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -105,14 +106,14 @@ export async function readImageMetadata(file: File): Promise<ImageCompressorMeta
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones válidas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -127,13 +128,15 @@ export async function readImageMetadata(file: File): Promise<ImageCompressorMeta
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
 function ensureOutputFormatSupported(outputFormat: ImageCompressorOutputFormat) {
   if (!canExportBrowserImageFormat(outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imágenes como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 }
 
@@ -142,7 +145,7 @@ export async function compressImageFile(
   { outputBaseName, outputFormat, quality = defaultCompressionQuality }: CompressImageOptions,
 ): Promise<ImageCompressorResult> {
   if (!isCompressibleImageFile(file)) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   ensureOutputFormatSupported(outputFormat);
@@ -150,13 +153,14 @@ export async function compressImageFile(
   const mimeType = getBrowserImageOutputMimeType(outputFormat);
   const compressed = await exportBrowserImageFile(file, {
     backgroundColor: outputFormat === "jpeg" ? "#ffffff" : undefined,
-    errorMessage: "No se pudo decodificar la imagen en este navegador.",
     mimeType,
     quality,
   });
 
   if (compressed.mimeType !== mimeType) {
-    throw new Error(`El navegador no exportó la imagen como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.canvasExportFailed", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 
   return {

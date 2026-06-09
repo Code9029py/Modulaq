@@ -4,6 +4,7 @@ import { Button } from "../../../shared/components/Button";
 import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
 import { cn } from "../../../shared/utils/cn";
 import {
   canExportBrowserImageFormat,
@@ -50,6 +51,7 @@ const copy = {
     background: "Color de fondo",
     dimensions: "Tamano",
     downloadReady: "Placeholder listo",
+    generateCta: "Generar imagen",
     height: "Alto",
     outputIntro: "Todo se genera localmente en tu navegador.",
     outputTitle: "Vista previa y salida",
@@ -66,6 +68,7 @@ const copy = {
     background: "Background color",
     dimensions: "Size",
     downloadReady: "Placeholder ready",
+    generateCta: "Generate image",
     height: "Height",
     outputIntro: "Everything is generated locally in your browser.",
     outputTitle: "Preview and output",
@@ -196,7 +199,7 @@ export function ImagePlaceholderTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo generar la imagen placeholder.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.placeholderGenerationFailed"));
     }
   };
 
@@ -255,7 +258,7 @@ export function ImagePlaceholderTool() {
             </div>
             {dimensionError ? (
               <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-                {dimensionError}
+                {t(dimensionError.code as TranslationKey, dimensionError.vars)}
               </p>
             ) : null}
           </div>
@@ -327,7 +330,7 @@ export function ImagePlaceholderTool() {
               description={t(formatDescKeys[outputFormat])}
               formats={outputFormats}
               getLabel={getImageFormatLabel}
-              label={language === "en" ? "Output format" : "Formato final"}
+              label={t("imageUi.finalFormat")}
               value={outputFormat}
               onChange={(format) => {
                 setOutputFormat(format);
@@ -447,7 +450,7 @@ export function ImagePlaceholderTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void generateImage()} disabled={!canGenerate}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Type size={16} />}
-              {language === "en" ? "Generate image" : "Generar imagen"}
+              {labels.generateCta}
             </Button>
             <Button type="button" variant="ghost" className="gap-2" onClick={clearSettings}>
               <RotateCcw size={16} />

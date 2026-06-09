@@ -2,24 +2,24 @@
 // Acá se re-exportan para que los services no migrados y los Tool components
 // que importan desde este archivo sigan funcionando sin cambios.
 export { parsePageSelection } from "@modulaq/core/ranges";
-export type { PageSelectionResult } from "@modulaq/core/ranges";
-import type { PageSelectionResult } from "@modulaq/core/ranges";
+export type { PageSelectionError, PageSelectionResult } from "@modulaq/core/ranges";
+import type { PageSelectionError, PageSelectionResult } from "@modulaq/core/ranges";
 
 export type PartsValidationResult = {
   assignedPageCount: number;
-  error: string | null;
+  error: PageSelectionError | null;
   isValid: boolean;
   missingPages: number[];
   pagesByPart: number[][];
   repeatedPages: number[];
 };
 
-function invalidPageMessage(pageNumber: number, totalPages: number) {
-  return `La página ${pageNumber} no existe. Usá páginas entre 1 y ${totalPages}.`;
-}
-
 function isOutOfOrder(pages: number[]) {
   return pages.some((pageNumber, index) => index > 0 && pageNumber < pages[index - 1]);
+}
+
+function invalidPageError(pageNumber: number, totalPages: number): PageSelectionError {
+  return { code: "tools.errors.pageNotExists", vars: { page: pageNumber, total: totalPages } };
 }
 
 function parsePages(
@@ -31,7 +31,7 @@ function parsePages(
 
   if (!trimmedInput) {
     return {
-      error: "Ingresá al menos una página o rango.",
+      error: { code: "tools.errors.pageRangeEmpty" },
       isOutOfOrder: false,
       pages: [],
     };
@@ -46,7 +46,7 @@ function parsePages(
 
     if (!token) {
       return {
-        error: "Formato inválido. Usá páginas como 1,3,5 o rangos como 2-4.",
+        error: { code: "tools.errors.pageRangeInvalidFormat" },
         isOutOfOrder: false,
         pages: [],
       };
@@ -57,7 +57,7 @@ function parsePages(
 
       if (pageNumber < 1 || pageNumber > totalPages) {
         return {
-          error: invalidPageMessage(pageNumber, totalPages),
+          error: invalidPageError(pageNumber, totalPages),
           isOutOfOrder: false,
           pages: [],
         };
@@ -66,7 +66,10 @@ function parsePages(
       if (includedPages.has(pageNumber)) {
         if (options.rejectDuplicates) {
           return {
-            error: `La página ${pageNumber} está repetida dentro de la parte ${options.partNumber}.`,
+            error: {
+              code: "tools.errors.pageRepeatedInPart",
+              vars: { page: pageNumber, part: options.partNumber ?? 0 },
+            },
             isOutOfOrder: false,
             pages: [],
           };
@@ -84,7 +87,7 @@ function parsePages(
 
     if (!rangeMatch) {
       return {
-        error: "Formato inválido. Usá páginas como 1,3,5 o rangos como 2-4.",
+        error: { code: "tools.errors.pageRangeInvalidFormat" },
         isOutOfOrder: false,
         pages: [],
       };
@@ -96,7 +99,7 @@ function parsePages(
 
     if (startPage < 1) {
       return {
-        error: invalidPageMessage(startPage, totalPages),
+        error: invalidPageError(startPage, totalPages),
         isOutOfOrder: false,
         pages: [],
       };
@@ -104,7 +107,7 @@ function parsePages(
 
     if (startPage > endPage) {
       return {
-        error: `El rango ${rangeLabel} no es válido. La página inicial no puede ser mayor que la final.`,
+        error: { code: "tools.errors.rangeStartGreater", vars: { range: rangeLabel } },
         isOutOfOrder: false,
         pages: [],
       };
@@ -112,7 +115,10 @@ function parsePages(
 
     if (endPage > totalPages) {
       return {
-        error: `El rango ${rangeLabel} no es válido. El PDF tiene solo ${totalPages} páginas.`,
+        error: {
+          code: "tools.errors.rangeEndExceeds",
+          vars: { range: rangeLabel, total: totalPages },
+        },
         isOutOfOrder: false,
         pages: [],
       };
@@ -122,7 +128,10 @@ function parsePages(
       if (includedPages.has(pageNumber)) {
         if (options.rejectDuplicates) {
           return {
-            error: `La página ${pageNumber} está repetida dentro de la parte ${options.partNumber}.`,
+            error: {
+              code: "tools.errors.pageRepeatedInPart",
+              vars: { page: pageNumber, part: options.partNumber ?? 0 },
+            },
             isOutOfOrder: false,
             pages: [],
           };
@@ -146,7 +155,7 @@ function parsePages(
 export function validateParts(parts: string[], totalPages: number): PartsValidationResult {
   const pagesByPart: number[][] = [];
   const pageAssignments = new Map<number, number>();
-  let firstSelectionError: string | null = null;
+  let firstSelectionError: PageSelectionError | null = null;
   let firstEmptyPart: number | null = null;
 
   parts.forEach((part, index) => {
@@ -180,21 +189,27 @@ export function validateParts(parts: string[], totalPages: number): PartsValidat
     (pageNumber) => !pageAssignments.has(pageNumber),
   );
 
-  let error: string | null = firstSelectionError;
+  let error: PageSelectionError | null = firstSelectionError;
 
   if (!error && firstEmptyPart !== null) {
-    error = `La parte ${firstEmptyPart} está vacía. Si querés dividir el PDF en ${parts.length - 1} archivos, cambiá la cantidad de partes a ${parts.length - 1}.`;
+    error = {
+      code: "tools.errors.partEmpty",
+      vars: { part: firstEmptyPart, newCount: parts.length - 1 },
+    };
   }
 
   if (!error && repeatedPages.length > 0) {
-    error = `La página ${repeatedPages[0]} está asignada en más de una parte.`;
+    error = {
+      code: "tools.errors.partsPageOverAssigned",
+      vars: { page: repeatedPages[0] },
+    };
   }
 
   if (!error && missingPages.length > 0) {
     error =
       missingPages.length === 1
-        ? `Falta asignar la página ${missingPages[0]}.`
-        : `Falta asignar: páginas ${missingPages.join(", ")}.`;
+        ? { code: "tools.errors.partsPageMissing", vars: { page: missingPages[0] } }
+        : { code: "tools.errors.partsPagesMissing", vars: { pages: missingPages.join(", ") } };
   }
 
   return {

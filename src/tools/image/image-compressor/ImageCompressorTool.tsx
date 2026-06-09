@@ -4,8 +4,9 @@ import { Button } from "../../../shared/components/Button";
 import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import { canExportBrowserImageFormat, jpegQualityPercentToDecimal } from "../../../shared/utils/imageFiles";
 import {
   buildCompressedImageFileName,
@@ -42,7 +43,8 @@ const formatDescKeys: Record<ImageCompressorOutputFormat, TranslationKey> = {
 };
 
 export function ImageCompressorTool() {
-  const { language, t } = useI18n();
+  const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
@@ -127,7 +129,7 @@ export function ImageCompressorTool() {
       setPreviewUrl(null);
     }
 
-    const fileLimitError = getImageFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getImageFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -147,7 +149,7 @@ export function ImageCompressorTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("imageUi.couldNotRead"));
+      setError(resolveToolErrorMessage(nextError, t, "imageUi.couldNotRead"));
     }
   };
 
@@ -187,7 +189,7 @@ export function ImageCompressorTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.image-compressor.ui.couldNotCompress"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.image-compressor.ui.couldNotCompress"));
     }
   };
 
@@ -317,7 +319,7 @@ export function ImageCompressorTool() {
             description={t(formatDescKeys[outputFormat])}
             formats={outputFormats}
             getLabel={getImageFormatLabel}
-            label={language === "en" ? "Output format" : "Formato final"}
+            label={t("imageUi.finalFormat")}
             value={outputFormat}
             onChange={(format) => {
               setOutputFormat(format);
