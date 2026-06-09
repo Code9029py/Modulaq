@@ -6,6 +6,7 @@
 // El SDK soporta PNG/JPG directamente; el caso WebP requiere conversión por canvas,
 // que es DOM-dependent y por eso vive en este adaptador (no en el SDK).
 import { imagesToPdf as coreImagesToPdf, type ImageInput } from "@modulaq/core/pdf";
+import { ToolError } from "../../../shared/errors/ToolError";
 import { buildDownloadFileName, getBaseFileName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, toArrayBuffer } from "../../../shared/utils/file";
 import {
@@ -43,7 +44,7 @@ async function prepareImageInput(file: File): Promise<ImageInput> {
   const imageType = getSupportedImageType(file);
 
   if (!imageType) {
-    throw new Error(`"${file.name}" no es una imagen PNG, JPG o WebP válida.`);
+    throw new ToolError("tools.errors.invalidImageNamed", { name: file.name });
   }
 
   if (imageType === "image/webp") {
@@ -51,7 +52,7 @@ async function prepareImageInput(file: File): Promise<ImageInput> {
       const bytes = await convertWebpToPngBytes(file);
       return { bytes, format: "png" };
     } catch {
-      throw new Error(`No se pudo procesar "${file.name}". Verificá que la imagen no esté dañada.`);
+      throw new ToolError("tools.errors.imageProcessFailedNamed", { name: file.name });
     }
   }
 
@@ -63,13 +64,13 @@ export async function createPdfFromImages(
   options: CreateImageToPdfOptions = {},
 ): Promise<ImageToPdfResult> {
   if (files.length === 0) {
-    throw new Error("Agregá al menos una imagen para generar el PDF.");
+    throw new ToolError("tools.errors.imageToPdfNeedOne");
   }
 
   const prepared: ImageInput[] = [];
   for (const file of files) {
     if (!isSupportedImageFile(file)) {
-      throw new Error(`"${file.name}" no es una imagen PNG, JPG o WebP válida.`);
+      throw new ToolError("tools.errors.invalidImageNamed", { name: file.name });
     }
     prepared.push(await prepareImageInput(file));
   }
@@ -78,7 +79,7 @@ export async function createPdfFromImages(
   try {
     bytes = await coreImagesToPdf(prepared);
   } catch {
-    throw new Error("No se pudo generar el PDF a partir de las imágenes. Verificá que no estén dañadas.");
+    throw new ToolError("tools.errors.imageToPdfFailed");
   }
 
   return {

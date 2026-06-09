@@ -4,8 +4,9 @@ import { Button } from "../../../shared/components/Button";
 import { HelpHint } from "../../../shared/components/HelpHint";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
-import { fileProcessingLimitLabels, getGeneratedPageFilesLimitError, getPdfFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   buildImageDownloadFileName,
   buildImageZipDownloadFileName,
@@ -34,6 +35,7 @@ const inputClassName =
 
 export function PdfToImagesTool() {
   const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<PdfToImagesMetadata | null>(null);
@@ -73,7 +75,7 @@ export function PdfToImagesTool() {
         ? t("tools.pdf-to-images.ui.individualFile", { format: outputFormatLabel })
         : t("tools.pdf-to-images.ui.zipArchive");
   const isBusy = status === "reading" || status === "processing";
-  const generatedOutputLimitError = imageCount > 0 ? getGeneratedPageFilesLimitError(imageCount, "convertir") : null;
+  const generatedOutputLimitError = imageCount > 0 ? limitLabels.getConvertPagesLimitError(imageCount) : null;
   const canConvert = Boolean(file && metadata) && !isBusy && imageCount > 0 && !rangeValidation?.error && !generatedOutputLimitError;
 
   const resetFeedback = () => {
@@ -98,7 +100,7 @@ export function PdfToImagesTool() {
       setError(t("toolUi.invalidPdfPicked"));
       return;
     }
-    const fileLimitError = getPdfFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getPdfFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -118,7 +120,7 @@ export function PdfToImagesTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
+      setError(resolveToolErrorMessage(nextError, t, "toolUi.couldNotReadFile"));
     }
   };
 
@@ -173,7 +175,7 @@ export function PdfToImagesTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.pdf-to-images.ui.couldNotConvertPages"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.pdf-to-images.ui.couldNotConvertPages"));
     }
   };
 
@@ -218,7 +220,7 @@ export function PdfToImagesTool() {
               <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.pdf-to-images.ui.dropHint")}</span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfToImages}</p>
+          <p className="text-xs leading-5 text-ink-600">{limitLabels.pdfToImages}</p>
 
           <input
             ref={fileInputRef}

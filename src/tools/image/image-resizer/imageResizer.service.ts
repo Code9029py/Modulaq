@@ -1,3 +1,5 @@
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -69,25 +71,28 @@ export function buildResizedImageFileName(
   return buildBrowserImageDownloadFileName(baseName, outputFormat, fallbackBaseName);
 }
 
-export function validateImageDimensions({ height, width }: ImageDimensions) {
+export function validateImageDimensions({
+  height,
+  width,
+}: ImageDimensions): PageSelectionError | null {
   if (!Number.isFinite(width) || !Number.isFinite(height)) {
-    return "Usá dimensiones numéricas válidas.";
+    return { code: "tools.errors.dimensionsNotNumeric" };
   }
 
   if (!Number.isInteger(width) || !Number.isInteger(height)) {
-    return "Usá dimensiones enteras en píxeles.";
+    return { code: "tools.errors.dimensionsNotInteger" };
   }
 
   if (width <= 0 || height <= 0) {
-    return "El ancho y el alto deben ser mayores que cero.";
+    return { code: "tools.errors.dimensionsNotPositive" };
   }
 
   if (width > maxImageDimension || height > maxImageDimension) {
-    return `El ancho y el alto no pueden superar ${maxImageDimension}px.`;
+    return { code: "tools.errors.dimensionsExceedMax", vars: { max: maxImageDimension } };
   }
 
   if (width * height > maxImagePixels) {
-    return "La imagen resultante supera el límite de 64 megapíxeles.";
+    return { code: "tools.errors.dimensionsExceedPixels" };
   }
 
   return null;
@@ -142,14 +147,14 @@ export async function readImageMetadata(file: File): Promise<ImageResizerMetadat
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones válidas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -164,13 +169,15 @@ export async function readImageMetadata(file: File): Promise<ImageResizerMetadat
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
 function ensureOutputFormatSupported(outputFormat: ImageResizerOutputFormat) {
   if (!canExportBrowserImageFormat(outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imágenes como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 }
 
@@ -179,13 +186,13 @@ export async function resizeImageFile(
   { height, outputBaseName, outputFormat, quality, width }: ResizeImageOptions,
 ): Promise<ImageResizerResult> {
   if (!isResizableImageFile(file)) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   const dimensionsError = validateImageDimensions({ width, height });
 
   if (dimensionsError) {
-    throw new Error(dimensionsError);
+    throw new ToolError(dimensionsError.code, dimensionsError.vars);
   }
 
   ensureOutputFormatSupported(outputFormat);
@@ -193,7 +200,6 @@ export async function resizeImageFile(
   const mimeType = getBrowserImageOutputMimeType(outputFormat);
   const resized = await exportBrowserImageFile(file, {
     backgroundColor: outputFormat === "jpeg" ? "#ffffff" : undefined,
-    errorMessage: "No se pudo decodificar la imagen en este navegador.",
     height,
     mimeType,
     quality,

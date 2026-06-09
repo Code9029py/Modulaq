@@ -10,9 +10,9 @@ import {
 describe("imagePlaceholder.service", () => {
   it("validates dimensions", () => {
     expect(validatePlaceholderDimensions(800, 400)).toBeNull();
-    expect(validatePlaceholderDimensions(0, 400)).toMatch(/mayores que cero/);
-    expect(validatePlaceholderDimensions(800, -1)).toMatch(/mayores que cero/);
-    expect(validatePlaceholderDimensions(Number.NaN, 400)).toMatch(/validos/);
+    expect(validatePlaceholderDimensions(0, 400)?.code).toBe("tools.errors.dimensionsNotPositive");
+    expect(validatePlaceholderDimensions(800, -1)?.code).toBe("tools.errors.dimensionsNotPositive");
+    expect(validatePlaceholderDimensions(Number.NaN, 400)?.code).toBe("tools.errors.dimensionsNotNumeric");
   });
 
   it("generates default text from dimensions", () => {
@@ -34,7 +34,10 @@ describe("imagePlaceholder.service", () => {
   });
 
   it("enforces side and pixel limits", () => {
-    expect(validatePlaceholderDimensions(8001, 400)).toMatch(/8000px/);
+    expect(validatePlaceholderDimensions(8001, 400)).toEqual({
+      code: "tools.errors.dimensionsExceedMax",
+      vars: { max: 8000 },
+    });
     expect(validatePlaceholderDimensions(8000, 8000)).toBeNull();
   });
 });

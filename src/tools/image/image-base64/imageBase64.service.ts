@@ -1,3 +1,4 @@
+import { ToolError } from "../../../shared/errors/ToolError";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   getBrowserImageMimeType,
@@ -128,26 +129,26 @@ export async function fileToBase64(file: File): Promise<ImageBase64Metadata> {
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error("No se pudo leer la imagen como Base64."));
+    reader.onerror = () => reject(new ToolError("tools.errors.base64DataUrlBuildFailed"));
     reader.onload = () => {
       if (typeof reader.result === "string") {
         resolve(reader.result);
         return;
       }
 
-      reject(new Error("No se pudo leer la imagen como Base64."));
+      reject(new ToolError("tools.errors.base64DataUrlBuildFailed"));
     };
     reader.readAsDataURL(file);
   });
   const parsed = parseDataUrl(dataUrl);
 
   if (!parsed || !isSupportedBase64ImageMime(parsed.mimeType)) {
-    throw new Error("No se pudo generar una Data URL válida para esta imagen.");
+    throw new ToolError("tools.errors.base64DataUrlBuildFailed");
   }
 
   const extension = inferExtensionFromMime(parsed.mimeType) ?? "png";
@@ -167,11 +168,11 @@ export function base64ToBlob(base64: string, mimeType: BrowserImageMimeType) {
   const normalized = normalizeBase64(base64);
 
   if (!isValidBase64(normalized)) {
-    throw new Error("Pegá una cadena Base64 válida.");
+    throw new ToolError("tools.errors.invalidBase64");
   }
 
   if (typeof atob !== "function") {
-    throw new Error("Este navegador no permite decodificar Base64.");
+    throw new ToolError("tools.errors.base64DecodeUnavailable");
   }
 
   const binary = atob(normalized);
@@ -188,20 +189,20 @@ export function parseBase64ImageInput(input: string, fallbackMimeType: BrowserIm
   const trimmed = input.trim();
 
   if (!trimmed) {
-    throw new Error("Pegá una cadena Base64 o Data URL.");
+    throw new ToolError("tools.errors.invalidBase64OrDataUrl");
   }
 
   const parsedDataUrl = parseDataUrl(trimmed);
   const mimeType = parsedDataUrl?.mimeType ?? fallbackMimeType;
 
   if (!isSupportedBase64ImageMime(mimeType)) {
-    throw new Error("La Data URL debe usar image/png, image/jpeg o image/webp.");
+    throw new ToolError("tools.errors.invalidDataUrl");
   }
 
   const base64 = parsedDataUrl ? parsedDataUrl.base64 : normalizeBase64(trimmed);
 
   if (!isValidBase64(base64)) {
-    throw new Error("Pegá una cadena Base64 válida.");
+    throw new ToolError("tools.errors.invalidBase64");
   }
 
   const blob = base64ToBlob(base64, mimeType);

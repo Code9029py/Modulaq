@@ -1,4 +1,6 @@
 import JSZip from "jszip";
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildImageZipDownloadFileName,
@@ -76,19 +78,40 @@ function hasValidImageDimensions(imageDimensions: ImageDimensions) {
   );
 }
 
-function validatePositiveInteger(value: number, label: string) {
-  if (!Number.isFinite(value)) {
-    return `${label} debe ser un numero valido.`;
-  }
+type SplitterIntField = "rows" | "columns" | "partWidth" | "partHeight";
 
-  if (!Number.isInteger(value)) {
-    return `${label} debe ser un numero entero.`;
-  }
+const splitterIntCodes: Record<SplitterIntField, {
+  notNumber: string;
+  notInteger: string;
+  notPositive: string;
+}> = {
+  rows: {
+    notNumber: "tools.errors.splitterRowsNotNumber",
+    notInteger: "tools.errors.splitterRowsNotInteger",
+    notPositive: "tools.errors.splitterRowsNotPositive",
+  },
+  columns: {
+    notNumber: "tools.errors.splitterColumnsNotNumber",
+    notInteger: "tools.errors.splitterColumnsNotInteger",
+    notPositive: "tools.errors.splitterColumnsNotPositive",
+  },
+  partWidth: {
+    notNumber: "tools.errors.splitterPartWidthNotNumber",
+    notInteger: "tools.errors.splitterPartWidthNotInteger",
+    notPositive: "tools.errors.splitterPartWidthNotPositive",
+  },
+  partHeight: {
+    notNumber: "tools.errors.splitterPartHeightNotNumber",
+    notInteger: "tools.errors.splitterPartHeightNotInteger",
+    notPositive: "tools.errors.splitterPartHeightNotPositive",
+  },
+};
 
-  if (value <= 0) {
-    return `${label} debe ser mayor que cero.`;
-  }
-
+function validatePositiveInteger(value: number, field: SplitterIntField): PageSelectionError | null {
+  const codes = splitterIntCodes[field];
+  if (!Number.isFinite(value)) return { code: codes.notNumber };
+  if (!Number.isInteger(value)) return { code: codes.notInteger };
+  if (value <= 0) return { code: codes.notPositive };
   return null;
 }
 
@@ -171,32 +194,35 @@ export function calculateImageSplitParts(
   return calculateGridParts(imageDimensions, options.rows, options.columns, outputFormat);
 }
 
-export function validateImageSplitterOptions(imageDimensions: ImageDimensions, options: ImageSplitterOptions) {
+export function validateImageSplitterOptions(
+  imageDimensions: ImageDimensions,
+  options: ImageSplitterOptions,
+): PageSelectionError | null {
   if (!hasValidImageDimensions(imageDimensions)) {
-    return "La imagen debe tener dimensiones validas.";
+    return { code: "tools.errors.splitterInvalidImageDims" };
   }
 
   if (options.mode === "grid") {
-    const rowsError = validatePositiveInteger(options.rows, "Las filas");
+    const rowsError = validatePositiveInteger(options.rows, "rows");
     if (rowsError) return rowsError;
 
-    const columnsError = validatePositiveInteger(options.columns, "Las columnas");
+    const columnsError = validatePositiveInteger(options.columns, "columns");
     if (columnsError) return columnsError;
   } else {
-    const widthError = validatePositiveInteger(options.partWidth, "El ancho de cada parte");
+    const widthError = validatePositiveInteger(options.partWidth, "partWidth");
     if (widthError) return widthError;
 
-    const heightError = validatePositiveInteger(options.partHeight, "El alto de cada parte");
+    const heightError = validatePositiveInteger(options.partHeight, "partHeight");
     if (heightError) return heightError;
   }
 
   const parts = calculateImageSplitParts(imageDimensions, options);
   if (parts.some((part) => part.width <= 0 || part.height <= 0)) {
-    return "Cada parte debe tener ancho y alto mayores que cero.";
+    return { code: "tools.errors.splitterPartNotPositive" };
   }
 
   if (parts.length > maxSplitParts) {
-    return `La division supera el limite de ${maxSplitParts} partes.`;
+    return { code: "tools.errors.splitterExceedsParts", vars: { max: maxSplitParts } };
   }
 
   return null;
@@ -206,14 +232,14 @@ export async function readImageMetadata(file: File): Promise<ImageSplitterMetada
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones validas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -228,25 +254,27 @@ export async function readImageMetadata(file: File): Promise<ImageSplitterMetada
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
 export async function splitImageFile(file: File, options: SplitImageOptions): Promise<ImageSplitterResult> {
   if (!isSplittableImageFile(file)) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   if (!canExportBrowserImageFormat(options.outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imagenes como ${getImageFormatLabel(options.outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(options.outputFormat),
+    });
   }
 
-  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const image = await loadBrowserImage(file);
   const imageDimensions = { height: image.naturalHeight, width: image.naturalWidth };
   const validationError = validateImageSplitterOptions(imageDimensions, options);
 
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   const parts = calculateImageSplitParts(imageDimensions, options, options.outputFormat);
@@ -260,7 +288,7 @@ export async function splitImageFile(file: File, options: SplitImageOptions): Pr
     const context = canvas.getContext("2d");
 
     if (!context) {
-      throw new Error("No se pudo preparar una parte de la imagen.");
+      throw new ToolError("tools.errors.splitterPartFailed");
     }
 
     if (options.outputFormat === "jpeg") {
@@ -271,7 +299,7 @@ export async function splitImageFile(file: File, options: SplitImageOptions): Pr
     context.drawImage(image, part.x, part.y, part.width, part.height, 0, 0, part.width, part.height);
 
     const result = await exportBrowserCanvas(canvas, {
-      errorMessage: "No se pudo exportar una parte de la imagen.",
+      canvasError: new ToolError("tools.errors.splitterPartFailed"),
       mimeType,
       quality: options.quality,
     });
@@ -289,6 +317,6 @@ export async function splitImageFile(file: File, options: SplitImageOptions): Pr
       size: bytes.byteLength,
     };
   } catch {
-    throw new Error("No se pudo preparar la descarga ZIP.");
+    throw new ToolError("tools.errors.zipPrepareFailed");
   }
 }

@@ -1,4 +1,6 @@
 import JSZip from "jszip";
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildImageZipDownloadFileName,
@@ -64,21 +66,23 @@ export function getFaviconIconSpecs() {
   return faviconIconSpecs.map((icon) => ({ ...icon }));
 }
 
-export function validateFaviconSourceDimensions(imageDimensions: ImageDimensions) {
+export function validateFaviconSourceDimensions(
+  imageDimensions: ImageDimensions,
+): PageSelectionError | null {
   if (!Number.isFinite(imageDimensions.width) || !Number.isFinite(imageDimensions.height)) {
-    return "La imagen debe tener dimensiones validas.";
+    return { code: "tools.errors.splitterInvalidImageDims" };
   }
 
   if (!Number.isInteger(imageDimensions.width) || !Number.isInteger(imageDimensions.height)) {
-    return "La imagen debe tener dimensiones enteras en pixeles.";
+    return { code: "tools.errors.dimensionsNotInteger" };
   }
 
   if (imageDimensions.width <= 0 || imageDimensions.height <= 0) {
-    return "La imagen debe tener ancho y alto mayores que cero.";
+    return { code: "tools.errors.dimensionsNotPositive" };
   }
 
   if (imageDimensions.width * imageDimensions.height > maxFaviconSourcePixels) {
-    return "La imagen supera el limite de 64 megapixeles.";
+    return { code: "tools.errors.placeholderPixelLimit" };
   }
 
   return null;
@@ -109,18 +113,18 @@ export async function readImageMetadata(file: File): Promise<ImageToFaviconMetad
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
     const validationError = validateFaviconSourceDimensions({
       height: image.naturalHeight,
       width: image.naturalWidth,
     });
 
     if (validationError) {
-      throw new Error(validationError);
+      throw new ToolError(validationError.code, validationError.vars);
     }
 
     return {
@@ -135,7 +139,7 @@ export async function readImageMetadata(file: File): Promise<ImageToFaviconMetad
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
@@ -143,7 +147,7 @@ function drawCoveredSquareImage(canvas: HTMLCanvasElement, image: HTMLImageEleme
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar el icono.");
+    throw new ToolError("tools.errors.faviconBuildFailed");
   }
 
   canvas.width = size;
@@ -164,7 +168,7 @@ async function createFaviconIcon(image: HTMLImageElement, iconSpec: FaviconIconS
   drawCoveredSquareImage(canvas, image, iconSpec.size);
 
   const result = await exportBrowserCanvas(canvas, {
-    errorMessage: "No se pudo exportar un icono PNG.",
+    canvasError: new ToolError("tools.errors.faviconBuildFailed"),
     mimeType: "image/png",
   });
 
@@ -180,17 +184,17 @@ export async function generateFaviconPack(
   { outputBaseName }: ImageToFaviconOptions,
 ): Promise<ImageToFaviconResult> {
   if (!isFaviconSourceImageFile(file)) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
-  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const image = await loadBrowserImage(file);
   const validationError = validateFaviconSourceDimensions({
     height: image.naturalHeight,
     width: image.naturalWidth,
   });
 
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   const zip = new JSZip();
@@ -213,6 +217,6 @@ export async function generateFaviconPack(
       size: bytes.byteLength,
     };
   } catch {
-    throw new Error("No se pudo preparar la descarga ZIP.");
+    throw new ToolError("tools.errors.zipPrepareFailed");
   }
 }

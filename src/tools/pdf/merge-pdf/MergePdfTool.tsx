@@ -2,8 +2,9 @@ import { ArrowDown, ArrowUp, Download, FileText, FilePlus2, Loader2, RotateCcw, 
 import { useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { fileProcessingLimitLabels, getPdfFileSizeLimitError, getTotalPdfSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   defaultOutputFileName,
   formatFileSize,
@@ -42,6 +43,7 @@ function useGetPageLabel() {
 
 export function MergePdfTool() {
   const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const getPageLabel = useGetPageLabel();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [items, setItems] = useState<MergePdfItem[]>([]);
@@ -85,7 +87,7 @@ export function MergePdfTool() {
     }
 
     for (const file of pdfFiles) {
-      const limitError = getPdfFileSizeLimitError(file) ?? getTotalPdfSizeLimitError(nextTotalSize + file.size);
+      const limitError = limitLabels.getPdfFileSizeLimitError(file) ?? limitLabels.getTotalPdfSizeLimitError(nextTotalSize + file.size);
 
       if (limitError) {
         messages.push(limitError);
@@ -147,7 +149,7 @@ export function MergePdfTool() {
                     ...currentItem,
                     pageCount: null,
                     status: "error",
-                    error: nextError instanceof Error ? nextError.message : t("toolUi.couldNotRead"),
+                    error: resolveToolErrorMessage(nextError, t, "toolUi.couldNotRead"),
                   }
                 : currentItem,
             ),
@@ -232,7 +234,7 @@ export function MergePdfTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("toolUi.failedMerge"));
+      setError(resolveToolErrorMessage(nextError, t, "toolUi.failedMerge"));
     }
   };
 
@@ -281,7 +283,7 @@ export function MergePdfTool() {
               <span className="mt-2 block text-sm leading-6 text-ink-500">{t("toolUi.dropHereMany")}</span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfMultiple}</p>
+          <p className="text-xs leading-5 text-ink-600">{limitLabels.pdfMultiple}</p>
 
           <input
             ref={fileInputRef}

@@ -4,8 +4,9 @@ import { Button } from "../../../shared/components/Button";
 import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   canExportBrowserImageFormat,
   jpegQualityDecimalToPercent,
@@ -81,6 +82,7 @@ const copy = {
     logoInvalid: "Seleccioná un logo PNG, JPG/JPEG o WebP. Para usar un SVG como logo, convertí primero SVG a PNG.",
     logoMaxWidth: "Ancho máximo del logo",
     logoMissing: "Seleccioná una imagen/logo para la marca de agua.",
+    addWatermarkCta: "Agregar marca de agua",
     margin: "Margen",
     opacity: "Opacidad",
     outputIntro: "Previsualizá el resultado y descargá la imagen final.",
@@ -111,6 +113,7 @@ const copy = {
     logoInvalid: "Select a PNG, JPG/JPEG or WebP logo. To use an SVG logo, convert SVG to PNG first.",
     logoMaxWidth: "Logo max width",
     logoMissing: "Select an image/logo watermark.",
+    addWatermarkCta: "Add watermark",
     margin: "Margin",
     opacity: "Opacity",
     outputIntro: "Preview the result and download the final image.",
@@ -196,6 +199,7 @@ function isSvgFile(file: File) {
 export function ImageWatermarkTool() {
   const { language, t } = useI18n();
   const labels = copy[language];
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const logoInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -247,12 +251,20 @@ export function ImageWatermarkTool() {
   const marginError = validateWatermarkMargin(margin);
   const opacityError = validateWatermarkOpacity(opacity);
   const logoMaxWidthError = validateWatermarkLogoMaxWidthPercent(logoMaxWidthPercent);
-  const textError = text.trim() ? null : language === "en" ? "Enter watermark text." : "Ingresá un texto para la marca de agua.";
+  const textError = text.trim()
+    ? null
+    : ({ code: "tools.errors.watermarkEmptyText" } as { code: string; vars?: Record<string, string | number> });
   const sharedWatermarkError = marginError ?? opacityError;
-  const watermarkError =
+  const watermarkValidationError =
     watermarkKind === "text"
       ? textError ?? fontSizeError ?? sharedWatermarkError
-      : (!logoFile || !logoMetadata ? labels.logoMissing : logoMaxWidthError ?? sharedWatermarkError);
+      : logoMaxWidthError ?? sharedWatermarkError;
+  const watermarkError =
+    watermarkKind === "image" && (!logoFile || !logoMetadata)
+      ? { code: "missing" as const, message: labels.logoMissing }
+      : watermarkValidationError
+        ? { code: "validation" as const, message: t(watermarkValidationError.code as TranslationKey, watermarkValidationError.vars) }
+        : null;
   const shouldShowQuality = outputFormat === "jpeg" || outputFormat === "webp";
   const fallbackBaseName = metadata ? getWatermarkedImageOutputBaseName(metadata.fileName) : defaultOutputBaseName;
   const finalOutputFileName = buildWatermarkedImageFileName(outputFileName, outputFormat, fallbackBaseName);
@@ -299,7 +311,7 @@ export function ImageWatermarkTool() {
       setPreviewUrl(null);
     }
 
-    const fileLimitError = getImageFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getImageFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -319,7 +331,7 @@ export function ImageWatermarkTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("imageUi.couldNotRead"));
+      setError(resolveToolErrorMessage(nextError, t, "imageUi.couldNotRead"));
     }
   };
 
@@ -344,7 +356,7 @@ export function ImageWatermarkTool() {
       setWatermarkKind("image");
     } catch (nextError) {
       clearLogoSelection();
-      setError(nextError instanceof Error ? nextError.message : labels.logoInvalid);
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.watermarkLogoInvalid"));
     }
   };
 
@@ -416,7 +428,7 @@ export function ImageWatermarkTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo agregar la marca de agua.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.watermarkFailed"));
     }
   };
 
@@ -697,7 +709,7 @@ export function ImageWatermarkTool() {
 
             {watermarkError ? (
               <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-                {watermarkError}
+                {watermarkError.message}
               </p>
             ) : null}
           </div>
@@ -769,7 +781,7 @@ export function ImageWatermarkTool() {
               description={t(formatDescKeys[outputFormat])}
               formats={outputFormats}
               getLabel={getImageFormatLabel}
-              label={language === "en" ? "Output format" : "Formato final"}
+              label={t("imageUi.finalFormat")}
               value={outputFormat}
               onChange={(format) => {
                 setOutputFormat(format);
@@ -841,7 +853,7 @@ export function ImageWatermarkTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void applyWatermark()} disabled={!canApply}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <Stamp size={16} />}
-              {language === "en" ? "Add watermark" : "Agregar marca de agua"}
+              {labels.addWatermarkCta}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />

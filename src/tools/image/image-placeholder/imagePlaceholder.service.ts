@@ -1,3 +1,5 @@
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -68,40 +70,48 @@ export function normalizeHexColor(value: string, fallback: string) {
   return fallback;
 }
 
-export function validatePlaceholderDimensions(width: number, height: number) {
+export function validatePlaceholderDimensions(
+  width: number,
+  height: number,
+): PageSelectionError | null {
   if (!Number.isFinite(width) || !Number.isFinite(height)) {
-    return "El ancho y el alto deben ser numeros validos.";
+    return { code: "tools.errors.dimensionsNotNumeric" };
   }
 
   if (!Number.isInteger(width) || !Number.isInteger(height)) {
-    return "El ancho y el alto deben ser numeros enteros.";
+    return { code: "tools.errors.dimensionsNotInteger" };
   }
 
   if (width <= 0 || height <= 0) {
-    return "El ancho y el alto deben ser mayores que cero.";
+    return { code: "tools.errors.dimensionsNotPositive" };
   }
 
   if (width > maxPlaceholderSide || height > maxPlaceholderSide) {
-    return `El ancho y el alto no pueden superar ${maxPlaceholderSide}px.`;
+    return { code: "tools.errors.dimensionsExceedMax", vars: { max: maxPlaceholderSide } };
   }
 
   if (width * height > maxPlaceholderPixels) {
-    return "La imagen supera el limite de 64 megapixeles.";
+    return { code: "tools.errors.placeholderPixelLimit" };
   }
 
   return null;
 }
 
-export function validatePlaceholderOptions({ backgroundColor, height, textColor, width }: ImagePlaceholderOptions) {
+export function validatePlaceholderOptions({
+  backgroundColor,
+  height,
+  textColor,
+  width,
+}: ImagePlaceholderOptions): PageSelectionError | null {
   const dimensionError = validatePlaceholderDimensions(width, height);
   if (dimensionError) return dimensionError;
 
   if (normalizeHexColor(backgroundColor, "") === "") {
-    return "El color de fondo debe ser hexadecimal.";
+    return { code: "tools.errors.placeholderInvalidBgColor" };
   }
 
   if (normalizeHexColor(textColor, "") === "") {
-    return "El color de texto debe ser hexadecimal.";
+    return { code: "tools.errors.placeholderInvalidTextColor" };
   }
 
   return null;
@@ -130,7 +140,7 @@ function drawPlaceholder(canvas: HTMLCanvasElement, options: ImagePlaceholderOpt
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar la imagen placeholder.");
+    throw new ToolError("tools.errors.placeholderPrepareFailed");
   }
 
   const backgroundColor = normalizeHexColor(options.backgroundColor, defaultBackgroundColor);
@@ -155,11 +165,13 @@ function drawPlaceholder(canvas: HTMLCanvasElement, options: ImagePlaceholderOpt
 export async function generatePlaceholderImage(options: ImagePlaceholderOptions): Promise<ImagePlaceholderResult> {
   const validationError = validatePlaceholderOptions(options);
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   if (!canExportBrowserImageFormat(options.outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imagenes como ${getImageFormatLabel(options.outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(options.outputFormat),
+    });
   }
 
   const canvas = document.createElement("canvas");
@@ -167,7 +179,7 @@ export async function generatePlaceholderImage(options: ImagePlaceholderOptions)
 
   const mimeType = getBrowserImageOutputMimeType(options.outputFormat);
   const result = await exportBrowserCanvas(canvas, {
-    errorMessage: "No se pudo exportar la imagen placeholder.",
+    canvasError: new ToolError("tools.errors.placeholderGenerationFailed"),
     mimeType,
     quality: options.quality,
   });

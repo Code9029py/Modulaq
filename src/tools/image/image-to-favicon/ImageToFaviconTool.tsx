@@ -2,8 +2,9 @@ import { ChevronDown, ChevronUp, Download, FileArchive, FileImage, Loader2, Pack
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   buildFaviconZipFileName,
   defaultOutputBaseName,
@@ -29,6 +30,9 @@ const copy = {
   es: {
     downloadPack: "Descargar ZIP",
     downloadReady: "Pack de favicon listo",
+    filesIncluded: "{{count}} archivos incluidos",
+    generateCta: "Generar pack favicon",
+    iconsLabel: "Iconos",
     outputIntro: "No genera archivo .ico clasico; descarga iconos PNG listos para usar.",
     outputName: "Nombre del ZIP",
     outputTitle: "Pack generado",
@@ -45,6 +49,9 @@ const copy = {
   en: {
     downloadPack: "Download ZIP",
     downloadReady: "Favicon pack ready",
+    filesIncluded: "{{count}} files included",
+    generateCta: "Generate favicon pack",
+    iconsLabel: "Icons",
     outputIntro: "It does not create a classic .ico file; it downloads ready-to-use PNG icons.",
     outputName: "ZIP name",
     outputTitle: "Generated pack",
@@ -67,6 +74,7 @@ function formatTemplate(template: string, values: Record<string, string>) {
 export function ImageToFaviconTool() {
   const { language, t } = useI18n();
   const labels = copy[language];
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
@@ -124,7 +132,7 @@ export function ImageToFaviconTool() {
       setPreviewUrl(null);
     }
 
-    const fileLimitError = getImageFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getImageFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -144,7 +152,7 @@ export function ImageToFaviconTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("imageUi.couldNotRead"));
+      setError(resolveToolErrorMessage(nextError, t, "imageUi.couldNotRead"));
     }
   };
 
@@ -179,7 +187,7 @@ export function ImageToFaviconTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo generar el pack.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.faviconPackFailed"));
     }
   };
 
@@ -360,7 +368,7 @@ export function ImageToFaviconTool() {
                   <dd className="font-semibold text-ink-900">{result.fileName}</dd>
                 </div>
                 <div>
-                  <dt className="text-ink-500">{language === "en" ? "Icons" : "Iconos"}</dt>
+                  <dt className="text-ink-500">{labels.iconsLabel}</dt>
                   <dd className="font-semibold text-ink-900">{result.iconCount}</dd>
                 </div>
                 <div>
@@ -378,7 +386,7 @@ export function ImageToFaviconTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void generatePack()} disabled={!canGenerate}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <FileArchive size={16} />}
-              {language === "en" ? "Generate favicon pack" : "Generar pack favicon"}
+              {labels.generateCta}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />
@@ -404,7 +412,7 @@ export function ImageToFaviconTool() {
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-ink-900">
             <span>{labels.zipContents}</span>
             <span className="inline-flex shrink-0 items-center gap-2 rounded-md bg-surface-100 px-2 py-1 text-xs text-ink-600">
-              {language === "en" ? `${iconSpecs.length + 1} files included` : `${iconSpecs.length + 1} archivos incluidos`}
+              {formatTemplate(labels.filesIncluded, { count: String(iconSpecs.length + 1) })}
               {isZipContentsOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </span>
           </summary>

@@ -1,3 +1,4 @@
+import { ToolError } from "../../../shared/errors/ToolError";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -68,14 +69,14 @@ export async function readImageMetadata(file: File): Promise<ImageConverterMetad
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones válidas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -90,13 +91,15 @@ export async function readImageMetadata(file: File): Promise<ImageConverterMetad
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
 function ensureOutputFormatSupported(outputFormat: ImageConverterOutputFormat) {
   if (!canExportBrowserImageFormat(outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imágenes como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 }
 
@@ -105,7 +108,7 @@ export async function convertImageFile(
   { outputBaseName, outputFormat, quality }: ConvertImageOptions,
 ): Promise<ImageConverterResult> {
   if (!isConvertibleImageFile(file)) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   ensureOutputFormatSupported(outputFormat);
@@ -113,13 +116,14 @@ export async function convertImageFile(
   const mimeType = getBrowserImageOutputMimeType(outputFormat);
   const converted = await exportBrowserImageFile(file, {
     backgroundColor: outputFormat === "jpeg" ? "#ffffff" : undefined,
-    errorMessage: "No se pudo decodificar la imagen en este navegador.",
     mimeType,
     quality,
   });
 
   if (converted.mimeType !== mimeType) {
-    throw new Error(`El navegador no exportó la imagen como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.canvasExportFailed", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 
   return {

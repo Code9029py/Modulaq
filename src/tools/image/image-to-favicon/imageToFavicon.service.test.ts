@@ -28,13 +28,21 @@ describe("imageToFavicon.service", () => {
   });
 
   it("rejects invalid source dimensions", () => {
-    expect(validateFaviconSourceDimensions({ width: 0, height: 800 })).toMatch(/mayores que cero/);
-    expect(validateFaviconSourceDimensions({ width: 1200, height: -1 })).toMatch(/mayores que cero/);
-    expect(validateFaviconSourceDimensions({ width: Number.NaN, height: 800 })).toMatch(/validas/);
+    expect(validateFaviconSourceDimensions({ width: 0, height: 800 })?.code).toBe(
+      "tools.errors.dimensionsNotPositive",
+    );
+    expect(validateFaviconSourceDimensions({ width: 1200, height: -1 })?.code).toBe(
+      "tools.errors.dimensionsNotPositive",
+    );
+    expect(validateFaviconSourceDimensions({ width: Number.NaN, height: 800 })?.code).toBe(
+      "tools.errors.splitterInvalidImageDims",
+    );
   });
 
   it("rejects unreasonably large source dimensions", () => {
-    expect(validateFaviconSourceDimensions({ width: 10000, height: 10000 })).toMatch(/64 megapixeles/);
+    expect(validateFaviconSourceDimensions({ width: 10000, height: 10000 })?.code).toBe(
+      "tools.errors.placeholderPixelLimit",
+    );
   });
 
   it("builds output names derived from the original file", () => {

@@ -5,6 +5,7 @@ import {
   extractPdfPages as coreExtractPdfPages,
 } from "@modulaq/core/pdf";
 import { parsePageSelection } from "@modulaq/core/ranges";
+import { ToolError } from "../../../shared/errors/ToolError";
 import { getBaseFileName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import { validateParts } from "../../../shared/utils/pageRanges";
@@ -23,14 +24,14 @@ function cleanOutputBaseName(fileName: string) {
     .trim();
 }
 
-export function getOutputBaseNameError(fileName: string) {
+export function getOutputBaseNameError(fileName: string): { code: string } | null {
   if (!fileName.trim()) {
     return null;
   }
 
   return cleanOutputBaseName(fileName)
     ? null
-    : "El nombre de salida no contiene caracteres válidos.";
+    : { code: "tools.errors.outputNameInvalid" };
 }
 
 export function sanitizeOutputBaseName(fileName: string, fallbackBaseName = defaultOutputBaseName) {
@@ -48,7 +49,7 @@ export function buildOutputFileName(baseName: string, extension: "pdf" | "zip", 
   const nameError = getOutputBaseNameError(baseName);
 
   if (nameError) {
-    throw new Error(nameError);
+    throw new ToolError(nameError.code);
   }
 
   return `${sanitizeOutputBaseName(baseName, fallbackBaseName)}.${extension}`;
@@ -56,7 +57,7 @@ export function buildOutputFileName(baseName: string, extension: "pdf" | "zip", 
 
 async function loadPdfDocument(file: File) {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   try {
@@ -64,7 +65,7 @@ async function loadPdfDocument(file: File) {
       ignoreEncryption: true,
     });
   } catch {
-    throw new Error("No se pudo leer el PDF. Puede estar dañado, protegido o incompleto.");
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 }
 
@@ -96,20 +97,20 @@ export async function extractSelectedPages(
   outputBaseName: string,
 ): Promise<SplitPdfResult> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   let pageCount: number;
   try {
     pageCount = await coreCountPdfPages(file);
   } catch {
-    throw new Error("No se pudo leer el PDF. Puede estar dañado, protegido o incompleto.");
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 
   const selection = parsePageSelection(pageSelection, pageCount);
 
   if (selection.error) {
-    throw new Error(selection.error);
+    throw new ToolError(selection.error.code, selection.error.vars);
   }
 
   const fallbackBaseName = getSuggestedOutputBaseName(file.name);
@@ -118,7 +119,7 @@ export async function extractSelectedPages(
   try {
     bytes = await coreExtractPdfPages(file, selection.pages);
   } catch {
-    throw new Error("No se pudo leer el PDF. Puede estar dañado, protegido o incompleto.");
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 
   return {
@@ -140,7 +141,10 @@ export async function createZipFromParts(
   const fallbackBaseName = getSuggestedOutputBaseName(file.name);
 
   if (!validation.isValid) {
-    throw new Error(validation.error ?? "Revisá la asignación de páginas.");
+    if (validation.error) {
+      throw new ToolError(validation.error.code, validation.error.vars);
+    }
+    throw new ToolError("tools.errors.partsAssignmentReview");
   }
 
   const safeBaseName = sanitizeOutputBaseName(outputBaseName, fallbackBaseName);

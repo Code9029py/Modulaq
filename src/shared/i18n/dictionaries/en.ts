@@ -805,6 +805,15 @@ export const en: Record<TranslationKey, string> = {
 
   // ---------- image-base64 renderer ----------
   "tools.image-base64.ui.title": "Image ↔ Base64",
+  "tools.image-base64.ui.imageToBase64Intro":
+    "Convert an image into Base64 text or a Data URL.",
+  "tools.image-base64.ui.base64ToImageIntro":
+    "Paste a Base64 string or a Data URL to reconstruct the image.",
+  "tools.image-base64.ui.localProcessing": "Everything is processed locally in your browser.",
+  "tools.image-base64.ui.base64ToImageHeadIntro":
+    "Rebuild an image from Base64 or a Data URL.",
+  "tools.image-base64.ui.base64ToImageWarning":
+    "A valid Base64 string doesn't always represent an image.",
   "tools.image-base64.ui.intro":
     "Convert an image to Base64 to use it in HTML, CSS, JSON, or tests. You can also paste a Base64 string or Data URL and reconstruct the image.",
   "tools.image-base64.ui.modeImageToBase64": "Image to Base64",
@@ -840,6 +849,193 @@ export const en: Record<TranslationKey, string> = {
   "tools.image-base64.ui.invalidMime":
     "The Base64 is valid, but it couldn't be previewed as an image with that MIME.",
   "tools.image-base64.ui.pasteFirst": "Paste Base64 or a Data URL to reconstruct an image.",
+
+  // ---------- Service / helper errors (resolved via resolveToolErrorMessage) ----------
+  "tools.errors.generic": "Something went wrong.",
+  "tools.errors.invalidPdf": "Pick a valid PDF file.",
+  "tools.errors.invalidPdfs": "Pick one or more valid PDF files.",
+  "tools.errors.invalidPdfNamed": "\"{{name}}\" is not a valid PDF file.",
+  "tools.errors.unreadablePdf":
+    "Couldn't read the PDF. It might be damaged, protected, or incomplete.",
+  "tools.errors.unreadablePdfNamed":
+    "Couldn't read \"{{name}}\". It might be damaged, protected, or incomplete.",
+  "tools.errors.encryptedPdf": "The PDF is encrypted and can't be modified.",
+  "tools.errors.pdfReadFile": "Couldn't read the PDF file.",
+  "tools.errors.pageOutOfRange": "Pick pages between 1 and {{max}}.",
+  "tools.errors.noPageSelected": "Pick at least one page to convert.",
+  "tools.errors.pdfPageConversionFailed": "Couldn't convert the page: {{detail}}",
+  "tools.errors.pdfPagesConversionFailed": "Couldn't convert the pages into images.",
+  "tools.errors.zipPrepareFailed": "Couldn't prepare the ZIP download.",
+  "tools.errors.pdfTextExtractFailed": "Couldn't extract text from the PDF.",
+  "tools.errors.pdfOrderInvalid":
+    "Couldn't process the page order. Reset the order and try again.",
+  "tools.errors.pdfOrderInvalidPages":
+    "The order contains invalid or repeated pages. Reset the order and try again.",
+  "tools.errors.pdfReorderFailed":
+    "Couldn't create the reordered PDF. Try again with a different file.",
+  "tools.errors.pdfMergeFailed":
+    "Couldn't generate the final PDF. Try removing the problematic file and try again.",
+  "tools.errors.pdfMergeNeedTwo": "Add at least two PDFs to merge them.",
+  "tools.errors.pdfCompressFailed": "Couldn't optimize this PDF. Try again with a different file.",
+  "tools.errors.pdfNoCompressResults": "No results available to download.",
+  "tools.errors.pdfSplitFailed": "Couldn't split the PDF.",
+  "tools.errors.partsAssignmentReview": "Review the page assignment.",
+  "tools.errors.invalidImage": "Pick a valid PNG, JPG, or WebP image.",
+  "tools.errors.invalidImages": "Pick valid PNG, JPG, or WebP images.",
+  "tools.errors.invalidImageNamed": "\"{{name}}\" is not a valid PNG, JPG, or WebP image.",
+  "tools.errors.imageProcessFailedNamed":
+    "Couldn't process \"{{name}}\". Make sure the image isn't damaged.",
+  "tools.errors.imageNoDimensions": "The image doesn't have valid dimensions.",
+  "tools.errors.imageLoadFailed": "Couldn't read the image.",
+  "tools.errors.imageLoadOneFailed": "Couldn't read one of the images.",
+  "tools.errors.canvasContextFailed": "Couldn't prepare the image conversion.",
+  "tools.errors.canvasGenericFailed": "Couldn't convert the image.",
+  "tools.errors.canvasUnexpectedFormat":
+    "The browser didn't return the expected image format.",
+  "tools.errors.unsupportedOutputFormat":
+    "This browser can't export images as {{format}}.",
+  "tools.errors.canvasExportFailed": "The browser didn't export the image as {{format}}.",
+  "tools.errors.imageToPdfFailed":
+    "Couldn't generate the PDF from the images. Make sure they aren't damaged.",
+  "tools.errors.imageToPdfNeedOne": "Add at least one image to generate the PDF.",
+  "tools.errors.imageCompressFailed": "Couldn't compress the image.",
+  "tools.errors.imageOutputFailed": "Couldn't prepare the output image.",
+  "tools.errors.imageExportFailed": "Couldn't export the image.",
+  "tools.errors.faviconBuildFailed": "Couldn't prepare the icon.",
+  "tools.errors.faviconPackFailed": "Couldn't generate the pack.",
+  "tools.errors.joinerNeedTwo": "Add at least two images to join.",
+  "tools.errors.joinerOutputFailed": "Couldn't prepare the final image.",
+  "tools.errors.joinerFailed": "Couldn't join the images.",
+  "tools.errors.splitterPartFailed": "Couldn't prepare a part of the image.",
+  "tools.errors.splitterFailed": "Couldn't split the image.",
+  "tools.errors.colorAnalysisFailed": "Couldn't analyze the image.",
+  "tools.errors.colorPaletteFailed": "Couldn't extract the palette.",
+  "tools.errors.colorCopyFailed": "Couldn't copy to the clipboard.",
+  "tools.errors.watermarkOutputFailed": "Couldn't prepare the image.",
+  "tools.errors.watermarkFailed": "Couldn't add the watermark.",
+  "tools.errors.watermarkLogoInvalid": "The logo isn't a valid image.",
+  "tools.errors.placeholderPrepareFailed": "Couldn't prepare the placeholder image.",
+  "tools.errors.placeholderGenerationFailed": "Couldn't generate the placeholder image.",
+  "tools.errors.svgPrepareFailed": "Couldn't prepare the PNG.",
+  "tools.errors.svgConversionFailed": "Couldn't convert the SVG to PNG.",
+  "tools.errors.svgReadFailed": "Couldn't read the SVG.",
+  "tools.errors.invalidBase64": "Paste a valid Base64 string.",
+  "tools.errors.invalidBase64OrDataUrl": "Paste a Base64 string or a Data URL.",
+  "tools.errors.invalidDataUrl": "The Data URL must use image/png, image/jpeg, or image/webp.",
+  "tools.errors.base64DecodeUnavailable": "This browser can't decode Base64.",
+  "tools.errors.base64DataUrlBuildFailed":
+    "Couldn't generate a valid Data URL for this image.",
+  "tools.errors.pdfFileTooLarge":
+    "\"{{name}}\" exceeds the 50 MB local-processing limit.",
+  "tools.errors.totalPdfTooLarge": "The selection exceeds the total 100 MB PDF limit.",
+  "tools.errors.imageFileTooLarge": "\"{{name}}\" exceeds the 15 MB per-image limit.",
+  "tools.errors.totalImageTooLarge":
+    "The selection exceeds the total 100 MB image limit.",
+  "tools.errors.tooManyImagesForPdf": "You can load up to 30 images per PDF.",
+  "tools.errors.tooManyImagesGeneric": "You can load up to 30 images.",
+  "tools.errors.splitPagesLimit":
+    "You can separate up to 50 pages per operation to avoid blocking the browser.",
+  "tools.errors.convertPagesLimit":
+    "You can convert up to 50 pages per operation to avoid blocking the browser.",
+  "tools.errors.pageRangeEmpty": "Enter at least one page or range.",
+  "tools.errors.pageRangeInvalidFormat":
+    "Invalid format. Use pages like 1,3,5 or ranges like 2-4.",
+  "tools.errors.pageNotExists": "Page {{page}} doesn't exist. Use pages between 1 and {{total}}.",
+  "tools.errors.pageRepeatedInPart":
+    "Page {{page}} is repeated inside part {{part}}.",
+  "tools.errors.rangeStartGreater":
+    "Range {{range}} is invalid. The start page can't be greater than the end page.",
+  "tools.errors.rangeEndExceeds":
+    "Range {{range}} is invalid. The PDF only has {{total}} pages.",
+  "tools.errors.partEmpty":
+    "Part {{part}} is empty. If you want to split the PDF into {{newCount}} files, change the part count to {{newCount}}.",
+  "tools.errors.partsPageOverAssigned": "Page {{page}} is assigned to more than one part.",
+  "tools.errors.partsPageMissing": "Page {{page}} is not assigned.",
+  "tools.errors.partsPagesMissing": "Pages not assigned: {{pages}}.",
+  "tools.errors.dimensionsNotNumeric": "Use valid numeric dimensions.",
+  "tools.errors.dimensionsNotInteger": "Use integer pixel dimensions.",
+  "tools.errors.dimensionsNotPositive": "Width and height must be greater than zero.",
+  "tools.errors.dimensionsExceedMax": "Width and height can't exceed {{max}}px.",
+  "tools.errors.dimensionsExceedPixels": "The resulting image exceeds the 64-megapixel limit.",
+  "tools.errors.cropOutOfBounds":
+    "The crop falls outside the image. Adjust the coordinates.",
+  "tools.errors.cropTooSmall": "The crop must be at least 1 pixel.",
+  "tools.errors.cropNotNumeric": "Use valid numeric values.",
+  "tools.errors.cropNotInteger": "Use integer pixel values.",
+  "tools.errors.cropNegativeOrigin": "X and Y can't be negative.",
+  "tools.errors.cropNotPositive": "Width and height must be greater than zero.",
+  "tools.errors.cropExceedsImage": "The crop area can't extend beyond the image.",
+  "tools.errors.cropExceedsPixels": "The crop exceeds the 64-megapixel limit.",
+  "tools.errors.joinerSpacingNotNumber": "Spacing must be a valid number.",
+  "tools.errors.joinerSpacingNotInteger": "Spacing must be an integer.",
+  "tools.errors.joinerSpacingNegative": "Spacing can't be negative.",
+  "tools.errors.joinerSpacingExceeds": "Spacing exceeds the allowed limit.",
+  "tools.errors.joinerPaddingNotNumber": "Padding must be a valid number.",
+  "tools.errors.joinerPaddingNotInteger": "Padding must be an integer.",
+  "tools.errors.joinerPaddingNegative": "Padding can't be negative.",
+  "tools.errors.joinerPaddingExceeds": "Padding exceeds the allowed limit.",
+  "tools.errors.joinerInvalidBgColor": "The background color must be hexadecimal.",
+  "tools.errors.joinerInvalidImageDims": "All images must have valid dimensions.",
+  "tools.errors.joinerColumnsNotInteger": "Columns must be an integer.",
+  "tools.errors.joinerColumnsTooFew": "The grid needs at least one column.",
+  "tools.errors.joinerColumnsExceed": "Columns can't exceed the number of images.",
+  "tools.errors.joinerCanvasTooLarge": "The final image exceeds the maximum canvas size.",
+  "tools.errors.joinerCanvasExceedsPixels": "The final image exceeds the 100-megapixel limit.",
+  "tools.errors.splitterRowsNotNumber": "Rows must be a valid number.",
+  "tools.errors.splitterRowsNotInteger": "Rows must be an integer.",
+  "tools.errors.splitterRowsNotPositive": "Rows must be greater than zero.",
+  "tools.errors.splitterColumnsNotNumber": "Columns must be a valid number.",
+  "tools.errors.splitterColumnsNotInteger": "Columns must be an integer.",
+  "tools.errors.splitterColumnsNotPositive": "Columns must be greater than zero.",
+  "tools.errors.splitterPartWidthNotNumber": "Each part's width must be a valid number.",
+  "tools.errors.splitterPartWidthNotInteger": "Each part's width must be an integer.",
+  "tools.errors.splitterPartWidthNotPositive": "Each part's width must be greater than zero.",
+  "tools.errors.splitterPartHeightNotNumber": "Each part's height must be a valid number.",
+  "tools.errors.splitterPartHeightNotInteger": "Each part's height must be an integer.",
+  "tools.errors.splitterPartHeightNotPositive": "Each part's height must be greater than zero.",
+  "tools.errors.splitterInvalidImageDims": "The image must have valid dimensions.",
+  "tools.errors.splitterPartNotPositive":
+    "Each part must have a width and height greater than zero.",
+  "tools.errors.splitterExceedsParts": "The split exceeds the {{max}}-parts limit.",
+  "tools.errors.placeholderInvalidBgColor": "The background color must be hexadecimal.",
+  "tools.errors.placeholderInvalidTextColor": "The text color must be hexadecimal.",
+  "tools.errors.placeholderPixelLimit": "The image exceeds the 64-megapixel limit.",
+  "tools.errors.watermarkOpacityNotNumber": "Opacity must be a valid number.",
+  "tools.errors.watermarkOpacityRange": "Opacity must be between 10% and 100%.",
+  "tools.errors.watermarkFontSizeNotNumber": "Font size must be a valid number.",
+  "tools.errors.watermarkFontSizeNotInteger": "Font size must be an integer.",
+  "tools.errors.watermarkFontSizeRange": "Font size must be between {{min}} and {{max}}px.",
+  "tools.errors.watermarkLogoSizeNotNumber":
+    "The logo's max width must be a valid number.",
+  "tools.errors.watermarkLogoSizeNotInteger": "The logo's max width must be an integer.",
+  "tools.errors.watermarkLogoSizeRange":
+    "The logo's max width must be between {{min}}% and {{max}}%.",
+  "tools.errors.watermarkMarginNotNumber": "Margin must be a valid number.",
+  "tools.errors.watermarkMarginNotInteger": "Margin must be an integer.",
+  "tools.errors.watermarkMarginRange":
+    "Margin must be zero or greater and not exceed the allowed limit.",
+  "tools.errors.watermarkLogoInvalidFile":
+    "Pick a PNG, JPG/JPEG, or WebP logo. To use an SVG as logo, convert SVG to PNG first.",
+  "tools.errors.watermarkEmptyText": "Enter a text for the watermark.",
+  "tools.errors.watermarkInvalidColor": "The color must be hexadecimal.",
+  "tools.errors.outputNameInvalid": "The output name doesn't contain valid characters.",
+  "tools.errors.invalidSvg": "Paste or upload a valid SVG.",
+  "tools.errors.svgContainsScript": "For safety, the SVG can't contain scripts or events.",
+  "tools.errors.svgInvalidDimensions": "The SVG dimensions are not valid.",
+  "tools.errors.invalidLogoFile": "The logo must be PNG, JPG, or WebP.",
+  "tools.errors.singleImageMode":
+    "The selected mode requires at least two images to generate multiple outputs.",
+  "tools.errors.splitterInvalidGrid": "Set a valid grid.",
+  "tools.errors.faviconNoSizesSelected": "Pick at least one favicon size.",
+  "tools.errors.colorExtractorEmptySwatch":
+    "Set an image and the number of colors before extracting the palette.",
+
+  // ---------- Visible labels for processing limits ----------
+  "tools.limits.pdfSingle": "Max: 50 MB per PDF.",
+  "tools.limits.pdfMultiple": "Max: 50 MB per PDF and 100 MB total.",
+  "tools.limits.images": "Max: 30 images, 15 MB per image, and 100 MB total.",
+  "tools.limits.pdfToImages": "Max: 50 MB per PDF and up to 50 pages per conversion.",
+  "tools.limits.splitPdf": "Max: 50 MB per PDF and up to 50 pages in Separate every page.",
 
   // Categories
   "category.documents": "Documents",
