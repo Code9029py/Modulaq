@@ -180,7 +180,7 @@ export function ImageToFaviconTool() {
     clearResult();
 
     try {
-      const nextResult = await generateFaviconPack(file, { outputBaseName: outputFileName });
+      const nextResult = await generateFaviconPack(file, { outputBaseName: outputFileName, language });
       const resultUrl = URL.createObjectURL(new Blob([nextResult.bytes], { type: nextResult.mimeType }));
       resultUrlRef.current = resultUrl;
       setResult({ ...nextResult, url: resultUrl });

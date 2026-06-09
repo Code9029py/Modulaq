@@ -26,6 +26,7 @@ export type ImageToFaviconResult = {
 };
 
 export type ImageToFaviconOptions = {
+  language?: "es" | "en";
   outputBaseName: string;
 };
 

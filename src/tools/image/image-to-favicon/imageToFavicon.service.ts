@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { ToolError } from "../../../shared/errors/ToolError";
+import type { Language } from "../../../shared/i18n/types";
 import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
@@ -88,18 +89,37 @@ export function validateFaviconSourceDimensions(
   return null;
 }
 
-export function createFaviconPackReadme(iconSpecs: readonly FaviconIconSpec[] = faviconIconSpecs) {
+const readmeCopy = {
+  es: {
+    title: "Imagen a favicon - Modulaq",
+    description: "Este ZIP contiene iconos PNG. No incluye un archivo .ico clasico.",
+    files: "Archivos:",
+    htmlExamples: "Ejemplos HTML:",
+  },
+  en: {
+    title: "Image to favicon - Modulaq",
+    description: "This ZIP contains PNG icons. It does not include a classic .ico file.",
+    files: "Files:",
+    htmlExamples: "HTML examples:",
+  },
+} as const;
+
+export function createFaviconPackReadme(
+  iconSpecs: readonly FaviconIconSpec[] = faviconIconSpecs,
+  language: Language = "es",
+) {
+  const labels = readmeCopy[language];
   const iconList = iconSpecs.map((icon) => `- ${icon.fileName}: ${icon.size}x${icon.size}px`).join("\n");
 
   return [
-    "Imagen a favicon - Modulaq",
+    labels.title,
     "",
-    "Este ZIP contiene iconos PNG. No incluye un archivo .ico clasico.",
+    labels.description,
     "",
-    "Archivos:",
+    labels.files,
     iconList,
     "",
-    "Ejemplos HTML:",
+    labels.htmlExamples,
     '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">',
     '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
     "",
@@ -181,7 +201,7 @@ async function createFaviconIcon(image: HTMLImageElement, iconSpec: FaviconIconS
 
 export async function generateFaviconPack(
   file: File,
-  { outputBaseName }: ImageToFaviconOptions,
+  { outputBaseName, language = "es" }: ImageToFaviconOptions,
 ): Promise<ImageToFaviconResult> {
   if (!isFaviconSourceImageFile(file)) {
     throw new ToolError("tools.errors.invalidImage");
@@ -204,7 +224,7 @@ export async function generateFaviconPack(
     zip.file(icon.fileName, icon.bytes);
   }
 
-  zip.file("README.txt", createFaviconPackReadme());
+  zip.file("README.txt", createFaviconPackReadme(faviconIconSpecs, language));
 
   try {
     const bytes = await zip.generateAsync({ type: "arraybuffer" });

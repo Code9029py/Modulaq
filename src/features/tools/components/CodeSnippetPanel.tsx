@@ -1,5 +1,6 @@
 import { Check, Copy, Package, ListChecks, TriangleAlert } from "lucide-react";
 import { useState } from "react";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import type { LocalizedCodeSnippet, LocalizedToolIntegrableCode } from "../types/tool.types";
 
 type CodeSnippetPanelProps = {
@@ -8,6 +9,7 @@ type CodeSnippetPanelProps = {
 
 function CopyButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
+  const { t } = useI18n();
 
   async function handleCopy() {
     try {
@@ -23,16 +25,18 @@ function CopyButton({ code }: { code: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      aria-label={copied ? "Código copiado" : "Copiar código"}
+      aria-label={copied ? t("toolDetail.snippet.codeCopiedAria") : t("toolDetail.snippet.copyCodeAria")}
       className="inline-flex items-center gap-1.5 rounded-md border border-surface-200/80 bg-surface-50/90 px-2.5 py-1.5 text-xs font-semibold text-ink-700 shadow-sm transition hover:border-accent-cyan/35 hover:bg-surface-50 hover:text-ink-900"
     >
       {copied ? <Check size={14} className="text-accent-teal" /> : <Copy size={14} />}
-      {copied ? "Copiado" : "Copiar"}
+      {copied ? t("toolDetail.snippet.copied") : t("toolDetail.snippet.copy")}
     </button>
   );
 }
 
 function SnippetCard({ snippet }: { snippet: LocalizedCodeSnippet }) {
+  const { t } = useI18n();
+
   return (
     <article className="min-w-0 max-w-full overflow-hidden rounded-xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/45 shadow-panel ring-1 ring-surface-50/80">
       <header className="flex flex-col gap-2 border-b border-surface-200/80 bg-surface-50/80 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
@@ -58,7 +62,7 @@ function SnippetCard({ snippet }: { snippet: LocalizedCodeSnippet }) {
         <div className="flex flex-wrap items-center gap-2 border-t border-surface-200/80 px-4 py-3">
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-700">
             <Package size={14} className="text-accent-teal" />
-            Dependencias
+            {t("toolDetail.snippet.dependencies")}
           </span>
           {snippet.dependencies.map((dependency) => (
             <code
@@ -75,7 +79,7 @@ function SnippetCard({ snippet }: { snippet: LocalizedCodeSnippet }) {
         <div className="border-t border-surface-200/80 px-4 py-3">
           <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-700">
             <ListChecks size={14} className="text-accent-teal" />
-            Notas de uso
+            {t("toolDetail.snippet.usageNotes")}
           </p>
           <ul className="mt-2 grid list-disc gap-1.5 pl-5 text-sm leading-6 text-ink-700 marker:text-ink-300">
             {snippet.usageNotes.map((note, index) => (
@@ -89,7 +93,7 @@ function SnippetCard({ snippet }: { snippet: LocalizedCodeSnippet }) {
         <div className="border-t border-surface-200/80 px-4 py-3">
           <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-700">
             <TriangleAlert size={14} className="text-accent-teal" />
-            Limitaciones
+            {t("toolDetail.snippet.limitations")}
           </p>
           <ul className="mt-2 grid list-disc gap-1.5 pl-5 text-sm leading-6 text-ink-700 marker:text-ink-300">
             {snippet.limitations.map((limitation, index) => (
