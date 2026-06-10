@@ -27,14 +27,14 @@ export const tools: ToolDefinition[] = [
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Unir PDFs online gratis sin subir archivos",
+        title: "Unir PDFs online gratis",
         description:
-          "Combiná varios PDFs en un solo documento y ordenalos como quieras. El procesamiento ocurre en tu navegador; no subimos tus archivos a Modulaq.",
+          "Combiná varios PDFs en un solo documento y ordenalos como quieras.",
       },
       en: {
-        title: "Merge PDFs online free, no uploads",
+        title: "Merge PDFs online free",
         description:
-          "Combine multiple PDFs into one ordered document. Processing happens in your browser — we don't upload your files to Modulaq.",
+          "Combine multiple PDFs into one ordered document.",
       },
     },
     doc: {
@@ -57,13 +57,13 @@ export const tools: ToolDefinition[] = [
           "Cada archivo admite hasta 50 MB y el conjunto, hasta 100 MB en total.",
         ],
         privacy:
-          "El procesamiento de estos archivos ocurre en tu navegador; no los subimos a Modulaq para unirlos.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Algún archivo no es un PDF válido.",
           "Un PDF protegido o dañado puede no poder leerse para unirse.",
         ],
         technicalNotes: [
-          "El procesamiento usa pdf-lib en el navegador.",
+          "Usa pdf-lib.",
           "El documento final respeta el orden mostrado en la lista.",
         ],
       },
@@ -86,20 +86,20 @@ export const tools: ToolDefinition[] = [
           "Each file can be up to 50 MB and the whole batch up to 100 MB.",
         ],
         privacy:
-          "Processing happens in your browser — we don't upload these files to Modulaq to merge them.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A file isn't a valid PDF.",
           "An encrypted or corrupt PDF may not be readable for merging.",
         ],
         technicalNotes: [
-          "Processing uses pdf-lib in the browser.",
+          "Uses pdf-lib.",
           "The final document follows the order shown in the list.",
         ],
       },
     },
     integrableCode: {
       summary: {
-        es: "Unir PDFs corre en el navegador con pdf-lib: copiás las páginas de cada documento a uno nuevo. Instalá pdf-lib y reutilizá esta función.",
+        es: "Unir PDFs usa pdf-lib: copiás las páginas de cada documento a uno nuevo. Instalá pdf-lib y reutilizá esta función.",
         en: "Merging runs in the browser with pdf-lib: you copy pages from each document into a new one. Install pdf-lib and reuse this function.",
       },
       snippets: [
@@ -177,14 +177,14 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Dividir PDF online gratis sin subir archivos",
+        title: "Dividir PDF online gratis",
         description:
-          "Separá un PDF por rangos o páginas individuales y descargá el resultado. El procesamiento del archivo ocurre en tu navegador.",
+          "Separá un PDF por rangos o páginas individuales y descargá el resultado.",
       },
       en: {
-        title: "Split PDF online free, no uploads",
+        title: "Split PDF online free",
         description:
-          "Split a PDF by ranges or individual pages and download the result. File processing happens in your browser.",
+          "Split a PDF by ranges or individual pages and download the result.",
       },
     },
     doc: {
@@ -210,14 +210,14 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
           "Las páginas se numeran desde 1 y los rangos incluyen los extremos.",
         ],
         privacy:
-          "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para dividirlo.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Rango invertido como 3-1: la página inicial no puede ser mayor que la final.",
           "Páginas fuera de rango: revisá que existan en el documento.",
           "PDF protegido o dañado: puede no poder leerse para dividirse.",
         ],
         technicalNotes: [
-          "El procesamiento usa pdf-lib en el navegador.",
+          "Usa pdf-lib.",
           "Cuando se generan varios archivos, se empaquetan en un único ZIP con nombres consistentes.",
         ],
       },
@@ -243,21 +243,21 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
           "Pages are numbered from 1 and ranges include both ends.",
         ],
         privacy:
-          "Processing happens in your browser — we don't upload this file to Modulaq to split it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Reversed range like 3-1: the start page can't be higher than the end.",
           "Out-of-range pages: check that they exist in the document.",
           "Encrypted or damaged PDF: may not be readable to split.",
         ],
         technicalNotes: [
-          "Processing uses pdf-lib in the browser.",
+          "Uses pdf-lib.",
           "When several files are generated they're bundled into a single ZIP with consistent names.",
         ],
       },
     },
     integrableCode: {
       summary: {
-        es: "Dividir corre con pdf-lib en el navegador. Esta versión extrae un rango de páginas a un PDF nuevo (la base para cualquier división). Instalá pdf-lib.",
+        es: "Dividir usa pdf-lib. Esta versión extrae un rango de páginas a un PDF nuevo (la base para cualquier división). Instalá pdf-lib.",
         en: "Splitting runs with pdf-lib in the browser. This version extracts a page range into a new PDF (the foundation for any split). Install pdf-lib.",
       },
       snippets: [
@@ -336,14 +336,14 @@ export async function extractPageRange(file: File, from: number, to: number): Pr
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Convertir imágenes a PDF sin subir archivos",
+        title: "Convertir imágenes a PDF online gratis",
         description:
-          "Convertí imágenes PNG, JPG o WebP en un PDF ordenado. Gratis, sin marcas de agua y con procesamiento en tu navegador.",
+          "Convertí imágenes PNG, JPG o WebP en un PDF ordenado. Gratis y sin marcas de agua.",
       },
       en: {
         title: "Convert images to PDF without uploads",
         description:
-          "Turn PNG, JPG or WebP images into an ordered PDF. Free, no watermarks, processed in your browser.",
+          "Turn PNG, JPG or WebP images into an ordered PDF. Free, no watermarks.",
       },
     },
     doc: {
@@ -366,13 +366,13 @@ export async function extractPageRange(file: File, from: number, to: number): Pr
           "Hasta 30 imágenes y 100 MB en total; cada imagen, hasta 15 MB.",
         ],
         privacy:
-          "El procesamiento de estas imágenes ocurre en tu navegador; no las subimos a Modulaq para crear el PDF.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Formato de imagen no soportado.",
           "Una imagen dañada que no se puede leer.",
         ],
         technicalNotes: [
-          "El procesamiento usa pdf-lib en el navegador.",
+          "Usa pdf-lib.",
           "Cada imagen se ajusta a una página A4 según su orientación; los WebP se convierten a PNG internamente.",
         ],
       },
@@ -395,13 +395,13 @@ export async function extractPageRange(file: File, from: number, to: number): Pr
           "Up to 30 images and 100 MB total; each image up to 15 MB.",
         ],
         privacy:
-          "Processing happens in your browser — we don't upload these images to Modulaq to create the PDF.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Unsupported image format.",
           "A damaged image that can't be read.",
         ],
         technicalNotes: [
-          "Processing uses pdf-lib in the browser.",
+          "Uses pdf-lib.",
           "Each image is fit to an A4 page based on its orientation; WebP is converted to PNG internally.",
         ],
       },
@@ -491,12 +491,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Convertir imagen online gratis",
         description:
-          "Convertí imágenes a PNG, JPG o WebP compatible desde tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+          "Convertí imágenes a PNG, JPG o WebP compatible.",
       },
       en: {
         title: "Convert image online free",
         description:
-          "Convert images to PNG, JPG or supported WebP from your browser. No account and no uploads to Modulaq.",
+          "Convert images to PNG, JPG or supported WebP.",
       },
     },
     doc: {
@@ -521,7 +521,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Tamaño máximo por imagen: 15 MB.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para convertirla.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Archivo que no es una imagen PNG, JPG o WebP.",
           "Imagen dañada o que el navegador no puede decodificar.",
@@ -553,7 +553,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximum image size: 15 MB.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to convert it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A file that is not a PNG, JPG or WebP image.",
           "A damaged image or one the browser cannot decode.",
@@ -572,8 +572,8 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     slugEn: "rotate-image",
     name: { es: "Rotar imagen", en: "Rotate image" },
     description: {
-      es: "Rota o voltea una imagen directamente en tu navegador.",
-      en: "Rotate or flip an image directly in your browser.",
+      es: "Rota o voltea una imagen sin perder calidad.",
+      en: "Rotate or flip an image without losing quality.",
     },
     category: "image",
     tags: {
@@ -591,18 +591,18 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Rotar imagen online gratis",
         description:
-          "Rota o voltea una imagen PNG, JPG o WebP desde tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+          "Rota o voltea una imagen PNG, JPG o WebP.",
       },
       en: {
         title: "Rotate image online free",
         description:
-          "Rotate or flip a PNG, JPG or WebP image from your browser. No account and no uploads to Modulaq.",
+          "Rotate or flip a PNG, JPG or WebP image.",
       },
     },
     doc: {
       es: {
         summary:
-          "Rotar imagen aplica rotaciones y volteos a una imagen local usando canvas, sin backend y sin subir archivos.",
+          "Rotar imagen aplica rotaciones y volteos a una imagen usando canvas.",
         howTo: [
           "Selecciona una imagen PNG, JPG/JPEG o WebP.",
           "Revisa el tipo, peso y dimensiones originales.",
@@ -613,21 +613,21 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         useCases: [
           "Corregir la orientacion de una foto.",
           "Reflejar una imagen horizontal o verticalmente.",
-          "Preparar una captura o recurso visual sin subirlo a un servidor.",
+          "Preparar una captura o recurso visual con un ajuste rápido.",
         ],
         limits: [
           "WebP aparece si tu navegador permite exportarlo correctamente.",
           "Tamano maximo por imagen: 15 MB.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para rotarla.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Imagen danada o que el navegador no puede decodificar.",
           "Archivo que no es PNG, JPG o WebP.",
           "Formato de salida no disponible en el navegador actual.",
         ],
         technicalNotes: [
-          "La transformacion usa canvas en el navegador.",
+          "Usa canvas para la transformación.",
           "La rotacion 90/270 intercambia ancho y alto; 0/180 conserva dimensiones.",
           "Los volteos horizontal y vertical conservan las dimensiones.",
         ],
@@ -652,7 +652,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximum image size: 15 MB.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to rotate it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A damaged image or one the browser cannot decode.",
           "A file that is not PNG, JPG or WebP.",
@@ -691,18 +691,18 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Recortar imagen online gratis",
         description:
-          "Recorta una imagen PNG, JPG o WebP definiendo X, Y, ancho y alto en tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+          "Recorta una imagen PNG, JPG o WebP definiendo X, Y, ancho y alto.",
       },
       en: {
         title: "Crop image online free",
         description:
-          "Crop a PNG, JPG or WebP image by setting X, Y, width and height in your browser. No account and no uploads to Modulaq.",
+          "Crop a PNG, JPG or WebP image by setting X, Y, width and height.",
       },
     },
     doc: {
       es: {
         summary:
-          "Recortar imagen permite definir un area exacta por valores numericos y exportar el recorte localmente desde el navegador.",
+          "Recortar imagen permite definir un area exacta por valores numericos y exportar el recorte como PNG, JPG o WebP.",
         howTo: [
           "Selecciona una imagen PNG, JPG/JPEG o WebP.",
           "Revisa el tipo, peso y dimensiones originales.",
@@ -713,7 +713,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         useCases: [
           "Recortar una zona exacta de una captura.",
           "Preparar una miniatura cuadrada.",
-          "Extraer una parte de una foto sin subirla a un servidor.",
+          "Extraer una parte de una foto con un encuadre exacto.",
         ],
         limits: [
           "WebP aparece si tu navegador permite exportarlo correctamente.",
@@ -721,21 +721,21 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "El area de recorte no puede salirse de la imagen.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para recortarla.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Valores no numericos o negativos.",
           "Ancho o alto igual a cero.",
           "Area de recorte fuera de los limites de la imagen.",
         ],
         technicalNotes: [
-          "La exportacion usa canvas en el navegador.",
+          "Usa canvas para la exportación.",
           "El recorte final tiene las dimensiones indicadas por ancho y alto.",
           "La salida WebP depende del soporte real del navegador.",
         ],
       },
       en: {
         summary:
-          "Crop image lets you define an exact area with numeric values and export the crop locally from the browser.",
+          "Crop image lets you define an exact area with numeric values and export the crop as PNG, JPG or WebP.",
         howTo: [
           "Select a PNG, JPG/JPEG or WebP image.",
           "Review the detected type, size and dimensions.",
@@ -754,7 +754,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "The crop area cannot go outside the image.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to crop it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Non-numeric or negative values.",
           "Width or height equal to zero.",
@@ -793,12 +793,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Imagen a favicon online gratis",
         description:
-          "Genera un ZIP con iconos PNG para favicon, Apple touch icon y PWA desde tu navegador. Sin cuenta y sin subir archivos a Modulaq.",
+          "Genera un ZIP con iconos PNG para favicon, Apple touch icon y PWA.",
       },
       en: {
         title: "Image to favicon online free",
         description:
-          "Generate a ZIP with PNG icons for favicon, Apple touch icon and PWA from your browser. No account and no uploads to Modulaq.",
+          "Generate a ZIP with PNG icons for favicon, Apple touch icon and PWA.",
       },
     },
     doc: {
@@ -823,14 +823,14 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Tamano maximo por imagen: 15 MB.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para crear favicons.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Archivo que no es una imagen PNG, JPG o WebP.",
           "Imagen danada o que el navegador no puede decodificar.",
           "Imagen con dimensiones invalidas o demasiado grande.",
         ],
         technicalNotes: [
-          "La exportacion usa canvas en el navegador.",
+          "Usa canvas para la exportación.",
           "Los iconos se exportan como PNG y se empaquetan con jszip.",
           "El ZIP incluye un README.txt con ejemplos HTML.",
         ],
@@ -856,7 +856,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximum image size: 15 MB.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to create favicons.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A file that is not PNG, JPG or WebP.",
           "A damaged image or one the browser cannot decode.",
@@ -895,12 +895,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Unir imágenes online gratis",
         description:
-          "Une imágenes PNG, JPG o WebP en una sola imagen vertical, horizontal o en cuadrícula desde tu navegador. Sin subir archivos a Modulaq.",
+          "Une imágenes PNG, JPG o WebP en una sola imagen vertical, horizontal o en cuadrícula. Sin subir archivos a Modulaq.",
       },
       en: {
         title: "Join images online free",
         description:
-          "Join PNG, JPG or WebP images into one vertical, horizontal or grid image from your browser. No uploads to Modulaq.",
+          "Join PNG, JPG or WebP images into one vertical, horizontal or grid image. No uploads to Modulaq.",
       },
     },
     doc: {
@@ -918,7 +918,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         useCases: [
           "Crear una tira vertical de capturas.",
           "Poner imágenes lado a lado.",
-          "Armar una cuadrícula simple sin subir archivos.",
+          "Armar una cuadrícula simple con varias imágenes.",
         ],
         limits: [
           "WebP aparece si tu navegador permite exportarlo correctamente.",
@@ -926,14 +926,14 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Las imágenes se dibujan en sus dimensiones originales.",
         ],
         privacy:
-          "El procesamiento de estas imágenes ocurre en tu navegador; no las subimos a Modulaq para unirlas.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Archivo que no es una imagen PNG, JPG o WebP.",
           "Imagen dañada o que el navegador no puede decodificar.",
-          "Canvas final demasiado grande para procesarlo localmente.",
+          "Canvas final demasiado grande para procesarlo.",
         ],
         technicalNotes: [
-          "La exportación usa canvas en el navegador.",
+          "Usa canvas para la exportación.",
           "Vertical y horizontal centran cada imagen en el eje secundario.",
           "La cuadrícula usa celdas uniformes y calcula filas automáticamente.",
         ],
@@ -960,11 +960,11 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Images are drawn at their original dimensions.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload these images to Modulaq to join them.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A file that is not PNG, JPG or WebP.",
           "A damaged image or one the browser cannot decode.",
-          "Final canvas too large to process locally.",
+          "Final canvas too large to process.",
         ],
         technicalNotes: [
           "Export uses browser canvas.",
@@ -999,7 +999,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Dividir imagen online gratis",
         description:
-          "Divide una imagen PNG, JPG o WebP en partes por filas y columnas o por tamano fijo. Descarga el resultado como ZIP sin subir archivos.",
+          "Divide una imagen PNG, JPG o WebP en partes por filas y columnas o por tamano fijo. Descarga el resultado como ZIP.",
       },
       en: {
         title: "Split image online free",
@@ -1030,14 +1030,14 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Tamano maximo por imagen: 15 MB.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para dividirla.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Filas, columnas, ancho o alto con valores no validos.",
           "La division supera el limite de 100 partes.",
           "Imagen danada o que el navegador no puede decodificar.",
         ],
         technicalNotes: [
-          "La exportacion usa canvas en el navegador.",
+          "Usa canvas para la exportación.",
           "Las partes se empaquetan en ZIP con jszip.",
           "Si el tamano fijo no calza exacto, el borde derecho o inferior genera partes mas pequenas.",
         ],
@@ -1064,7 +1064,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximum image size: 15 MB.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to split it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Rows, columns, width or height with invalid values.",
           "The split exceeds the 100-part limit.",
@@ -1103,7 +1103,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Extraer colores de imagen online gratis",
         description:
-          "Extrae una paleta aproximada de colores dominantes desde una imagen PNG, JPG o WebP. Copia HEX/RGB y descarga TXT o JSON sin subir archivos.",
+          "Extrae una paleta aproximada de colores dominantes desde una imagen PNG, JPG o WebP. Copia HEX/RGB y descarga TXT o JSON.",
       },
       en: {
         title: "Extract image colors online free",
@@ -1134,14 +1134,14 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Tamano maximo por imagen: 15 MB.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para extraer colores.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Archivo que no es una imagen PNG, JPG o WebP.",
           "Imagen danada o que el navegador no puede decodificar.",
           "Imagen sin pixeles visibles luego de ignorar transparencia total.",
         ],
         technicalNotes: [
-          "El analisis usa canvas en el navegador.",
+          "Usa canvas para el análisis.",
           "Se muestrean hasta 50.000 pixeles.",
           "La paleta se obtiene con cuantizacion RGB simple y orden por frecuencia.",
         ],
@@ -1168,7 +1168,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximum image size: 15 MB.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to extract colors.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A file that is not PNG, JPG or WebP.",
           "A damaged image or one the browser cannot decode.",
@@ -1207,12 +1207,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Generar imagen placeholder online gratis",
         description:
-          "Genera una imagen placeholder configurando tamano, texto y colores. Exporta PNG, JPG o WebP desde tu navegador, sin backend.",
+          "Genera una imagen placeholder configurando tamano, texto y colores. Exporta PNG, JPG o WebP, sin backend.",
       },
       en: {
         title: "Generate placeholder image online free",
         description:
-          "Generate a placeholder image by setting size, text and colors. Export PNG, JPG or WebP from your browser, with no backend.",
+          "Generate a placeholder image by setting size, text and colors. Export PNG, JPG or WebP, with no backend.",
       },
     },
     doc: {
@@ -1238,14 +1238,14 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "WebP aparece si tu navegador permite exportarlo correctamente.",
         ],
         privacy:
-          "La imagen se genera localmente en tu navegador; no se sube nada a Modulaq.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Ancho o alto con valores no validos.",
           "Dimensiones demasiado grandes para canvas.",
           "Formato de salida no disponible en el navegador actual.",
         ],
         technicalNotes: [
-          "La exportacion usa canvas en el navegador.",
+          "Usa canvas para la exportación.",
           "La calidad aplica a JPG y WebP, no a PNG.",
           "El nombre de salida se deriva de las dimensiones.",
         ],
@@ -1272,7 +1272,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "WebP appears if your browser can export it correctly.",
         ],
         privacy:
-          "The image is generated locally in your browser; nothing is uploaded to Modulaq.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Width or height with invalid values.",
           "Dimensions too large for canvas.",
@@ -1292,8 +1292,8 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     slugEn: "svg-to-png",
     name: { es: "SVG a PNG", en: "SVG to PNG" },
     description: {
-      es: "Convierte un archivo SVG a PNG desde tu navegador.",
-      en: "Convert an SVG file to PNG from your browser.",
+      es: "Convierte un archivo SVG a PNG.",
+      en: "Convert an SVG file to PNG.",
     },
     category: "image",
     tags: {
@@ -1311,18 +1311,18 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Convertir SVG a PNG online gratis",
         description:
-          "Convierte SVG simple a PNG desde tu navegador. Ajusta tamano y fondo antes de descargar, sin backend ni subir archivos.",
+          "Convierte SVG simple a PNG. Ajusta tamano y fondo antes de descargar, sin backend ni subir archivos.",
       },
       en: {
         title: "Convert SVG to PNG online free",
         description:
-          "Convert simple SVG to PNG from your browser. Adjust size and background before downloading, with no backend or uploads.",
+          "Convert simple SVG to PNG. Adjust size and background before downloading, with no backend or uploads.",
       },
     },
     doc: {
       es: {
         summary:
-          "SVG a PNG convierte un archivo SVG o codigo SVG pegado en una imagen PNG generada localmente.",
+          "SVG a PNG convierte un archivo SVG o codigo SVG pegado en una imagen PNG.",
         howTo: [
           "Selecciona un archivo SVG o pega codigo SVG.",
           "Revisa el nombre, peso y dimensiones detectadas desde width/height o viewBox.",
@@ -1341,7 +1341,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximo 8000 px por lado y 64 megapixeles de salida.",
         ],
         privacy:
-          "Todo se procesa localmente en tu navegador; no subimos el SVG a Modulaq.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Contenido sin etiqueta SVG valida.",
           "SVG con scripts.",
@@ -1349,14 +1349,14 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "SVG con recursos externos que el navegador no puede renderizar en canvas.",
         ],
         technicalNotes: [
-          "La conversion usa Blob SVG, Image, canvas y exportacion PNG en el navegador.",
+          "Usa Blob SVG, Image y canvas para exportar a PNG.",
           "Solo exporta PNG.",
           "No promete compatibilidad perfecta con todos los SVG.",
         ],
       },
       en: {
         summary:
-          "SVG to PNG converts an SVG file or pasted SVG code into a locally generated PNG image.",
+          "SVG to PNG converts an SVG file or pasted SVG code into a PNG image.",
         howTo: [
           "Select an SVG file or paste SVG code.",
           "Review the detected name, size and dimensions from width/height or viewBox.",
@@ -1375,7 +1375,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximum 8000 px per side and 64 megapixels output.",
         ],
         privacy:
-          "Everything is processed locally in your browser; we don't upload the SVG to Modulaq.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Content without a valid SVG tag.",
           "SVG with scripts.",
@@ -1415,12 +1415,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Agregar marca de agua a imagen online gratis",
         description:
-          "Agrega una marca de agua de texto o logo a una imagen PNG, JPG o WebP. Configura posición, margen y opacidad desde tu navegador.",
+          "Agrega una marca de agua de texto o logo a una imagen PNG, JPG o WebP. Configura posición, margen y opacidad.",
       },
       en: {
         title: "Add image watermark online free",
         description:
-          "Add a text watermark to a PNG, JPG or WebP image. Configure text, position, color and opacity from your browser.",
+          "Add a text watermark to a PNG, JPG or WebP image. Configure text, position, color and opacity.",
       },
     },
     doc: {
@@ -1438,7 +1438,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
         useCases: [
           "Agregar una firma o nombre a una imagen.",
           "Marcar capturas o recursos visuales de trabajo.",
-          "Preparar una imagen con texto sobrepuesto sin subirla a un servidor.",
+          "Preparar una imagen con texto sobrepuesto rápidamente.",
         ],
         limits: [
           "WebP aparece si tu navegador permite exportarlo correctamente.",
@@ -1446,14 +1446,14 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "No incluye marca de agua con otra imagen ni drag visual.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para agregar la marca.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Archivo que no es una imagen PNG, JPG o WebP.",
           "Texto vacio para la marca de agua.",
           "Valores invalidos de opacidad, tamano de fuente o margen.",
         ],
         technicalNotes: [
-          "La exportacion usa canvas en el navegador.",
+          "Usa canvas para la exportación.",
           "La marca se dibuja con texto, globalAlpha y posicion calculada.",
           "La calidad aplica a JPG y WebP, no a PNG.",
         ],
@@ -1480,7 +1480,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "It does not include image watermarks or visual drag editing.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to add the watermark.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A file that is not PNG, JPG or WebP.",
           "Empty watermark text.",
@@ -1519,18 +1519,18 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Comprimir imagen online gratis",
         description:
-          "Intentá reducir el peso de una imagen ajustando formato y calidad en tu navegador. El resultado depende del archivo original.",
+          "Intentá reducir el peso de una imagen ajustando formato y calidad. El resultado depende del archivo original.",
       },
       en: {
         title: "Compress image online free",
         description:
-          "Try to reduce an image file size by adjusting format and quality in your browser. Results depend on the original file.",
+          "Try to reduce an image file size by adjusting format and quality. Results depend on the original file.",
       },
     },
     doc: {
       es: {
         summary:
-          "Comprimir imagen intenta reducir el peso de una imagen mediante canvas, cambiando formato y calidad sin subir el archivo.",
+          "Comprimir imagen intenta reducir el peso de una imagen mediante canvas, cambiando formato y calidad.",
         howTo: [
           "Seleccioná una imagen PNG, JPG/JPEG o WebP.",
           "Revisá el peso y dimensiones originales.",
@@ -1549,7 +1549,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Tamaño máximo por imagen: 15 MB.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para comprimirla.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Imagen dañada o que el navegador no puede decodificar.",
           "El archivo final puede pesar más si el formato elegido no conviene para esa imagen.",
@@ -1581,7 +1581,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Maximum image size: 15 MB.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to compress it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A damaged image or one the browser cannot decode.",
           "The final file can be larger when the chosen format is not suitable for that image.",
@@ -1619,18 +1619,18 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Redimensionar imagen online gratis",
         description:
-          "Cambiá ancho, alto o porcentaje de una imagen en tu navegador. Mantiene proporción por defecto y permite exportar PNG, JPG o WebP compatible.",
+          "Cambiá ancho, alto o porcentaje de una imagen. Mantiene proporción por defecto y permite exportar PNG, JPG o WebP compatible.",
       },
       en: {
         title: "Resize image online free",
         description:
-          "Change image width, height or scale percentage in your browser. Keeps aspect ratio by default and exports PNG, JPG or supported WebP.",
+          "Change image width, height or scale percentage. Keeps aspect ratio by default and exports PNG, JPG or supported WebP.",
       },
     },
     doc: {
       es: {
         summary:
-          "Redimensionar imagen cambia las dimensiones de una imagen localmente, con proporción activada por defecto y salida en formatos compatibles.",
+          "Redimensionar imagen cambia las dimensiones de una imagen, con proporción activada por defecto y salida en formatos compatibles.",
         howTo: [
           "Seleccioná una imagen PNG, JPG/JPEG o WebP.",
           "Revisá el ancho, alto, peso y tipo original.",
@@ -1649,7 +1649,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "No mejora la calidad de una imagen pequeña al ampliarla.",
         ],
         privacy:
-          "El procesamiento de esta imagen ocurre en tu navegador; no la subimos a Modulaq para redimensionarla.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Valores vacíos, cero, negativos o no numéricos.",
           "Dimensiones demasiado grandes para procesarlas con estabilidad.",
@@ -1662,7 +1662,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       },
       en: {
         summary:
-          "Resize image changes image dimensions locally, with aspect ratio on by default and output in compatible formats.",
+          "Resize image changes image dimensions, with aspect ratio on by default and output in compatible formats.",
         howTo: [
           "Select a PNG, JPG/JPEG or WebP image.",
           "Review original width, height, size and type.",
@@ -1681,7 +1681,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Upscaling a small image does not improve its quality.",
         ],
         privacy:
-          "Processing happens in your browser; we don't upload this image to Modulaq to resize it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Empty, zero, negative or non-numeric values.",
           "Dimensions too large to process reliably.",
@@ -1700,8 +1700,8 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     slugEn: "image-to-base64",
     name: { es: "Imagen a Base64", en: "Image to Base64" },
     description: {
-      es: "Convierte una imagen en texto Base64 o Data URL. Todo se procesa localmente en tu navegador.",
-      en: "Convert an image into Base64 text or a Data URL. Everything runs locally in your browser.",
+      es: "Convierte una imagen en texto Base64 o Data URL.",
+      en: "Convert an image into Base64 text or a Data URL.",
     },
     category: "image",
     tags: {
@@ -1719,12 +1719,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Imagen a Base64 online",
         description:
-          "Convierte una imagen PNG, JPG o WebP a Base64 puro o Data URL. Todo se procesa localmente en tu navegador.",
+          "Convierte una imagen PNG, JPG o WebP a Base64 puro o Data URL.",
       },
       en: {
         title: "Image to Base64 online",
         description:
-          "Convert a PNG, JPG or WebP image to plain Base64 or a Data URL. Everything runs locally in your browser.",
+          "Convert a PNG, JPG or WebP image to plain Base64 or a Data URL.",
       },
     },
     doc: {
@@ -1748,7 +1748,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Las imagenes grandes generan textos largos dificiles de revisar manualmente.",
         ],
         privacy:
-          "La conversion ocurre en tu navegador; no subimos esta imagen a Modulaq.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Archivo que no es PNG, JPG/JPEG o WebP.",
           "Imagen danada o que el navegador no puede leer.",
@@ -1780,7 +1780,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Large images generate long text that is hard to inspect manually.",
         ],
         privacy:
-          "Conversion happens in your browser; we don't upload this image to Modulaq.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "A file that is not PNG, JPG/JPEG or WebP.",
           "A damaged image or one the browser cannot read.",
@@ -1819,12 +1819,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Base64 a imagen online",
         description:
-          "Pega Base64 puro o una Data URL y descarga la imagen reconstruida como PNG, JPG o WebP. El proceso ocurre localmente.",
+          "Pega Base64 puro o una Data URL y descarga la imagen reconstruida como PNG, JPG o WebP.",
       },
       en: {
         title: "Base64 to image online",
         description:
-          "Paste plain Base64 or a Data URL and download the rebuilt image as PNG, JPG or WebP. Processing happens locally.",
+          "Paste plain Base64 or a Data URL and download the rebuilt image as PNG, JPG or WebP.",
       },
     },
     doc: {
@@ -1848,7 +1848,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "No corrige contenido danado ni cambia la imagen real.",
         ],
         privacy:
-          "La reconstruccion ocurre en tu navegador; no subimos este texto a Modulaq.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Base64 invalido o incompleto.",
           "Data URL invalida o con MIME no soportado.",
@@ -1880,7 +1880,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "It does not repair damaged content or change the actual image.",
         ],
         privacy:
-          "Rebuilding happens in your browser; we don't upload this text to Modulaq.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Invalid or incomplete Base64.",
           "Invalid Data URL or unsupported MIME type.",
@@ -1919,12 +1919,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Convertir PDF a imágenes PNG o JPG online",
         description:
-          "Convertí páginas de un PDF en imágenes PNG o JPG descargables. El renderizado ocurre localmente en tu navegador.",
+          "Convertí páginas de un PDF en imágenes PNG o JPG descargables.",
       },
       en: {
         title: "Convert PDF to PNG or JPG images online",
         description:
-          "Turn PDF pages into downloadable PNG or JPG images. Rendering happens locally in your browser.",
+          "Turn PDF pages into downloadable PNG or JPG images.",
       },
     },
     doc: {
@@ -1949,7 +1949,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Las páginas se numeran desde 1 y los rangos incluyen los extremos.",
         ],
         privacy:
-          "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para convertirlo en imágenes.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Páginas fuera de rango: revisá que existan en el documento.",
           "PDF protegido o dañado: puede no poder renderizarse.",
@@ -1980,7 +1980,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
           "Pages are numbered from 1 and ranges include both ends.",
         ],
         privacy:
-          "Processing happens in your browser — we don't upload this file to Modulaq to render images.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Out-of-range pages: check that they exist in the document.",
           "Encrypted or damaged PDF: it may not render.",
@@ -1993,7 +1993,7 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     },
     integrableCode: {
       summary: {
-        es: "PDF a imágenes usa pdfjs-dist + canvas en el navegador. El snippet incluye la configuración del worker para Vite; en las notas están las alternativas para PNG/JPG y worker (workerPort y CDN).",
+        es: "PDF a imágenes usa pdfjs-dist + canvas. El snippet incluye la configuración del worker para Vite; en las notas están las alternativas para PNG/JPG y worker (workerPort y CDN).",
         en: "PDF to images uses pdfjs-dist + canvas in the browser. The snippet includes the worker setup for Vite; the notes cover PNG/JPG and worker alternatives (workerPort and CDN).",
       },
       snippets: [
@@ -2080,7 +2080,7 @@ export async function renderPdfPageToImage(
     name: { es: "Comprimir PDF", en: "Compress PDF" },
     description: {
       es: "Intenta optimizar el tamaño de un PDF directamente desde el navegador.",
-      en: "Attempts to optimize a PDF's size right from your browser.",
+      en: "Attempts to optimize a PDF's size right.",
     },
     category: "pdf",
     tags: {
@@ -2098,12 +2098,12 @@ export async function renderPdfPageToImage(
       es: {
         title: "Comprimir PDF online gratis",
         description:
-          "Intenta optimizar un PDF directamente en tu navegador y muestra el resultado real. La reducción depende del contenido del archivo.",
+          "Intenta optimizar un PDF y muestra el resultado real. La reducción depende del contenido del archivo.",
       },
       en: {
         title: "Compress PDF online free",
         description:
-          "Attempts to optimize a PDF right in your browser and shows the real result. The reduction depends on the file's content.",
+          "Attempts to optimize a PDF and shows the real result. The reduction depends on the file's content.",
       },
     },
     doc: {
@@ -2126,7 +2126,7 @@ export async function renderPdfPageToImage(
           "La reducción depende del contenido: un PDF ya optimizado o con muchas imágenes puede bajar poco o nada. En ese caso se conserva el original.",
         ],
         privacy:
-          "La optimización se intenta en tu navegador. No recomprime imágenes ni garantiza reducción; el resultado depende de la estructura del PDF.",
+          "La optimización es un intento; no recomprime imágenes ni garantiza reducción. El resultado depende de la estructura del PDF.",
         commonErrors: [
           "Un PDF protegido o encriptado no se puede comprimir desde la herramienta.",
           "Algunos PDF con estructuras poco comunes pueden no ser compatibles.",
@@ -2155,7 +2155,7 @@ export async function renderPdfPageToImage(
           "The reduction depends on the content: an already-optimized PDF or one full of images may shrink little or not at all. In that case we keep the original.",
         ],
         privacy:
-          "Optimization is attempted in your browser. It doesn't recompress images or guarantee shrinkage; the result depends on the PDF's structure.",
+          "Optimization is just an attempt; it doesn't recompress images or guarantee shrinkage. The result depends on the PDF's structure.",
         commonErrors: [
           "An encrypted PDF can't be compressed from this tool.",
           "Some PDFs with unusual structures may not be compatible.",
@@ -2190,14 +2190,14 @@ export async function renderPdfPageToImage(
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Extraer texto de PDF online sin subir archivos",
+        title: "Extraer texto de PDF online gratis",
         description:
-          "Extraé texto seleccionable de un PDF para copiarlo o descargarlo como TXT. El procesamiento ocurre en tu navegador.",
+          "Extraé texto seleccionable de un PDF para copiarlo o descargarlo como TXT.",
       },
       en: {
-        title: "Extract text from PDF online, no uploads",
+        title: "Extract text from PDF online free",
         description:
-          "Pull selectable text from a PDF to copy or download as TXT. Processing happens in your browser.",
+          "Pull selectable text from a PDF to copy or download as TXT.",
       },
     },
     doc: {
@@ -2220,7 +2220,7 @@ export async function renderPdfPageToImage(
           "Tamaño máximo del PDF: 50 MB.",
         ],
         privacy:
-          "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para extraer texto.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "El PDF parece escaneado y no tiene texto seleccionable.",
           "Aparecen símbolos extraños cuando el PDF usa fuentes no estándar.",
@@ -2249,7 +2249,7 @@ export async function renderPdfPageToImage(
           "Max PDF size: 50 MB.",
         ],
         privacy:
-          "Processing happens in your browser — we don't upload this file to Modulaq to extract text.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "The PDF looks scanned and has no selectable text.",
           "Strange symbols show up when the PDF uses non-standard fonts.",
@@ -2262,7 +2262,7 @@ export async function renderPdfPageToImage(
     },
     integrableCode: {
       summary: {
-        es: "Extraer texto usa pdfjs-dist en el navegador. El snippet incluye la configuración del worker para Vite; en las notas están las alternativas (workerPort y CDN).",
+        es: "Extraer texto usa pdfjs-dist. El snippet incluye la configuración del worker para Vite; en las notas están las alternativas (workerPort y CDN).",
         en: "Text extraction uses pdfjs-dist in the browser. The snippet includes the worker setup for Vite; the notes cover the alternatives (workerPort and CDN).",
       },
       snippets: [
@@ -2357,12 +2357,12 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
       es: {
         title: "Contar páginas de un PDF online",
         description:
-          "Conocé cuántas páginas tiene un PDF al instante. La lectura del archivo ocurre en tu navegador.",
+          "Conocé cuántas páginas tiene un PDF al instante.",
       },
       en: {
         title: "Count PDF pages online",
         description:
-          "See how many pages a PDF has instantly. File reading happens in your browser.",
+          "See how many pages a PDF has instantly.",
       },
     },
     doc: {
@@ -2380,7 +2380,7 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
         ],
         limits: ["Tamaño máximo del PDF: 50 MB."],
         privacy:
-          "La lectura de este archivo ocurre en tu navegador; no lo subimos a Modulaq para contar sus páginas.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "El archivo no es un PDF válido.",
           "Un PDF protegido o dañado puede no poder leerse.",
@@ -2401,7 +2401,7 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
         ],
         limits: ["Max PDF size: 50 MB."],
         privacy:
-          "Reading happens in your browser — we don't upload this file to Modulaq to count its pages.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "The file isn't a valid PDF.",
           "An encrypted or damaged PDF may not be readable.",
@@ -2411,7 +2411,7 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
     },
     integrableCode: {
       summary: {
-        es: "Contar páginas es directo con pdf-lib: cargás el documento en memoria y leés getPageCount(). Corre en el navegador; instalá pdf-lib.",
+        es: "Contar páginas es directo con pdf-lib: cargás el documento en memoria y leés getPageCount(). Instalá pdf-lib.",
         en: "Counting pages is straightforward with pdf-lib: load the document in memory and read getPageCount(). Runs in the browser; install pdf-lib.",
       },
       snippets: [
@@ -2483,12 +2483,12 @@ export async function countPdfPages(file: File): Promise<number> {
       es: {
         title: "Reordenar páginas PDF online gratis",
         description:
-          "Cambiá el orden de las páginas de un PDF y descargá el documento reorganizado. Funciona directamente en tu navegador.",
+          "Cambiá el orden de las páginas de un PDF y descargá el documento reorganizado.",
       },
       en: {
         title: "Reorder PDF pages online free",
         description:
-          "Change the order of a PDF's pages and download the reorganized document. Runs right in your browser.",
+          "Change the order of a PDF's pages and download the reorganized document.",
       },
     },
     doc: {
@@ -2511,13 +2511,13 @@ export async function countPdfPages(file: File): Promise<number> {
           "En esta versión el reordenamiento se hace con botones de subir/bajar (sin miniaturas ni arrastrar y soltar).",
         ],
         privacy:
-          "El procesamiento de este archivo ocurre en tu navegador; no lo subimos a Modulaq para reordenarlo.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Un PDF protegido o dañado puede no poder procesarse.",
           "Un orden inválido se valida y avisa antes de generar el archivo.",
         ],
         technicalNotes: [
-          "Usa pdf-lib en el navegador.",
+          "Usa pdf-lib.",
           "El documento resultante respeta el orden mostrado en la lista.",
         ],
       },
@@ -2540,7 +2540,7 @@ export async function countPdfPages(file: File): Promise<number> {
           "In this version reordering is done with up/down buttons (no thumbnails or drag-and-drop).",
         ],
         privacy:
-          "Processing happens in your browser — we don't upload this file to Modulaq to reorder it.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "An encrypted or damaged PDF may not be processable.",
           "An invalid order is validated and flagged before generating the file.",
@@ -2656,7 +2656,7 @@ export async function reorderPdfPages(file: File, order: number[]): Promise<Uint
           "Si no seleccionás ninguna limpieza, el texto queda igual.",
         ],
         privacy:
-          "La limpieza del texto ocurre en tu navegador.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Esperar un cambio sin haber activado ninguna opción de limpieza.",
         ],
@@ -2683,7 +2683,7 @@ export async function reorderPdfPages(file: File, order: number[]): Promise<Uint
           "If you don't pick any cleanup, the text comes out unchanged.",
         ],
         privacy:
-          "Text cleanup happens in your browser.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Expecting a change without enabling any cleanup option.",
         ],
@@ -2829,13 +2829,13 @@ export function cleanText(input: string, options: TextCleanerOptions): string {
           "El tamaño personalizado se admite dentro de límites razonables.",
         ],
         privacy:
-          "El código QR se genera en tu navegador.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Email o URL con formato inválido: la validación visual te avisa antes de generar.",
           "Contenido demasiado largo: el QR resultante puede no ser legible por las cámaras.",
         ],
         technicalNotes: [
-          "Usa la librería qrcode en el navegador.",
+          "Usa la librería qrcode.",
           "El tamaño seleccionado corresponde al PNG exportado, no solo a la vista previa.",
         ],
       },
@@ -2860,7 +2860,7 @@ export function cleanText(input: string, options: TextCleanerOptions): string {
           "Custom size is supported within reasonable bounds.",
         ],
         privacy:
-          "The QR code is generated in your browser.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Email or URL with an invalid format: the on-screen validation warns you before generating.",
           "Content too long: the resulting QR may not be readable by cameras.",
@@ -2962,12 +2962,12 @@ export async function generateQrDataUrl(
       es: {
         title: "Texto a PDF online gratis",
         description:
-          "Convertí texto plano a un PDF simple con título y márgenes básicos. Funciona en tu navegador, sin subir nada.",
+          "Convertí texto plano a un PDF simple con título y márgenes básicos.",
       },
       en: {
         title: "Text to PDF online free",
         description:
-          "Turn plain text into a simple PDF with a basic title and margins. Runs in your browser, no uploads.",
+          "Turn plain text into a simple PDF with a basic title and margins.",
       },
     },
     doc: {
@@ -2989,13 +2989,13 @@ export async function generateQrDataUrl(
           "Helvetica como única fuente, tamaños 10/12/14/16.",
         ],
         privacy:
-          "El texto y el PDF resultante quedan en tu navegador; no subimos nada a Modulaq.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Texto vacío: ingresá al menos algo de contenido.",
           "Texto demasiado largo: dividilo en partes más chicas si supera el límite.",
         ],
         technicalNotes: [
-          "Usa pdf-lib en el navegador con StandardFonts.Helvetica.",
+          "Usa pdf-lib con StandardFonts.Helvetica.",
           "Word-wrap calculado con la métrica real de la fuente.",
         ],
       },
@@ -3017,7 +3017,7 @@ export async function generateQrDataUrl(
           "Helvetica only, sizes 10/12/14/16.",
         ],
         privacy:
-          "The text and the generated PDF stay in your browser — we don't upload anything to Modulaq.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Empty text: enter at least some content.",
           "Text too long: split it into smaller chunks if it exceeds the limit.",
@@ -3054,12 +3054,12 @@ export async function generateQrDataUrl(
       es: {
         title: "Eliminar páginas de PDF online gratis",
         description:
-          "Quitá páginas o rangos de un PDF y descargá el resultado. Procesamiento local en el navegador.",
+          "Quitá páginas o rangos de un PDF y descargá el resultado.",
       },
       en: {
         title: "Remove PDF pages online free",
         description:
-          "Drop pages or ranges from a PDF and download the result. Local processing in the browser.",
+          "Drop pages or ranges from a PDF and download the result.",
       },
     },
     doc: {
@@ -3081,7 +3081,7 @@ export async function generateQrDataUrl(
           "Páginas fuera de rango se validan y avisan antes de procesar.",
         ],
         privacy:
-          "El archivo se procesa en tu navegador; no lo subimos a Modulaq.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Rango inválido: revisá la sintaxis (números separados por coma, rangos con guion).",
           "Intento de eliminar todas las páginas: dejá al menos una.",
@@ -3108,7 +3108,7 @@ export async function generateQrDataUrl(
           "Out-of-range pages are validated and flagged before processing.",
         ],
         privacy:
-          "The file is processed in your browser — we don't upload it to Modulaq.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "Invalid range: check the syntax (numbers separated by commas, ranges with dashes).",
           "Attempt to remove every page: at least one must remain.",
@@ -3144,12 +3144,12 @@ export async function generateQrDataUrl(
       es: {
         title: "Numerar páginas de PDF online gratis",
         description:
-          "Agregá numeración simple al pie de cada página de un PDF. Procesamiento local en el navegador.",
+          "Agregá numeración simple al pie de cada página de un PDF.",
       },
       en: {
         title: "Add PDF page numbers online free",
         description:
-          "Add simple numbering to the bottom of every PDF page. Local processing in the browser.",
+          "Add simple numbering to the bottom of every PDF page.",
       },
     },
     doc: {
@@ -3171,7 +3171,7 @@ export async function generateQrDataUrl(
           "No promete preservar firmas digitales, formularios interactivos o anotaciones complejas: pdf-lib re-serializa el documento.",
         ],
         privacy:
-          "El archivo se procesa en tu navegador; no lo subimos a Modulaq.",
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
         commonErrors: [
           "Un PDF protegido o dañado puede no poder procesarse.",
           "Si el PDF tiene firmas digitales, pueden invalidarse al re-guardar.",
@@ -3198,7 +3198,7 @@ export async function generateQrDataUrl(
           "Doesn't promise to preserve digital signatures, interactive forms, or complex annotations: pdf-lib re-serializes the document.",
         ],
         privacy:
-          "The file is processed in your browser — we don't upload it to Modulaq.",
+          "Processing happens in your browser — we don't upload your files.",
         commonErrors: [
           "An encrypted or damaged PDF may not be processable.",
           "If the PDF has digital signatures, they may be invalidated on re-save.",

@@ -22,11 +22,11 @@ export const en: Record<TranslationKey, string> = {
   // Home
   "home.head.title": "Modulaq - PDF, QR and text tools in your browser",
   "home.head.description":
-    "Modulaq offers free PDF, QR and text tools. They run in your browser, with no account and without uploading your files.",
+    "Modulaq offers free PDF, QR and text tools. No account, no install.",
   "home.hero.badge": "Public beta · {{count}} tools available",
   "home.hero.subhead": "Digital tools that run in your browser.",
   "home.hero.description":
-    "Convert, organize, and clean files right in your browser. Every tool does one thing well — fast and with no friction.",
+    "Convert, organize, and clean files fast. Every tool does one thing well — simple and with no friction.",
   "home.hero.ctaPrimary": "Browse tools",
   "home.hero.ctaSecondary": "Send a question or feedback",
   "home.stats.toolsLabel": "active tools",
@@ -52,11 +52,11 @@ export const en: Record<TranslationKey, string> = {
   // Catalog
   "catalog.head.title": "Free PDF, QR and text tools",
   "catalog.head.description":
-    "Browse Modulaq's free tools for PDF, QR and text. Use quick utilities in your browser, with no account and no install.",
+    "Browse Modulaq's free tools for PDF, QR and text. No account, no install.",
   "catalog.hero.badge": "Catalog",
   "catalog.hero.h1": "Free PDF, QR and text tools",
   "catalog.hero.description":
-    "Browse Modulaq's catalog and open the tool you need. Everything runs in your browser.",
+    "Browse Modulaq's catalog and open the tool you need.",
   "catalog.filters.button": "Filters",
   "catalog.filters.countShort": "{{count}} tools",
   "catalog.filters.countLong": "{{shown}} of {{total}} tools",
@@ -278,9 +278,9 @@ export const en: Record<TranslationKey, string> = {
   "toolUi.uploadPdf": "Select PDF",
   "toolUi.uploadPdfs": "Select PDFs",
   "toolUi.uploadImages": "Select images",
-  "toolUi.dropHere": "You can also drop a file here. Processing is local.",
-  "toolUi.dropHereMany": "You can upload two or more files. Everything is processed in your browser.",
-  "toolUi.dropHereImages": "You can also drop the images here. Processing is local.",
+  "toolUi.dropHere": "You can also drop a file here.",
+  "toolUi.dropHereMany": "You can upload two or more files.",
+  "toolUi.dropHereImages": "You can also drop the images here.",
   "toolUi.processingLocal": "Processing is local.",
   "toolUi.clear": "Clear",
   "toolUi.clearAll": "Clear all",
@@ -408,8 +408,8 @@ export const en: Record<TranslationKey, string> = {
   "tools.split-pdf.ui.archiveZip": "ZIP file",
   "tools.split-pdf.ui.preparing": "Preparing download...",
   "tools.split-pdf.ui.pickFirst": "Pick a PDF to enable splitting.",
-  "tools.split-pdf.ui.intro2": "Pick a PDF and choose how to separate its pages. Everything happens in your browser.",
-  "tools.split-pdf.ui.resultIntro2": "Files are processed locally. They aren't uploaded to servers.",
+  "tools.split-pdf.ui.intro2": "Pick a PDF and choose how to separate its pages.",
+  "tools.split-pdf.ui.resultIntro2": "Files are processed locally.",
   "tools.split-pdf.ui.successOnePartLabel": "part",
   "tools.split-pdf.ui.successPartsLabel": "parts",
   "tools.split-pdf.ui.successIndividualOne": "individual PDF",
@@ -418,7 +418,7 @@ export const en: Record<TranslationKey, string> = {
   // ---------- image-to-pdf renderer ----------
   "tools.image-to-pdf.ui.intro": "Add images (PNG, JPG/JPEG or WebP) and order them before generating the PDF.",
   "tools.image-to-pdf.ui.uploadImages": "Select images",
-  "tools.image-to-pdf.ui.uploadHint": "You can upload several images. Everything is processed in your browser.",
+  "tools.image-to-pdf.ui.uploadHint": "You can upload several images.",
   "tools.image-to-pdf.ui.skippedNotImageOne": "Skipped one file that isn't a supported image.",
   "tools.image-to-pdf.ui.skippedNotImageMany": "Skipped {{count}} files that aren't supported images.",
   "tools.image-to-pdf.ui.imageLoaded": "image loaded",
@@ -567,7 +567,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.pdf-page-counter.ui.pageCount": "Pages",
   "tools.pdf-page-counter.ui.pickPdf": "Upload a PDF to start.",
   "tools.pdf-page-counter.ui.intro2":
-    "Pick or drop a single PDF to count its pages right in your browser.",
+    "Pick or drop a single PDF to count its pages.",
   "tools.pdf-page-counter.ui.dropHint": "You can also drop the file here. It isn't uploaded to any server.",
   "tools.pdf-page-counter.ui.resultIntro": "Local, fast, no backend.",
   "tools.pdf-page-counter.ui.readingDetail": "This should only take a moment.",
@@ -771,7 +771,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.image-converter.ui.intro": "Convert images between formats your browser supports.",
   "tools.image-converter.ui.outputTitle": "Output format",
   "tools.image-converter.ui.outputIntro":
-    "Pick the format and download the new image processed in your browser.",
+    "Pick the format and download the new image.",
   "tools.image-converter.ui.convertCta": "Convert image",
   "tools.image-converter.ui.converting": "Converting image...",
   "tools.image-converter.ui.resultTitle": "Converted image ready",
@@ -825,7 +825,7 @@ export const en: Record<TranslationKey, string> = {
     "Convert an image into Base64 text or a Data URL.",
   "tools.image-base64.ui.base64ToImageIntro":
     "Paste a Base64 string or a Data URL to reconstruct the image.",
-  "tools.image-base64.ui.localProcessing": "Everything is processed locally in your browser.",
+  "tools.image-base64.ui.localProcessing": "Everything is processed locally.",
   "tools.image-base64.ui.base64ToImageHeadIntro":
     "Rebuild an image from Base64 or a Data URL.",
   "tools.image-base64.ui.base64ToImageWarning":
@@ -836,7 +836,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.image-base64.ui.modeBase64ToImage": "Base64 to image",
   "tools.image-base64.ui.sourceTitle": "Source image",
   "tools.image-base64.ui.sourceIntro":
-    "Everything is processed locally in your browser. Base64 usually takes more space than the original file.",
+    "Base64 usually takes more space than the original file.",
   "tools.image-base64.ui.detectedExtension": "Detected extension",
   "tools.image-base64.ui.resultTitle": "Base64 result",
   "tools.image-base64.ui.resultIntro": "Copy the raw text or the full Data URL.",
@@ -850,7 +850,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.image-base64.ui.couldNotCopy": "Couldn't copy text to the clipboard.",
   "tools.image-base64.ui.base64Source": "Source Base64",
   "tools.image-base64.ui.base64SourceIntro":
-    "Paste raw Base64 or a full Data URL. Everything is processed locally in your browser.",
+    "Paste raw Base64 or a full Data URL.",
   "tools.image-base64.ui.base64Placeholder": "data:image/png;base64,...",
   "tools.image-base64.ui.fallbackType": "Type if it's raw Base64",
   "tools.image-base64.ui.imageName": "Image name",
@@ -1099,7 +1099,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.text-to-pdf.ui.generating": "Generating PDF...",
   "tools.text-to-pdf.ui.generateCta": "Generate PDF",
   "tools.text-to-pdf.ui.localProcessingNote":
-    "The text and the PDF are processed in your browser. We don't upload anything.",
+    "Processing happens in your browser.",
 
   "tools.remove-pdf-pages.ui.fileSection": "PDF and pages to remove",
   "tools.remove-pdf-pages.ui.intro":
