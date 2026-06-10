@@ -1,7 +1,7 @@
-import type { PageSelectionResult } from "./types";
+import type { PageSelectionError, PageSelectionResult } from "./types";
 
-function invalidPageMessage(pageNumber: number, totalPages: number) {
-  return `La página ${pageNumber} no existe. Usá páginas entre 1 y ${totalPages}.`;
+function invalidPageError(pageNumber: number, totalPages: number): PageSelectionError {
+  return { code: "tools.errors.pageNotExists", vars: { page: pageNumber, total: totalPages } };
 }
 
 function isOutOfOrder(pages: number[]) {
@@ -10,13 +10,18 @@ function isOutOfOrder(pages: number[]) {
 
 /**
  * Parsea una selección de páginas tipo "1,3,5-7" y la valida contra el total.
- * Devuelve `pages` (1-based, deduplicadas, en orden de aparición) o `error`.
+ * Devuelve `pages` (1-based, deduplicadas, en orden de aparición) o `error`
+ * como `{ code, vars }` — el consumidor traduce el `code` con su `t()`.
  */
 export function parsePageSelection(input: string, totalPages: number): PageSelectionResult {
   const trimmedInput = input.trim();
 
   if (!trimmedInput) {
-    return { error: "Ingresá al menos una página o rango.", isOutOfOrder: false, pages: [] };
+    return {
+      error: { code: "tools.errors.pageRangeEmpty" },
+      isOutOfOrder: false,
+      pages: [],
+    };
   }
 
   const pages: number[] = [];
@@ -28,7 +33,7 @@ export function parsePageSelection(input: string, totalPages: number): PageSelec
 
     if (!token) {
       return {
-        error: "Formato inválido. Usá páginas como 1,3,5 o rangos como 2-4.",
+        error: { code: "tools.errors.pageRangeInvalidFormat" },
         isOutOfOrder: false,
         pages: [],
       };
@@ -37,7 +42,7 @@ export function parsePageSelection(input: string, totalPages: number): PageSelec
     if (/^\d+$/.test(token)) {
       const pageNumber = Number(token);
       if (pageNumber < 1 || pageNumber > totalPages) {
-        return { error: invalidPageMessage(pageNumber, totalPages), isOutOfOrder: false, pages: [] };
+        return { error: invalidPageError(pageNumber, totalPages), isOutOfOrder: false, pages: [] };
       }
       if (includedPages.has(pageNumber)) {
         continue;
@@ -50,7 +55,7 @@ export function parsePageSelection(input: string, totalPages: number): PageSelec
     const rangeMatch = token.match(/^(\d+)\s*-\s*(\d+)$/);
     if (!rangeMatch) {
       return {
-        error: "Formato inválido. Usá páginas como 1,3,5 o rangos como 2-4.",
+        error: { code: "tools.errors.pageRangeInvalidFormat" },
         isOutOfOrder: false,
         pages: [],
       };
@@ -61,18 +66,21 @@ export function parsePageSelection(input: string, totalPages: number): PageSelec
     const rangeLabel = `${startPage}-${endPage}`;
 
     if (startPage < 1) {
-      return { error: invalidPageMessage(startPage, totalPages), isOutOfOrder: false, pages: [] };
+      return { error: invalidPageError(startPage, totalPages), isOutOfOrder: false, pages: [] };
     }
     if (startPage > endPage) {
       return {
-        error: `El rango ${rangeLabel} no es válido. La página inicial no puede ser mayor que la final.`,
+        error: { code: "tools.errors.rangeStartGreater", vars: { range: rangeLabel } },
         isOutOfOrder: false,
         pages: [],
       };
     }
     if (endPage > totalPages) {
       return {
-        error: `El rango ${rangeLabel} no es válido. El PDF tiene solo ${totalPages} páginas.`,
+        error: {
+          code: "tools.errors.rangeEndExceeds",
+          vars: { range: rangeLabel, total: totalPages },
+        },
         isOutOfOrder: false,
         pages: [],
       };

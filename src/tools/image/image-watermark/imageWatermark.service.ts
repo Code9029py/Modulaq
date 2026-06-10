@@ -1,3 +1,5 @@
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -103,67 +105,49 @@ export function normalizeHexColor(value: string, fallback = defaultWatermarkColo
   return fallback;
 }
 
-export function validateWatermarkOpacity(opacity: number) {
-  if (!Number.isFinite(opacity)) {
-    return "La opacidad debe ser un número válido.";
-  }
-
-  if (opacity < 0.1 || opacity > 1) {
-    return "La opacidad debe estar entre 10% y 100%.";
-  }
-
+export function validateWatermarkOpacity(opacity: number): PageSelectionError | null {
+  if (!Number.isFinite(opacity)) return { code: "tools.errors.watermarkOpacityNotNumber" };
+  if (opacity < 0.1 || opacity > 1) return { code: "tools.errors.watermarkOpacityRange" };
   return null;
 }
 
-export function validateWatermarkFontSize(fontSize: number) {
-  if (!Number.isFinite(fontSize)) {
-    return "El tamaño de fuente debe ser un número válido.";
-  }
-
-  if (!Number.isInteger(fontSize)) {
-    return "El tamaño de fuente debe ser un número entero.";
-  }
-
+export function validateWatermarkFontSize(fontSize: number): PageSelectionError | null {
+  if (!Number.isFinite(fontSize)) return { code: "tools.errors.watermarkFontSizeNotNumber" };
+  if (!Number.isInteger(fontSize)) return { code: "tools.errors.watermarkFontSizeNotInteger" };
   if (fontSize < minWatermarkFontSize || fontSize > maxWatermarkFontSize) {
-    return `El tamaño de fuente debe estar entre ${minWatermarkFontSize} y ${maxWatermarkFontSize}px.`;
+    return {
+      code: "tools.errors.watermarkFontSizeRange",
+      vars: { min: minWatermarkFontSize, max: maxWatermarkFontSize },
+    };
   }
-
   return null;
 }
 
-export function validateWatermarkLogoMaxWidthPercent(maxWidthPercent: number) {
-  if (!Number.isFinite(maxWidthPercent)) {
-    return "El ancho máximo del logo debe ser un número válido.";
+export function validateWatermarkLogoMaxWidthPercent(
+  maxWidthPercent: number,
+): PageSelectionError | null {
+  if (!Number.isFinite(maxWidthPercent)) return { code: "tools.errors.watermarkLogoSizeNotNumber" };
+  if (!Number.isInteger(maxWidthPercent)) return { code: "tools.errors.watermarkLogoSizeNotInteger" };
+  if (
+    maxWidthPercent < minWatermarkLogoMaxWidthPercent ||
+    maxWidthPercent > maxWatermarkLogoMaxWidthPercent
+  ) {
+    return {
+      code: "tools.errors.watermarkLogoSizeRange",
+      vars: { min: minWatermarkLogoMaxWidthPercent, max: maxWatermarkLogoMaxWidthPercent },
+    };
   }
-
-  if (!Number.isInteger(maxWidthPercent)) {
-    return "El ancho máximo del logo debe ser un número entero.";
-  }
-
-  if (maxWidthPercent < minWatermarkLogoMaxWidthPercent || maxWidthPercent > maxWatermarkLogoMaxWidthPercent) {
-    return `El ancho máximo del logo debe estar entre ${minWatermarkLogoMaxWidthPercent}% y ${maxWatermarkLogoMaxWidthPercent}%.`;
-  }
-
   return null;
 }
 
-export function validateWatermarkMargin(margin: number) {
-  if (!Number.isFinite(margin)) {
-    return "El margen debe ser un número válido.";
-  }
-
-  if (!Number.isInteger(margin)) {
-    return "El margen debe ser un número entero.";
-  }
-
-  if (margin < 0 || margin > maxWatermarkMargin) {
-    return "El margen debe ser cero o mayor y no superar el límite permitido.";
-  }
-
+export function validateWatermarkMargin(margin: number): PageSelectionError | null {
+  if (!Number.isFinite(margin)) return { code: "tools.errors.watermarkMarginNotNumber" };
+  if (!Number.isInteger(margin)) return { code: "tools.errors.watermarkMarginNotInteger" };
+  if (margin < 0 || margin > maxWatermarkMargin) return { code: "tools.errors.watermarkMarginRange" };
   return null;
 }
 
-export function validateWatermarkOptions(options: ImageWatermarkOptions) {
+export function validateWatermarkOptions(options: ImageWatermarkOptions): PageSelectionError | null {
   const opacityError = validateWatermarkOpacity(options.opacity);
   if (opacityError) return opacityError;
 
@@ -172,21 +156,21 @@ export function validateWatermarkOptions(options: ImageWatermarkOptions) {
 
   if (options.kind === "image") {
     if (!isWatermarkLogoFile(options.logoFile)) {
-      return "Seleccioná un logo PNG, JPG/JPEG o WebP. Para usar un SVG como logo, convertí primero SVG a PNG.";
+      return { code: "tools.errors.watermarkLogoInvalidFile" };
     }
 
     return validateWatermarkLogoMaxWidthPercent(options.logoMaxWidthPercent);
   }
 
   if (!options.text.trim()) {
-    return "Ingresá un texto para la marca de agua.";
+    return { code: "tools.errors.watermarkEmptyText" };
   }
 
   const fontSizeError = validateWatermarkFontSize(options.fontSize);
   if (fontSizeError) return fontSizeError;
 
   if (normalizeHexColor(options.color, "") === "") {
-    return "El color debe ser hexadecimal.";
+    return { code: "tools.errors.watermarkInvalidColor" };
   }
 
   return null;
@@ -243,14 +227,14 @@ export async function readImageMetadata(file: File): Promise<ImageWatermarkMetad
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones válidas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -265,7 +249,7 @@ export async function readImageMetadata(file: File): Promise<ImageWatermarkMetad
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
@@ -284,26 +268,28 @@ function measureWatermarkText(context: CanvasRenderingContext2D, text: string, f
 
 export async function addImageWatermark(file: File, options: ImageWatermarkOptions): Promise<ImageWatermarkResult> {
   if (!isWatermarkableImageFile(file)) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   const validationError = validateWatermarkOptions(options);
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   if (!canExportBrowserImageFormat(options.outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imágenes como ${getImageFormatLabel(options.outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(options.outputFormat),
+    });
   }
 
-  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const image = await loadBrowserImage(file);
   const canvas = document.createElement("canvas");
   canvas.width = image.naturalWidth;
   canvas.height = image.naturalHeight;
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar la imagen.");
+    throw new ToolError("tools.errors.watermarkOutputFailed");
   }
 
   if (options.outputFormat === "jpeg") {
@@ -316,7 +302,7 @@ export async function addImageWatermark(file: File, options: ImageWatermarkOptio
   context.globalAlpha = options.opacity;
 
   if (options.kind === "image") {
-    const logo = await loadBrowserImage(options.logoFile, "No se pudo decodificar el logo en este navegador.");
+    const logo = await loadBrowserImage(options.logoFile, new ToolError("tools.errors.watermarkLogoInvalid"));
     const logoDimensions = calculateLogoWatermarkDimensions(
       { height: canvas.height, width: canvas.width },
       { height: logo.naturalHeight, width: logo.naturalWidth },
@@ -350,7 +336,7 @@ export async function addImageWatermark(file: File, options: ImageWatermarkOptio
 
   const mimeType = getBrowserImageOutputMimeType(options.outputFormat);
   const result = await exportBrowserCanvas(canvas, {
-    errorMessage: "No se pudo exportar la imagen con marca de agua.",
+    canvasError: new ToolError("tools.errors.watermarkFailed"),
     mimeType,
     quality: options.quality,
   });

@@ -19,13 +19,13 @@ describe("svgToPng.service", () => {
 
   it("rejects content without SVG", () => {
     expect(looksLikeSvg("<div>Nope</div>")).toBe(false);
-    expect(validateSvgContent("<div>Nope</div>")).toMatch(/SVG/);
+    expect(validateSvgContent("<div>Nope</div>")?.code).toBe("tools.errors.invalidSvg");
   });
 
   it("detects scripts", () => {
     const svg = '<svg width="10" height="10"><script>alert(1)</script></svg>';
     expect(hasSvgScript(svg)).toBe(true);
-    expect(validateSvgContent(svg)).toMatch(/scripts/);
+    expect(validateSvgContent(svg)?.code).toBe("tools.errors.svgContainsScript");
   });
 
   it("extracts width and height", () => {
@@ -60,10 +60,10 @@ describe("svgToPng.service", () => {
 
   it("validates output dimensions", () => {
     expect(validateSvgOutputDimensions(800, 400)).toBeNull();
-    expect(validateSvgOutputDimensions(0, 400)).toMatch(/mayores que cero/);
-    expect(validateSvgOutputDimensions(800, Number.NaN)).toMatch(/validos/);
-    expect(validateSvgOutputDimensions(800.5, 400)).toMatch(/enteros/);
-    expect(validateSvgOutputDimensions(8001, 400)).toMatch(/8000px/);
+    expect(validateSvgOutputDimensions(0, 400)?.code).toBe("tools.errors.dimensionsNotPositive");
+    expect(validateSvgOutputDimensions(800, Number.NaN)?.code).toBe("tools.errors.dimensionsNotNumeric");
+    expect(validateSvgOutputDimensions(800.5, 400)?.code).toBe("tools.errors.dimensionsNotInteger");
+    expect(validateSvgOutputDimensions(8001, 400)?.code).toBe("tools.errors.dimensionsExceedMax");
   });
 
   it("builds final PNG names", () => {

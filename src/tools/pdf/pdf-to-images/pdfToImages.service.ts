@@ -16,6 +16,7 @@ import {
   type PdfPageImage,
 } from "@modulaq/core/pdf-render";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import { ToolError } from "../../../shared/errors/ToolError";
 import { getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile } from "../../../shared/utils/file";
 import {
@@ -39,7 +40,6 @@ configurePdfWorker(pdfWorkerUrl);
 
 const renderScale = 2;
 export const defaultOutputBaseName = "paginas-pdf";
-const pdfReadErrorMessage = "No se pudo leer el PDF. Verificá que el archivo no esté dañado o protegido.";
 
 export { formatFileSize, isPdfFile };
 
@@ -110,7 +110,7 @@ export function parsePageRange(input: string, pageCount: number): PdfPageRangeRe
 
 export async function readPdfMetadata(file: File): Promise<PdfToImagesMetadata> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   try {
@@ -121,7 +121,7 @@ export async function readPdfMetadata(file: File): Promise<PdfToImagesMetadata> 
       pageCount,
     };
   } catch {
-    throw new Error(pdfReadErrorMessage);
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 }
 
@@ -131,11 +131,11 @@ function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 
 function validateSelectedPages(pages: number[], pageCount: number) {
   if (pages.length === 0) {
-    throw new Error("Seleccioná al menos una página para convertir.");
+    throw new ToolError("tools.errors.noPageSelected");
   }
 
   if (pages.some((pageNumber) => pageNumber < 1 || pageNumber > pageCount)) {
-    throw new Error(`Elegí páginas entre 1 y ${pageCount}.`);
+    throw new ToolError("tools.errors.pageOutOfRange", { max: pageCount });
   }
 }
 
@@ -148,14 +148,14 @@ export async function convertPdfPagesToImages(
   onProgress?: (progress: PdfToImagesProgress) => void,
 ): Promise<PdfToImagesResult> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   let pageCount: number;
   try {
     pageCount = await coreCountPdfPages(file);
   } catch {
-    throw new Error(pdfReadErrorMessage);
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 
   validateSelectedPages(pages, pageCount);
@@ -174,10 +174,13 @@ export async function convertPdfPagesToImages(
       quality: outputFormat === "jpeg" ? normalizeJpegQuality(jpegQuality) : undefined,
     });
   } catch (error) {
-    if (error instanceof Error && /página\s+\d+/i.test(error.message)) {
-      throw new Error(`No se pudo convertir la página: ${error.message}`);
+    if (error instanceof ToolError) {
+      throw error;
     }
-    throw new Error("No se pudieron convertir las páginas a imágenes.");
+    if (error instanceof Error && /página\s+\d+/i.test(error.message)) {
+      throw new ToolError("tools.errors.pdfPageConversionFailed", { detail: error.message });
+    }
+    throw new ToolError("tools.errors.pdfPagesConversionFailed");
   }
 
   onProgress?.({ current: renderedImages.length, total: renderedImages.length });
@@ -206,6 +209,6 @@ export async function convertPdfPagesToImages(
       mimeType: "application/zip",
     };
   } catch {
-    throw new Error("No se pudo preparar la descarga ZIP.");
+    throw new ToolError("tools.errors.zipPrepareFailed");
   }
 }

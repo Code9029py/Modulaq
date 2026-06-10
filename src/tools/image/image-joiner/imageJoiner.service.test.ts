@@ -52,19 +52,31 @@ describe("imageJoiner.service", () => {
   });
 
   it("validates grid columns", () => {
-    expect(validateImageJoinerOptions(images, { ...baseOptions, mode: "grid", columns: 0 })).toMatch(/columna/);
-    expect(validateImageJoinerOptions(images, { ...baseOptions, mode: "grid", columns: 4 })).toMatch(/cantidad/);
+    expect(validateImageJoinerOptions(images, { ...baseOptions, mode: "grid", columns: 0 })).toEqual({
+      code: "tools.errors.joinerColumnsTooFew",
+    });
+    expect(validateImageJoinerOptions(images, { ...baseOptions, mode: "grid", columns: 4 })).toEqual({
+      code: "tools.errors.joinerColumnsExceed",
+    });
     expect(validateImageJoinerOptions(images, { ...baseOptions, mode: "grid", columns: 2 })).toBeNull();
   });
 
   it("validates padding and spacing", () => {
-    expect(validateImageJoinerOptions(images, { ...baseOptions, spacing: -1 })).toMatch(/separacion/);
-    expect(validateImageJoinerOptions(images, { ...baseOptions, padding: -1 })).toMatch(/padding/);
-    expect(validateImageJoinerOptions(images, { ...baseOptions, spacing: 1.5 })).toMatch(/entero/);
+    expect(validateImageJoinerOptions(images, { ...baseOptions, spacing: -1 })).toEqual({
+      code: "tools.errors.joinerSpacingNegative",
+    });
+    expect(validateImageJoinerOptions(images, { ...baseOptions, padding: -1 })).toEqual({
+      code: "tools.errors.joinerPaddingNegative",
+    });
+    expect(validateImageJoinerOptions(images, { ...baseOptions, spacing: 1.5 })).toEqual({
+      code: "tools.errors.joinerSpacingNotInteger",
+    });
   });
 
   it("validates the background color", () => {
-    expect(validateImageJoinerOptions(images, { ...baseOptions, backgroundColor: "white" })).toMatch(/hexadecimal/);
+    expect(validateImageJoinerOptions(images, { ...baseOptions, backgroundColor: "white" })).toEqual({
+      code: "tools.errors.joinerInvalidBgColor",
+    });
   });
 
   it("builds the output name with the correct extension", () => {

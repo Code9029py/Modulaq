@@ -1,2 +1,2 @@
 export { parsePageSelection } from "./parsePageSelection";
-export type { PageSelectionResult } from "./types";
+export type { PageSelectionError, PageSelectionErrorVars, PageSelectionResult } from "./types";

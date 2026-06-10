@@ -4,6 +4,7 @@ import {
   countPdfPages as coreCountPdfPages,
   reorderPdfPages as coreReorderPdfPages,
 } from "@modulaq/core/pdf";
+import { ToolError } from "../../../shared/errors/ToolError";
 import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { ReorderPdfPagesMetadata, ReorderPdfPagesResult } from "./reorderPdfPages.types";
@@ -32,13 +33,13 @@ async function readPageCount(file: File): Promise<number> {
   try {
     return await coreCountPdfPages(file);
   } catch {
-    throw new Error("No se pudo leer el PDF. Puede estar dañado, protegido o incompleto.");
+    throw new ToolError("tools.errors.unreadablePdf");
   }
 }
 
 export async function readPdfMetadata(file: File): Promise<ReorderPdfPagesMetadata> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   const pageCount = await readPageCount(file);
@@ -47,14 +48,14 @@ export async function readPdfMetadata(file: File): Promise<ReorderPdfPagesMetada
 
 function validatePageOrder(pageOrder: number[], pageCount: number) {
   if (pageOrder.length !== pageCount) {
-    throw new Error("No se pudo procesar el orden de páginas. Restablecé el orden e intentá nuevamente.");
+    throw new ToolError("tools.errors.pdfOrderInvalid");
   }
 
   const uniquePages = new Set(pageOrder);
   const hasInvalidPage = pageOrder.some((pageNumber) => pageNumber < 1 || pageNumber > pageCount);
 
   if (uniquePages.size !== pageCount || hasInvalidPage) {
-    throw new Error("El orden contiene páginas inválidas o repetidas. Restablecé el orden e intentá nuevamente.");
+    throw new ToolError("tools.errors.pdfOrderInvalidPages");
   }
 }
 
@@ -64,7 +65,7 @@ export async function reorderPdfPages(
   outputBaseName: string,
 ): Promise<ReorderPdfPagesResult> {
   if (!isPdfFile(file)) {
-    throw new Error("Seleccioná un archivo PDF válido.");
+    throw new ToolError("tools.errors.invalidPdf");
   }
 
   const pageCount = await readPageCount(file);
@@ -74,7 +75,7 @@ export async function reorderPdfPages(
   try {
     bytes = await coreReorderPdfPages(file, pageOrder);
   } catch {
-    throw new Error("No se pudo crear el PDF reordenado. Probá nuevamente con otro archivo.");
+    throw new ToolError("tools.errors.pdfReorderFailed");
   }
 
   return {

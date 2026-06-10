@@ -2,13 +2,9 @@ import { ArrowDown, ArrowUp, Download, FileImage, ImagePlus, Loader2, RotateCcw,
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import {
-  fileProcessingLimitLabels,
-  getImageCountLimitError,
-  getImageFileSizeLimitError,
-  getTotalImageSizeLimitError,
-} from "../../../shared/utils/fileProcessingLimits";
 import {
   createPdfFromImages,
   defaultOutputFileName,
@@ -39,6 +35,7 @@ function getImageTypeLabel(type: ImageToPdfItem["type"]) {
 
 export function ImageToPdfTool() {
   const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlsRef = useRef<Set<string>>(new Set());
   const [images, setImages] = useState<ImageToPdfItem[]>([]);
@@ -92,9 +89,9 @@ export function ImageToPdfTool() {
 
     for (const file of supportedFiles) {
       const limitError =
-        getImageFileSizeLimitError(file) ??
-        getImageCountLimitError(images.length + validFiles.length + 1) ??
-        getTotalImageSizeLimitError(nextTotalSize + file.size);
+        limitLabels.getImageFileSizeLimitError(file) ??
+        limitLabels.getImageCountLimitError(images.length + validFiles.length + 1, "perPdf") ??
+        limitLabels.getTotalImageSizeLimitError(nextTotalSize + file.size);
 
       if (limitError) {
         messages.push(limitError);
@@ -187,7 +184,7 @@ export function ImageToPdfTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.image-to-pdf.ui.couldNotGenerate2"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.image-to-pdf.ui.couldNotGenerate2"));
     }
   };
 
@@ -232,7 +229,7 @@ export function ImageToPdfTool() {
               <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.image-to-pdf.ui.dropHint")}</span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.images}</p>
+          <p className="text-xs leading-5 text-ink-600">{limitLabels.images}</p>
 
           <input
             ref={fileInputRef}

@@ -1,3 +1,5 @@
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -83,29 +85,32 @@ function hasOnlyIntegers(cropRect: ImageCropRect) {
   return [cropRect.x, cropRect.y, cropRect.width, cropRect.height].every(Number.isInteger);
 }
 
-export function validateCropRect(cropRect: ImageCropRect, imageDimensions: ImageDimensions) {
+export function validateCropRect(
+  cropRect: ImageCropRect,
+  imageDimensions: ImageDimensions,
+): PageSelectionError | null {
   if (!hasOnlyFiniteNumbers(cropRect)) {
-    return "Usa valores numericos validos.";
+    return { code: "tools.errors.cropNotNumeric" };
   }
 
   if (!hasOnlyIntegers(cropRect)) {
-    return "Usa valores enteros en pixeles.";
+    return { code: "tools.errors.cropNotInteger" };
   }
 
   if (cropRect.x < 0 || cropRect.y < 0) {
-    return "X e Y no pueden ser negativos.";
+    return { code: "tools.errors.cropNegativeOrigin" };
   }
 
   if (cropRect.width <= 0 || cropRect.height <= 0) {
-    return "El ancho y el alto deben ser mayores que cero.";
+    return { code: "tools.errors.cropNotPositive" };
   }
 
   if (cropRect.x + cropRect.width > imageDimensions.width || cropRect.y + cropRect.height > imageDimensions.height) {
-    return "El area de recorte no puede salirse de la imagen.";
+    return { code: "tools.errors.cropExceedsImage" };
   }
 
   if (cropRect.width * cropRect.height > maxCropPixels) {
-    return "El recorte supera el limite de 64 megapixeles.";
+    return { code: "tools.errors.cropExceedsPixels" };
   }
 
   return null;
@@ -144,14 +149,14 @@ export async function readImageMetadata(file: File): Promise<ImageCropperMetadat
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones validas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -166,13 +171,15 @@ export async function readImageMetadata(file: File): Promise<ImageCropperMetadat
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
 function ensureOutputFormatSupported(outputFormat: ImageCropperOutputFormat) {
   if (!canExportBrowserImageFormat(outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imagenes como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 }
 
@@ -185,7 +192,7 @@ function drawCroppedImage(
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar la imagen de salida.");
+    throw new ToolError("tools.errors.imageOutputFailed");
   }
 
   if (outputFormat === "jpeg") {
@@ -211,19 +218,19 @@ export async function cropImageFile(
   { cropRect, outputBaseName, outputFormat, quality }: CropImageOptions,
 ): Promise<ImageCropperResult> {
   if (!isCroppableImageFile(file)) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   ensureOutputFormatSupported(outputFormat);
 
-  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const image = await loadBrowserImage(file);
   const validationError = validateCropRect(cropRect, {
     height: image.naturalHeight,
     width: image.naturalWidth,
   });
 
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   const canvas = document.createElement("canvas");
@@ -233,7 +240,7 @@ export async function cropImageFile(
 
   const mimeType = getBrowserImageOutputMimeType(outputFormat);
   const result = await exportBrowserCanvas(canvas, {
-    errorMessage: "No se pudo exportar la imagen.",
+    canvasError: new ToolError("tools.errors.imageExportFailed"),
     mimeType,
     quality,
   });

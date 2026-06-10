@@ -2,13 +2,15 @@ import { FileText, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { fileProcessingLimitLabels, getPdfFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import { countPdfPages, formatFileSize, isPdfFile } from "./pdfPageCounter.service";
 import type { PdfPageCounterStatus, PdfPageCountResult } from "./pdfPageCounter.types";
 
 export function PdfPageCounterTool() {
   const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [status, setStatus] = useState<PdfPageCounterStatus>("idle");
   const [result, setResult] = useState<PdfPageCountResult | null>(null);
@@ -26,7 +28,7 @@ export function PdfPageCounterTool() {
       return;
     }
 
-    const fileLimitError = getPdfFileSizeLimitError(file);
+    const fileLimitError = limitLabels.getPdfFileSizeLimitError(file);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -40,7 +42,7 @@ export function PdfPageCounterTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
+      setError(resolveToolErrorMessage(nextError, t, "toolUi.couldNotReadFile"));
     }
   };
 
@@ -95,7 +97,7 @@ export function PdfPageCounterTool() {
               </span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfSingle}</p>
+          <p className="text-xs leading-5 text-ink-600">{limitLabels.pdfSingle}</p>
 
           <input
             ref={fileInputRef}

@@ -2,8 +2,9 @@ import { ArrowDown, ArrowUp, Download, FileText, Loader2, RotateCcw, Trash2, Upl
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { fileProcessingLimitLabels, getPdfFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   createOriginalPageOrder,
   defaultOutputBaseName,
@@ -21,6 +22,7 @@ const acceptedPdfTypes = "application/pdf,.pdf";
 
 export function ReorderPdfPagesTool() {
   const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<ReorderPdfPagesMetadata | null>(null);
@@ -59,7 +61,7 @@ export function ReorderPdfPagesTool() {
       setError(t("toolUi.invalidPdfPicked"));
       return;
     }
-    const fileLimitError = getPdfFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getPdfFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -78,7 +80,7 @@ export function ReorderPdfPagesTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
+      setError(resolveToolErrorMessage(nextError, t, "toolUi.couldNotReadFile"));
     }
   };
 
@@ -140,7 +142,7 @@ export function ReorderPdfPagesTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.reorder-pdf-pages.ui.couldNotGenerate"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.reorder-pdf-pages.ui.couldNotGenerate"));
     }
   };
 
@@ -185,7 +187,7 @@ export function ReorderPdfPagesTool() {
               <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.reorder-pdf-pages.ui.dropHint")}</span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.pdfSingle}</p>
+          <p className="text-xs leading-5 text-ink-600">{limitLabels.pdfSingle}</p>
 
           <input
             ref={fileInputRef}

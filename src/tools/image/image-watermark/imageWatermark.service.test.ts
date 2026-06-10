@@ -33,22 +33,22 @@ describe("imageWatermark.service", () => {
   it("validates opacity", () => {
     expect(validateWatermarkOpacity(0.1)).toBeNull();
     expect(validateWatermarkOpacity(1)).toBeNull();
-    expect(validateWatermarkOpacity(0)).toMatch(/10%/);
-    expect(validateWatermarkOpacity(1.1)).toMatch(/100%/);
+    expect(validateWatermarkOpacity(0)?.code).toBe("tools.errors.watermarkOpacityRange");
+    expect(validateWatermarkOpacity(1.1)?.code).toBe("tools.errors.watermarkOpacityRange");
   });
 
   it("validates font size", () => {
     expect(validateWatermarkFontSize(48)).toBeNull();
-    expect(validateWatermarkFontSize(7)).toMatch(/8/);
-    expect(validateWatermarkFontSize(513)).toMatch(/512/);
-    expect(validateWatermarkFontSize(12.5)).toMatch(/entero/);
+    expect(validateWatermarkFontSize(7)?.code).toBe("tools.errors.watermarkFontSizeRange");
+    expect(validateWatermarkFontSize(513)?.code).toBe("tools.errors.watermarkFontSizeRange");
+    expect(validateWatermarkFontSize(12.5)?.code).toBe("tools.errors.watermarkFontSizeNotInteger");
   });
 
   it("validates margin", () => {
     expect(validateWatermarkMargin(0)).toBeNull();
     expect(validateWatermarkMargin(24)).toBeNull();
-    expect(validateWatermarkMargin(-1)).toMatch(/margen/);
-    expect(validateWatermarkMargin(1.5)).toMatch(/entero/);
+    expect(validateWatermarkMargin(-1)?.code).toBe("tools.errors.watermarkMarginRange");
+    expect(validateWatermarkMargin(1.5)?.code).toBe("tools.errors.watermarkMarginNotInteger");
   });
 
   it("builds output names", () => {

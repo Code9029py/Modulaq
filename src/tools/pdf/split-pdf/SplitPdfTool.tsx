@@ -4,8 +4,9 @@ import { Button } from "../../../shared/components/Button";
 import { HelpHint } from "../../../shared/components/HelpHint";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { fileProcessingLimitLabels, getGeneratedPageFilesLimitError, getPdfFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   buildOutputFileName,
   createZipFromParts,
@@ -49,6 +50,7 @@ const modeKeys: Record<SplitPdfMode, { button: TranslationKey; description: Tran
 
 export function SplitPdfTool() {
   const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<SplitPdfMetadata | null>(null);
@@ -87,7 +89,7 @@ export function SplitPdfTool() {
   const partsModeUnavailable = Boolean(metadata && metadata.pageCount < 2);
   const generatedOutputLimitError =
     mode === "individual-pages" && metadata
-      ? getGeneratedPageFilesLimitError(metadata.pageCount, "separar")
+      ? limitLabels.getSplitPagesLimitError(metadata.pageCount)
       : null;
   const canProcess =
     Boolean(file && metadata) &&
@@ -118,7 +120,7 @@ export function SplitPdfTool() {
       return;
     }
 
-    const fileLimitError = getPdfFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getPdfFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -142,7 +144,7 @@ export function SplitPdfTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("toolUi.couldNotReadFile"));
+      setError(resolveToolErrorMessage(nextError, t, "toolUi.couldNotReadFile"));
     }
   };
 
@@ -224,7 +226,7 @@ export function SplitPdfTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.split-pdf.ui.couldNotSplit"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.split-pdf.ui.couldNotSplit"));
     }
   };
 
@@ -269,7 +271,7 @@ export function SplitPdfTool() {
               <span className="mt-2 block text-sm leading-6 text-ink-500">{t("tools.split-pdf.ui.dropHintShort")}</span>
             </span>
           </button>
-          <p className="text-xs leading-5 text-ink-600">{fileProcessingLimitLabels.splitPdf}</p>
+          <p className="text-xs leading-5 text-ink-600">{limitLabels.splitPdf}</p>
 
           <input
             ref={fileInputRef}
@@ -341,7 +343,7 @@ export function SplitPdfTool() {
                 }}
               />
               <p className="text-xs leading-5 text-ink-500">{t("tools.split-pdf.ui.pagesHelp")}</p>
-              {selectionValidation?.error ? <p role="alert" className="text-sm text-ink-700">{selectionValidation.error}</p> : null}
+              {selectionValidation?.error ? <p role="alert" className="text-sm text-ink-700">{t(selectionValidation.error.code as TranslationKey, selectionValidation.error.vars)}</p> : null}
               {!selectionValidation?.error && selectionValidation?.isOutOfOrder ? (
                 <p className="rounded-md border border-accent-cyan/25 bg-accent-cyan/10 px-3 py-2 text-sm text-ink-700">
                   {t("tools.split-pdf.ui.pagesOutOfOrder")}
@@ -408,7 +410,11 @@ export function SplitPdfTool() {
                     })}
                   </p>
                   <p className="mt-1">
-                    {partsValidation.isValid ? t("tools.split-pdf.ui.assignedReady") : partsValidation.error}
+                    {partsValidation.isValid
+                      ? t("tools.split-pdf.ui.assignedReady")
+                      : partsValidation.error
+                        ? t(partsValidation.error.code as TranslationKey, partsValidation.error.vars)
+                        : null}
                   </p>
                 </div>
               ) : null}
@@ -456,7 +462,7 @@ export function SplitPdfTool() {
                 <span className="mt-2 block text-xs leading-5 text-ink-500">
                   {t("tools.split-pdf.ui.outputNameHelp")}
                 </span>
-                {outputNameError ? <span role="alert" className="mt-2 block text-sm text-ink-700">{outputNameError}</span> : null}
+                {outputNameError ? <span role="alert" className="mt-2 block text-sm text-ink-700">{t(outputNameError.code as TranslationKey)}</span> : null}
               </dd>
             </div>
             <div className="rounded-lg border border-surface-200/80 bg-surface-50/90 p-3 shadow-sm">

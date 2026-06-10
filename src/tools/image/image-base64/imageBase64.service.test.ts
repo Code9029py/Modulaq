@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ToolError } from "../../../shared/errors/ToolError";
 import {
   buildDataUrl,
   getBase64TextSize,
@@ -72,8 +73,12 @@ describe("imageBase64.service", () => {
   });
 
   it("rejects unsupported Data URL MIME types", () => {
-    expect(() => parseBase64ImageInput(`data:text/plain;base64,${pngBase64}`, "image/png")).toThrow(
-      "La Data URL debe usar image/png, image/jpeg o image/webp.",
-    );
+    try {
+      parseBase64ImageInput(`data:text/plain;base64,${pngBase64}`, "image/png");
+      throw new Error("Expected ToolError");
+    } catch (error) {
+      expect(error).toBeInstanceOf(ToolError);
+      expect((error as ToolError).code).toBe("tools.errors.invalidDataUrl");
+    }
   });
 });

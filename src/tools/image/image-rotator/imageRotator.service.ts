@@ -1,3 +1,4 @@
+import { ToolError } from "../../../shared/errors/ToolError";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildBrowserImageDownloadFileName,
@@ -140,14 +141,14 @@ export async function readImageMetadata(file: File): Promise<ImageRotatorMetadat
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones validas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -162,13 +163,15 @@ export async function readImageMetadata(file: File): Promise<ImageRotatorMetadat
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
 function ensureOutputFormatSupported(outputFormat: ImageRotatorOutputFormat) {
   if (!canExportBrowserImageFormat(outputFormat)) {
-    throw new Error(`Este navegador no permite exportar imagenes como ${getImageFormatLabel(outputFormat)}.`);
+    throw new ToolError("tools.errors.unsupportedOutputFormat", {
+      format: getImageFormatLabel(outputFormat),
+    });
   }
 }
 
@@ -181,7 +184,7 @@ function drawTransformedImage(
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar la imagen de salida.");
+    throw new ToolError("tools.errors.imageOutputFailed");
   }
 
   if (outputFormat === "jpeg") {
@@ -202,12 +205,12 @@ export async function rotateImageFile(
   { outputBaseName, outputFormat, quality, transform }: RotateImageOptions,
 ): Promise<ImageRotatorResult> {
   if (!isRotatableImageFile(file)) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   ensureOutputFormatSupported(outputFormat);
 
-  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const image = await loadBrowserImage(file);
   const outputDimensions = getTransformedImageDimensions(
     { height: image.naturalHeight, width: image.naturalWidth },
     transform,
@@ -219,7 +222,7 @@ export async function rotateImageFile(
 
   const mimeType = getBrowserImageOutputMimeType(outputFormat);
   const result = await exportBrowserCanvas(canvas, {
-    errorMessage: "No se pudo exportar la imagen.",
+    canvasError: new ToolError("tools.errors.imageExportFailed"),
     mimeType,
     quality,
   });

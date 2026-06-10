@@ -1,3 +1,4 @@
+import { ToolError } from "../../../shared/errors/ToolError";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   getBrowserImageMimeType,
@@ -191,14 +192,14 @@ export async function readImageMetadata(file: File): Promise<ImageColorExtractor
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
 
     if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
-      throw new Error("La imagen no tiene dimensiones válidas.");
+      throw new ToolError("tools.errors.imageNoDimensions");
     }
 
     return {
@@ -213,7 +214,7 @@ export async function readImageMetadata(file: File): Promise<ImageColorExtractor
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
@@ -222,10 +223,10 @@ export async function extractImageColors(
   options: ExtractImageColorsOptions,
 ): Promise<ImageColorExtractorResult> {
   if (!isColorExtractableImageFile(file)) {
-    throw new Error("Seleccioná una imagen PNG, JPG o WebP válida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
-  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const image = await loadBrowserImage(file);
   const sampleDimensions = calculateSampleDimensions(image.naturalWidth, image.naturalHeight);
   const canvas = document.createElement("canvas");
   canvas.width = sampleDimensions.width;
@@ -233,7 +234,7 @@ export async function extractImageColors(
   const context = canvas.getContext("2d", { willReadFrequently: true });
 
   if (!context) {
-    throw new Error("No se pudo analizar la imagen.");
+    throw new ToolError("tools.errors.colorAnalysisFailed");
   }
 
   context.drawImage(image, 0, 0, sampleDimensions.width, sampleDimensions.height);

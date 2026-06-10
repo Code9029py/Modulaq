@@ -2,8 +2,9 @@ import { Clipboard, Download, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   buildBase64TextFileName,
   defaultTextOutputBaseName,
@@ -19,7 +20,8 @@ const inputClassName =
 const textareaClassName = cn(inputClassName, "min-h-56 resize-y py-3 font-mono text-xs leading-5");
 
 export function ImageToBase64Tool() {
-  const { language, t } = useI18n();
+  const { t } = useI18n();
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [status, setStatus] = useState<ImageBase64Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -28,14 +30,8 @@ export function ImageToBase64Tool() {
   const [copiedTarget, setCopiedTarget] = useState<ImageBase64CopyTarget | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const intro =
-    language === "en"
-      ? "Convert an image into Base64 text or a Data URL."
-      : "Convierte una imagen en texto Base64 o Data URL.";
-  const localNote =
-    language === "en"
-      ? "Everything is processed locally in your browser."
-      : "Todo se procesa localmente en tu navegador.";
+  const intro = t("tools.image-base64.ui.imageToBase64Intro");
+  const localNote = t("tools.image-base64.ui.localProcessing");
 
   const getCopyLabel = (target: ImageBase64CopyTarget) => {
     if (target === copiedTarget) return t("toolUi.copied");
@@ -59,7 +55,7 @@ export function ImageToBase64Tool() {
     setImageMetadata(null);
     setCopiedTarget(null);
 
-    const fileLimitError = getImageFileSizeLimitError(file);
+    const fileLimitError = limitLabels.getImageFileSizeLimitError(file);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -73,7 +69,7 @@ export function ImageToBase64Tool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("tools.image-base64.ui.couldNotConvert"));
+      setError(resolveToolErrorMessage(nextError, t, "tools.image-base64.ui.couldNotConvert"));
     }
   };
 

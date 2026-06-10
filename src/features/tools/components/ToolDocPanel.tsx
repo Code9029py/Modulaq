@@ -1,4 +1,5 @@
 import { AlertTriangle, Lightbulb, ListChecks, ShieldCheck, SlidersHorizontal, TriangleAlert } from "lucide-react";
+import { useI18n } from "../../../shared/i18n/I18nProvider";
 import type { ToolDoc } from "../types/tool.types";
 
 type ToolDocPanelProps = {
@@ -44,38 +45,40 @@ function UnorderedList({ items }: { items: string[] }) {
 }
 
 export function ToolDocPanel({ doc }: ToolDocPanelProps) {
+  const { t } = useI18n();
+
   return (
     <div className="grid gap-4">
       <p className="text-sm leading-6 text-ink-700">{doc.summary}</p>
 
-      <DocSection icon={ListChecks} title="Cómo usarla">
+      <DocSection icon={ListChecks} title={t("toolDetail.doc.howTo")}>
         <OrderedList items={doc.howTo} />
       </DocSection>
 
-      <DocSection icon={Lightbulb} title="Casos de uso">
+      <DocSection icon={Lightbulb} title={t("toolDetail.doc.useCases")}>
         <UnorderedList items={doc.useCases} />
       </DocSection>
 
       {doc.limits && doc.limits.length > 0 ? (
-        <DocSection icon={SlidersHorizontal} title="Límites">
+        <DocSection icon={SlidersHorizontal} title={t("toolDetail.doc.limits")}>
           <UnorderedList items={doc.limits} />
         </DocSection>
       ) : null}
 
       {doc.privacy ? (
-        <DocSection icon={ShieldCheck} title="Privacidad">
+        <DocSection icon={ShieldCheck} title={t("toolDetail.doc.privacy")}>
           <p>{doc.privacy}</p>
         </DocSection>
       ) : null}
 
       {doc.commonErrors && doc.commonErrors.length > 0 ? (
-        <DocSection icon={TriangleAlert} title="Errores comunes">
+        <DocSection icon={TriangleAlert} title={t("toolDetail.doc.commonErrors")}>
           <UnorderedList items={doc.commonErrors} />
         </DocSection>
       ) : null}
 
       {doc.technicalNotes && doc.technicalNotes.length > 0 ? (
-        <DocSection icon={AlertTriangle} title="Notas técnicas">
+        <DocSection icon={AlertTriangle} title={t("toolDetail.doc.technicalNotes")}>
           <UnorderedList items={doc.technicalNotes} />
         </DocSection>
       ) : null}

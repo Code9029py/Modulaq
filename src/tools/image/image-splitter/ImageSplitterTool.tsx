@@ -4,8 +4,9 @@ import { Button } from "../../../shared/components/Button";
 import { OutputFormatSelector } from "../shared/OutputFormatSelector";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
+import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
-import { getImageFileSizeLimitError } from "../../../shared/utils/fileProcessingLimits";
 import {
   canExportBrowserImageFormat,
   jpegQualityDecimalToPercent,
@@ -52,7 +53,9 @@ const formatDescKeys: Record<ImageSplitterOutputFormat, TranslationKey> = {
 const copy = {
   es: {
     columns: "Columnas",
+    downloadZip: "Descargar ZIP",
     downloadReady: "Partes listas",
+    splitCta: "Dividir imagen",
     fixedHeight: "Alto de cada parte",
     fixedMode: "Tamano fijo",
     fixedWidth: "Ancho de cada parte",
@@ -71,7 +74,9 @@ const copy = {
   },
   en: {
     columns: "Columns",
+    downloadZip: "Download ZIP",
     downloadReady: "Parts ready",
+    splitCta: "Split image",
     fixedHeight: "Part height",
     fixedMode: "Fixed size",
     fixedWidth: "Part width",
@@ -107,6 +112,7 @@ function getPartPreviewStyle(part: ImageSplitPart, metadata: ImageSplitterMetada
 export function ImageSplitterTool() {
   const { language, t } = useI18n();
   const labels = copy[language];
+  const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const resultUrlRef = useRef<string | null>(null);
@@ -192,7 +198,7 @@ export function ImageSplitterTool() {
       setPreviewUrl(null);
     }
 
-    const fileLimitError = getImageFileSizeLimitError(nextFile);
+    const fileLimitError = limitLabels.getImageFileSizeLimitError(nextFile);
     if (fileLimitError) {
       setStatus("error");
       setError(fileLimitError);
@@ -212,7 +218,7 @@ export function ImageSplitterTool() {
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : t("imageUi.couldNotRead"));
+      setError(resolveToolErrorMessage(nextError, t, "imageUi.couldNotRead"));
     }
   };
 
@@ -259,7 +265,7 @@ export function ImageSplitterTool() {
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "No se pudo dividir la imagen.");
+      setError(resolveToolErrorMessage(nextError, t, "tools.errors.splitterFailed"));
     }
   };
 
@@ -426,7 +432,7 @@ export function ImageSplitterTool() {
 
             {splitError ? (
               <p role="alert" className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
-                {splitError}
+                {t(splitError.code as TranslationKey, splitError.vars)}
               </p>
             ) : null}
           </div>
@@ -436,7 +442,7 @@ export function ImageSplitterTool() {
               description={t(formatDescKeys[outputFormat])}
               formats={outputFormats}
               getLabel={getImageFormatLabel}
-              label={language === "en" ? "Output format" : "Formato final"}
+              label={t("imageUi.finalFormat")}
               value={outputFormat}
               onChange={(format) => {
                 setOutputFormat(format);
@@ -558,7 +564,7 @@ export function ImageSplitterTool() {
               </dl>
               <Button type="button" variant="secondary" className="gap-2" onClick={downloadResult}>
                 <Download size={16} />
-                {language === "en" ? "Download ZIP" : "Descargar ZIP"}
+                {labels.downloadZip}
               </Button>
             </div>
           ) : null}
@@ -566,7 +572,7 @@ export function ImageSplitterTool() {
           <div className="grid gap-2 pt-1">
             <Button type="button" className="gap-2" onClick={() => void splitImage()} disabled={!canSplit}>
               {status === "processing" ? <Loader2 className="animate-spin" size={16} /> : <FileArchive size={16} />}
-              {language === "en" ? "Split image" : "Dividir imagen"}
+              {labels.splitCta}
             </Button>
             <Button type="button" variant="secondary" className="gap-2" onClick={() => fileInputRef.current?.click()}>
               <Upload size={16} />

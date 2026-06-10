@@ -1,4 +1,7 @@
 import JSZip from "jszip";
+import { ToolError } from "../../../shared/errors/ToolError";
+import type { Language } from "../../../shared/i18n/types";
+import type { PageSelectionError } from "@modulaq/core/ranges";
 import { formatFileSize } from "../../../shared/utils/file";
 import {
   buildImageZipDownloadFileName,
@@ -64,38 +67,59 @@ export function getFaviconIconSpecs() {
   return faviconIconSpecs.map((icon) => ({ ...icon }));
 }
 
-export function validateFaviconSourceDimensions(imageDimensions: ImageDimensions) {
+export function validateFaviconSourceDimensions(
+  imageDimensions: ImageDimensions,
+): PageSelectionError | null {
   if (!Number.isFinite(imageDimensions.width) || !Number.isFinite(imageDimensions.height)) {
-    return "La imagen debe tener dimensiones validas.";
+    return { code: "tools.errors.splitterInvalidImageDims" };
   }
 
   if (!Number.isInteger(imageDimensions.width) || !Number.isInteger(imageDimensions.height)) {
-    return "La imagen debe tener dimensiones enteras en pixeles.";
+    return { code: "tools.errors.dimensionsNotInteger" };
   }
 
   if (imageDimensions.width <= 0 || imageDimensions.height <= 0) {
-    return "La imagen debe tener ancho y alto mayores que cero.";
+    return { code: "tools.errors.dimensionsNotPositive" };
   }
 
   if (imageDimensions.width * imageDimensions.height > maxFaviconSourcePixels) {
-    return "La imagen supera el limite de 64 megapixeles.";
+    return { code: "tools.errors.placeholderPixelLimit" };
   }
 
   return null;
 }
 
-export function createFaviconPackReadme(iconSpecs: readonly FaviconIconSpec[] = faviconIconSpecs) {
+const readmeCopy = {
+  es: {
+    title: "Imagen a favicon - Modulaq",
+    description: "Este ZIP contiene iconos PNG. No incluye un archivo .ico clasico.",
+    files: "Archivos:",
+    htmlExamples: "Ejemplos HTML:",
+  },
+  en: {
+    title: "Image to favicon - Modulaq",
+    description: "This ZIP contains PNG icons. It does not include a classic .ico file.",
+    files: "Files:",
+    htmlExamples: "HTML examples:",
+  },
+} as const;
+
+export function createFaviconPackReadme(
+  iconSpecs: readonly FaviconIconSpec[] = faviconIconSpecs,
+  language: Language = "es",
+) {
+  const labels = readmeCopy[language];
   const iconList = iconSpecs.map((icon) => `- ${icon.fileName}: ${icon.size}x${icon.size}px`).join("\n");
 
   return [
-    "Imagen a favicon - Modulaq",
+    labels.title,
     "",
-    "Este ZIP contiene iconos PNG. No incluye un archivo .ico clasico.",
+    labels.description,
     "",
-    "Archivos:",
+    labels.files,
     iconList,
     "",
-    "Ejemplos HTML:",
+    labels.htmlExamples,
     '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">',
     '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
     "",
@@ -109,18 +133,18 @@ export async function readImageMetadata(file: File): Promise<ImageToFaviconMetad
   const mimeType = getBrowserImageMimeType(file);
 
   if (!mimeType) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
   try {
-    const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+    const image = await loadBrowserImage(file);
     const validationError = validateFaviconSourceDimensions({
       height: image.naturalHeight,
       width: image.naturalWidth,
     });
 
     if (validationError) {
-      throw new Error(validationError);
+      throw new ToolError(validationError.code, validationError.vars);
     }
 
     return {
@@ -135,7 +159,7 @@ export async function readImageMetadata(file: File): Promise<ImageToFaviconMetad
       throw error;
     }
 
-    throw new Error("No se pudo leer la imagen.");
+    throw new ToolError("tools.errors.imageLoadFailed");
   }
 }
 
@@ -143,7 +167,7 @@ function drawCoveredSquareImage(canvas: HTMLCanvasElement, image: HTMLImageEleme
   const context = canvas.getContext("2d");
 
   if (!context) {
-    throw new Error("No se pudo preparar el icono.");
+    throw new ToolError("tools.errors.faviconBuildFailed");
   }
 
   canvas.width = size;
@@ -164,7 +188,7 @@ async function createFaviconIcon(image: HTMLImageElement, iconSpec: FaviconIconS
   drawCoveredSquareImage(canvas, image, iconSpec.size);
 
   const result = await exportBrowserCanvas(canvas, {
-    errorMessage: "No se pudo exportar un icono PNG.",
+    canvasError: new ToolError("tools.errors.faviconBuildFailed"),
     mimeType: "image/png",
   });
 
@@ -177,20 +201,20 @@ async function createFaviconIcon(image: HTMLImageElement, iconSpec: FaviconIconS
 
 export async function generateFaviconPack(
   file: File,
-  { outputBaseName }: ImageToFaviconOptions,
+  { outputBaseName, language = "es" }: ImageToFaviconOptions,
 ): Promise<ImageToFaviconResult> {
   if (!isFaviconSourceImageFile(file)) {
-    throw new Error("Selecciona una imagen PNG, JPG o WebP valida.");
+    throw new ToolError("tools.errors.invalidImage");
   }
 
-  const image = await loadBrowserImage(file, "No se pudo decodificar la imagen en este navegador.");
+  const image = await loadBrowserImage(file);
   const validationError = validateFaviconSourceDimensions({
     height: image.naturalHeight,
     width: image.naturalWidth,
   });
 
   if (validationError) {
-    throw new Error(validationError);
+    throw new ToolError(validationError.code, validationError.vars);
   }
 
   const zip = new JSZip();
@@ -200,7 +224,7 @@ export async function generateFaviconPack(
     zip.file(icon.fileName, icon.bytes);
   }
 
-  zip.file("README.txt", createFaviconPackReadme());
+  zip.file("README.txt", createFaviconPackReadme(faviconIconSpecs, language));
 
   try {
     const bytes = await zip.generateAsync({ type: "arraybuffer" });
@@ -213,6 +237,6 @@ export async function generateFaviconPack(
       size: bytes.byteLength,
     };
   } catch {
-    throw new Error("No se pudo preparar la descarga ZIP.");
+    throw new ToolError("tools.errors.zipPrepareFailed");
   }
 }
