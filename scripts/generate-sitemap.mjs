@@ -9,6 +9,20 @@ const SITE_URL = "https://modulaq.dev";
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = join(repoRoot, "dist");
 
+// Política canonical: sin trailing slash salvo la raíz "/". Refleja
+// src/shared/seo/canonical.ts (duplicado porque este script corre en Node sin
+// poder importar TS del bundle).
+function ensureNoTrailingSlash(path) {
+  if (path === "/") return "/";
+  return path.replace(/\/+$/, "") || "/";
+}
+
+function toCanonicalUrl(path) {
+  const normalized = ensureNoTrailingSlash(path);
+  if (normalized === "/") return `${SITE_URL}/`;
+  return `${SITE_URL}${normalized}`;
+}
+
 // Routes that canonicalize elsewhere or are noindex.
 const excludedRoutes = new Set([
   "/contacto",
@@ -111,7 +125,7 @@ const routeSet = new Set(allRoutes);
 
 const urlsXml = allRoutes
   .map((route) => {
-    const loc = `${SITE_URL}${route === "/" ? "/" : route}`;
+    const loc = toCanonicalUrl(route);
     const lang = isEnglishRoute(route) ? "en" : "es";
     const alt = findAlternate(route, routeSet);
     const altLang = lang === "es" ? "en" : "es";
@@ -122,10 +136,10 @@ const urlsXml = allRoutes
       `    <xhtml:link rel="alternate" hreflang="${lang}" href="${loc}" />`,
     ];
     if (alt) {
-      const altLoc = `${SITE_URL}${alt === "/" ? "/" : alt}`;
+      const altLoc = toCanonicalUrl(alt);
       lines.push(`    <xhtml:link rel="alternate" hreflang="${altLang}" href="${altLoc}" />`);
       // x-default points to Spanish (the configured default).
-      const xDefault = lang === "es" ? loc : `${SITE_URL}${alt === "/" ? "/" : alt}`;
+      const xDefault = lang === "es" ? loc : altLoc;
       lines.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${xDefault}" />`);
     } else {
       lines.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${loc}" />`);
