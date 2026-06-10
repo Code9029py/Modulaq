@@ -52,12 +52,15 @@ const tabPlannedLabelKeys: Record<ToolModeId, TranslationKey> = {
 };
 
 const relatedToolIds: Record<string, string[]> = {
-  "merge-pdf": ["split-pdf", "reorder-pdf-pages"],
-  "split-pdf": ["merge-pdf", "reorder-pdf-pages"],
-  "reorder-pdf-pages": ["merge-pdf", "split-pdf"],
-  "image-to-pdf": ["merge-pdf"],
+  "merge-pdf": ["split-pdf", "reorder-pdf-pages", "remove-pdf-pages"],
+  "split-pdf": ["merge-pdf", "reorder-pdf-pages", "remove-pdf-pages"],
+  "reorder-pdf-pages": ["merge-pdf", "split-pdf", "add-page-numbers"],
+  "image-to-pdf": ["merge-pdf", "text-to-pdf"],
   "image-to-base64": ["base64-to-image"],
   "base64-to-image": ["image-to-base64"],
+  "text-to-pdf": ["image-to-pdf", "add-page-numbers"],
+  "remove-pdf-pages": ["reorder-pdf-pages", "split-pdf", "add-page-numbers"],
+  "add-page-numbers": ["merge-pdf", "reorder-pdf-pages", "remove-pdf-pages"],
 };
 
 function isDefinition(tool: ToolDefinition | undefined): tool is ToolDefinition {

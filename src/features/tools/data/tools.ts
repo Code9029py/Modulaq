@@ -2937,4 +2937,276 @@ export async function generateQrDataUrl(
       ],
     },
   },
+  {
+    id: "text-to-pdf",
+    slug: "texto-a-pdf",
+    slugEn: "text-to-pdf",
+    name: { es: "Texto a PDF", en: "Text to PDF" },
+    description: {
+      es: "Generá un PDF a partir de texto plano con título, tamaño de fuente y márgenes básicos.",
+      en: "Generate a PDF from plain text with a basic title, font size, and margins.",
+    },
+    category: "documents",
+    tags: {
+      es: ["pdf", "texto", "documentos", "generar"],
+      en: ["pdf", "text", "documents", "generate"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Texto a PDF online gratis",
+        description:
+          "Convertí texto plano a un PDF simple con título y márgenes básicos. Funciona en tu navegador, sin subir nada.",
+      },
+      en: {
+        title: "Text to PDF online free",
+        description:
+          "Turn plain text into a simple PDF with a basic title and margins. Runs in your browser, no uploads.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Texto a PDF toma texto plano y genera un PDF simple en A4 o Letter con título opcional, tamaño de fuente y margen ajustables.",
+        howTo: [
+          "Pegá o escribí el texto que querés convertir.",
+          "Opcional: agregá un título y elegí tamaño de fuente, margen y tamaño de página.",
+          "Hacé click en generar para descargar el PDF.",
+        ],
+        useCases: [
+          "Imprimir un fragmento de texto rápido sin abrir un editor.",
+          "Generar un PDF simple para compartir notas o instrucciones.",
+        ],
+        limits: [
+          "Solo texto plano: sin imágenes, tablas, markdown ni fuentes custom.",
+          "Hasta 200 000 caracteres por documento.",
+          "Helvetica como única fuente, tamaños 10/12/14/16.",
+        ],
+        privacy:
+          "El texto y el PDF resultante quedan en tu navegador; no subimos nada a Modulaq.",
+        commonErrors: [
+          "Texto vacío: ingresá al menos algo de contenido.",
+          "Texto demasiado largo: dividilo en partes más chicas si supera el límite.",
+        ],
+        technicalNotes: [
+          "Usa pdf-lib en el navegador con StandardFonts.Helvetica.",
+          "Word-wrap calculado con la métrica real de la fuente.",
+        ],
+      },
+      en: {
+        summary:
+          "Text to PDF takes plain text and produces a simple A4 or Letter PDF with optional title, font size, and margins.",
+        howTo: [
+          "Paste or type the text you want to convert.",
+          "Optional: add a title and pick font size, margin, and page size.",
+          "Click generate to download the PDF.",
+        ],
+        useCases: [
+          "Quickly print a snippet of text without opening an editor.",
+          "Generate a simple PDF to share notes or instructions.",
+        ],
+        limits: [
+          "Plain text only: no images, tables, markdown, or custom fonts.",
+          "Up to 200,000 characters per document.",
+          "Helvetica only, sizes 10/12/14/16.",
+        ],
+        privacy:
+          "The text and the generated PDF stay in your browser — we don't upload anything to Modulaq.",
+        commonErrors: [
+          "Empty text: enter at least some content.",
+          "Text too long: split it into smaller chunks if it exceeds the limit.",
+        ],
+        technicalNotes: [
+          "Uses pdf-lib in the browser with StandardFonts.Helvetica.",
+          "Word-wrap computed with the real font metric.",
+        ],
+      },
+    },
+  },
+  {
+    id: "remove-pdf-pages",
+    slug: "eliminar-paginas-pdf",
+    slugEn: "remove-pdf-pages",
+    name: { es: "Eliminar páginas de PDF", en: "Remove PDF pages" },
+    description: {
+      es: "Quitá páginas o rangos de un PDF y descargá el documento sin esas páginas.",
+      en: "Drop pages or ranges from a PDF and download the document without them.",
+    },
+    category: "documents",
+    tags: {
+      es: ["pdf", "paginas", "eliminar", "documentos"],
+      en: ["pdf", "pages", "remove", "documents"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Eliminar páginas de PDF online gratis",
+        description:
+          "Quitá páginas o rangos de un PDF y descargá el resultado. Procesamiento local en el navegador.",
+      },
+      en: {
+        title: "Remove PDF pages online free",
+        description:
+          "Drop pages or ranges from a PDF and download the result. Local processing in the browser.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Eliminar páginas de PDF acepta una lista de páginas y rangos (ej. 1,3-5,8) y genera un PDF nuevo sin esas páginas.",
+        howTo: [
+          "Cargá el PDF.",
+          'Ingresá las páginas a eliminar (ej. "1,3-5,8").',
+          "Descargá el PDF resultante.",
+        ],
+        useCases: [
+          "Quitar carátulas, anuncios o páginas en blanco.",
+          "Limpiar un escaneo antes de compartirlo.",
+        ],
+        limits: [
+          "Tamaño máximo del PDF: 50 MB.",
+          "No se permite eliminar todas las páginas: el resultado siempre tiene al menos una página.",
+          "Páginas fuera de rango se validan y avisan antes de procesar.",
+        ],
+        privacy:
+          "El archivo se procesa en tu navegador; no lo subimos a Modulaq.",
+        commonErrors: [
+          "Rango inválido: revisá la sintaxis (números separados por coma, rangos con guion).",
+          "Intento de eliminar todas las páginas: dejá al menos una.",
+        ],
+        technicalNotes: [
+          "Usa pdf-lib y reusa el parser de rangos del catálogo.",
+        ],
+      },
+      en: {
+        summary:
+          "Remove PDF pages takes a list of pages and ranges (e.g. 1,3-5,8) and produces a new PDF without them.",
+        howTo: [
+          "Upload the PDF.",
+          'Enter the pages to remove (e.g. "1,3-5,8").',
+          "Download the resulting PDF.",
+        ],
+        useCases: [
+          "Drop cover sheets, ads, or blank pages.",
+          "Clean up a scan before sharing it.",
+        ],
+        limits: [
+          "Max PDF size: 50 MB.",
+          "You can't remove every page: the result always has at least one page.",
+          "Out-of-range pages are validated and flagged before processing.",
+        ],
+        privacy:
+          "The file is processed in your browser — we don't upload it to Modulaq.",
+        commonErrors: [
+          "Invalid range: check the syntax (numbers separated by commas, ranges with dashes).",
+          "Attempt to remove every page: at least one must remain.",
+        ],
+        technicalNotes: [
+          "Uses pdf-lib and reuses the catalog's range parser.",
+        ],
+      },
+    },
+  },
+  {
+    id: "add-page-numbers",
+    slug: "numerar-paginas-pdf",
+    slugEn: "add-page-numbers",
+    name: { es: "Numerar páginas de PDF", en: "Add page numbers to PDF" },
+    description: {
+      es: "Agregá numeración simple al pie de cada página de un PDF.",
+      en: "Add simple numbering to the footer of every PDF page.",
+    },
+    category: "documents",
+    tags: {
+      es: ["pdf", "paginas", "numerar", "documentos"],
+      en: ["pdf", "pages", "numbering", "documents"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Numerar páginas de PDF online gratis",
+        description:
+          "Agregá numeración simple al pie de cada página de un PDF. Procesamiento local en el navegador.",
+      },
+      en: {
+        title: "Add PDF page numbers online free",
+        description:
+          "Add simple numbering to the bottom of every PDF page. Local processing in the browser.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Numerar páginas de PDF dibuja un número simple (formato 'página / total') al pie de cada página, en izquierda, centro o derecha.",
+        howTo: [
+          "Cargá el PDF.",
+          "Elegí posición: abajo izquierda, abajo centro o abajo derecha.",
+          "Descargá el PDF con la numeración aplicada.",
+        ],
+        useCases: [
+          "Preparar un PDF para imprimir o entregar con páginas identificables.",
+          "Agregar numeración a un PDF combinado que perdió el orden original.",
+        ],
+        limits: [
+          "Numeración simple con fuente Helvetica embebida.",
+          "Sin opciones de fuente, color, prefijo custom ni rangos parciales en esta versión.",
+          "No promete preservar firmas digitales, formularios interactivos o anotaciones complejas: pdf-lib re-serializa el documento.",
+        ],
+        privacy:
+          "El archivo se procesa en tu navegador; no lo subimos a Modulaq.",
+        commonErrors: [
+          "Un PDF protegido o dañado puede no poder procesarse.",
+          "Si el PDF tiene firmas digitales, pueden invalidarse al re-guardar.",
+        ],
+        technicalNotes: [
+          "Usa pdf-lib con StandardFonts.Helvetica y drawText en el pie de cada página.",
+        ],
+      },
+      en: {
+        summary:
+          "Add page numbers stamps a simple 'page / total' label at the bottom of every page — left, center, or right.",
+        howTo: [
+          "Upload the PDF.",
+          "Pick a position: bottom-left, bottom-center, or bottom-right.",
+          "Download the PDF with numbering applied.",
+        ],
+        useCases: [
+          "Prepare a PDF for printing or handing off with identifiable pages.",
+          "Add numbering to a merged PDF that lost its original order.",
+        ],
+        limits: [
+          "Simple numbering with embedded Helvetica.",
+          "No font, color, custom prefix, or partial-range options in this version.",
+          "Doesn't promise to preserve digital signatures, interactive forms, or complex annotations: pdf-lib re-serializes the document.",
+        ],
+        privacy:
+          "The file is processed in your browser — we don't upload it to Modulaq.",
+        commonErrors: [
+          "An encrypted or damaged PDF may not be processable.",
+          "If the PDF has digital signatures, they may be invalidated on re-save.",
+        ],
+        technicalNotes: [
+          "Uses pdf-lib with StandardFonts.Helvetica and drawText at the bottom of each page.",
+        ],
+      },
+    },
+  },
 ];

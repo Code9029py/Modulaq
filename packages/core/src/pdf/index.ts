@@ -4,4 +4,7 @@ export { reorderPdfPages } from "./reorderPdfPages";
 export { extractPdfPages } from "./extractPdfPages";
 export { splitPdfRange, type PageRange } from "./splitPdfRange";
 export { imagesToPdf, type ImageInput } from "./imagesToPdf";
+export { textToPdf, type TextToPdfOptions, type TextToPdfPageSize } from "./textToPdf";
+export { removePdfPages } from "./removePdfPages";
+export { addPageNumbers, type AddPageNumbersOptions, type PageNumberPosition } from "./addPageNumbers";
 export type { PdfInput } from "./types";
