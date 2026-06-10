@@ -18,7 +18,7 @@ export function filterTools(tools: ToolDefinition[], filters: ToolFilters) {
         ...tool.tags.es,
         ...tool.tags.en,
       ].some((value) => value.toLowerCase().includes(normalizedSearch));
-    const matchesCategory = filters.category === "all" || tool.category === filters.category;
+    const matchesCategory = filters.categories.length === 0 || filters.categories.includes(tool.category);
     const matchesMode = filters.mode === "all" || tool.modes.includes(filters.mode);
     const matchesStatus = filters.status === "all" || tool.status === filters.status;
 
