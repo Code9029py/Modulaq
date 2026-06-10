@@ -1062,4 +1062,72 @@ export const en: Record<TranslationKey, string> = {
   "category.development": "Development",
   "category.ai": "AI",
   "category.productivity": "Productivity",
+
+  // Documents tools (Text to PDF / Remove pages / Add page numbers)
+  "tools.errors.textToPdfEmpty": "Enter at least some text to generate the PDF.",
+  "tools.errors.textToPdfTooLong":
+    "The text exceeds the {{limit}} character limit. Split it into smaller chunks.",
+  "tools.errors.textToPdfFailed": "Couldn't generate the PDF from the text.",
+  "tools.errors.removeAllPages":
+    "You can't remove every page. At least one must remain.",
+  "tools.errors.removePdfPagesFailed": "Couldn't remove the pages from the PDF.",
+  "tools.errors.addPageNumbersFailed": "Couldn't add page numbers to the PDF.",
+
+  "tools.text-to-pdf.ui.textSection": "Text to convert",
+  "tools.text-to-pdf.ui.textIntro":
+    "Paste or type the content. We generate a simple PDF with automatic pagination.",
+  "tools.text-to-pdf.ui.titleLabel": "Title (optional)",
+  "tools.text-to-pdf.ui.titlePlaceholder": "My document",
+  "tools.text-to-pdf.ui.contentLabel": "Content",
+  "tools.text-to-pdf.ui.contentPlaceholder":
+    "Paste or type the text you want to turn into a PDF.",
+  "tools.text-to-pdf.ui.charCount": "{{count}} / {{limit}} characters",
+  "tools.text-to-pdf.ui.charSummary": "{{count}} characters",
+  "tools.text-to-pdf.ui.layoutSection": "Layout",
+  "tools.text-to-pdf.ui.fontSizeLabel": "Font size",
+  "tools.text-to-pdf.ui.marginLabel": "Margin",
+  "tools.text-to-pdf.ui.marginSmall": "Small",
+  "tools.text-to-pdf.ui.marginMedium": "Standard",
+  "tools.text-to-pdf.ui.marginLarge": "Large",
+  "tools.text-to-pdf.ui.pageSizeLabel": "Page size",
+  "tools.text-to-pdf.ui.pageSize.a4": "A4",
+  "tools.text-to-pdf.ui.pageSize.letter": "Letter",
+  "tools.text-to-pdf.ui.outputTitle": "Generated PDF",
+  "tools.text-to-pdf.ui.outputIntro": "Set the filename and download.",
+  "tools.text-to-pdf.ui.previewLabel": "Text ready",
+  "tools.text-to-pdf.ui.previewEmpty": "No text",
+  "tools.text-to-pdf.ui.generating": "Generating PDF...",
+  "tools.text-to-pdf.ui.generateCta": "Generate PDF",
+  "tools.text-to-pdf.ui.localProcessingNote":
+    "The text and the PDF are processed in your browser. We don't upload anything.",
+
+  "tools.remove-pdf-pages.ui.fileSection": "PDF and pages to remove",
+  "tools.remove-pdf-pages.ui.intro":
+    "Upload a PDF and pick the pages or ranges to drop. The rest is kept in the original order.",
+  "tools.remove-pdf-pages.ui.rangeLabel": "Pages to remove",
+  "tools.remove-pdf-pages.ui.rangePlaceholder": "e.g. 1,3-5,8",
+  "tools.remove-pdf-pages.ui.rangeHelp":
+    "Use numbers separated by commas and ranges with dashes (e.g. 1,3-5,8).",
+  "tools.remove-pdf-pages.ui.outputTitle": "Resulting PDF",
+  "tools.remove-pdf-pages.ui.outputIntro": "Set the filename and download the PDF without the selected pages.",
+  "tools.remove-pdf-pages.ui.processing": "Removing pages...",
+  "tools.remove-pdf-pages.ui.cta": "Remove and download",
+  "tools.remove-pdf-pages.ui.successSummary":
+    "Removed {{removed}} pages. The downloaded PDF has {{remaining}} pages.",
+  "tools.remove-pdf-pages.ui.localProcessingNote":
+    "Processing happens in your browser.",
+
+  "tools.add-page-numbers.ui.fileSection": "PDF to number",
+  "tools.add-page-numbers.ui.intro":
+    "Upload a PDF and pick where the numbering goes at the bottom.",
+  "tools.add-page-numbers.ui.positionLabel": "Number position",
+  "tools.add-page-numbers.ui.position.bottom-left": "Bottom left",
+  "tools.add-page-numbers.ui.position.bottom-center": "Bottom center",
+  "tools.add-page-numbers.ui.position.bottom-right": "Bottom right",
+  "tools.add-page-numbers.ui.outputTitle": "Numbered PDF",
+  "tools.add-page-numbers.ui.outputIntro": "Set the filename and download the PDF with numbering applied.",
+  "tools.add-page-numbers.ui.processing": "Adding numbers...",
+  "tools.add-page-numbers.ui.cta": "Number and download",
+  "tools.add-page-numbers.ui.localProcessingNote":
+    "Processing happens in your browser.",
 };

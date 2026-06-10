@@ -82,6 +82,15 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "text-cleaner": lazy(() =>
     import("../../../tools/text/text-cleaner").then((module) => ({ default: module.TextCleanerTool })),
   ),
+  "text-to-pdf": lazy(() =>
+    import("../../../tools/pdf/text-to-pdf").then((module) => ({ default: module.TextToPdfTool })),
+  ),
+  "remove-pdf-pages": lazy(() =>
+    import("../../../tools/pdf/remove-pdf-pages").then((module) => ({ default: module.RemovePdfPagesTool })),
+  ),
+  "add-page-numbers": lazy(() =>
+    import("../../../tools/pdf/add-page-numbers").then((module) => ({ default: module.AddPageNumbersTool })),
+  ),
 };
 
 export function getToolRenderer(toolId: ToolMetadata["id"]) {
