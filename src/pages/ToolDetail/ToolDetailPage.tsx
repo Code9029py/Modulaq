@@ -9,6 +9,7 @@ import { useRecentTools } from "../../features/tools/context/ToolPrefsProvider";
 import { ToolStatusBadge } from "../../features/tools/components/ToolStatusBadge";
 import { getToolRenderer } from "../../features/tools/renderers/toolRenderers";
 import type { ToolDefinition, ToolModeId } from "../../features/tools/types/tool.types";
+import { markCameFromToolDetail } from "../../features/tools/utils/catalogReturn";
 import { getToolById } from "../../features/tools/utils/getToolById";
 import { getToolBySlug } from "../../features/tools/utils/getToolBySlug";
 import { localizeTool, useTool } from "../../features/tools/utils/localizeTool";
@@ -108,6 +109,15 @@ export function ToolDetailPage() {
       recordVisit(definition.id);
     }
   }, [definition, hydrated, recordVisit]);
+
+  useEffect(() => {
+    // Señala al catálogo que la próxima entrada viene desde un detalle de
+    // herramienta para que restaure filtros + scroll. Marca sólo si hubo
+    // resolución válida; rutas inexistentes no deberían disparar la señal.
+    if (definition) {
+      markCameFromToolDetail();
+    }
+  }, [definition]);
 
   if (!definition || !localizedTool) {
     return (

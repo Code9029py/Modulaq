@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowRight, LayoutGrid, Search, SlidersHorizontal } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, LayoutGrid, Search, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { categories } from "../../config/categories";
 import { toolModes } from "../../config/toolModes";
 import { ToolCard } from "../../features/tools/components/ToolCard";
@@ -7,6 +7,11 @@ import { ToolFilters } from "../../features/tools/components/ToolFilters";
 import { useFavorites } from "../../features/tools/context/ToolPrefsProvider";
 import { tools } from "../../features/tools/data/tools";
 import type { ToolFilters as ToolFiltersType } from "../../features/tools/types/tool.types";
+import {
+  consumeCatalogReturnState,
+  saveCatalogState,
+  type CatalogPersistedState,
+} from "../../features/tools/utils/catalogReturn";
 import {
   filterTools,
   getAvailableModeIds,
@@ -28,10 +33,20 @@ import { cn } from "../../shared/utils/cn";
 
 const defaultFilters: ToolFiltersType = {
   search: "",
-  category: "all",
+  categories: [],
   mode: "all",
   status: "all",
 };
+
+function hasFiltersOrSearch(filters: ToolFiltersType, onlyFavorites: boolean) {
+  return (
+    onlyFavorites ||
+    filters.search !== "" ||
+    filters.categories.length > 0 ||
+    filters.mode !== "all" ||
+    filters.status !== "all"
+  );
+}
 
 export function ToolsCatalogPage() {
   const { language, t } = useI18n();
@@ -40,7 +55,66 @@ export function ToolsCatalogPage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const [hasRestored, setHasRestored] = useState(false);
   const { hydrated, favoriteIds } = useFavorites();
+
+  // Estado más reciente expuesto al listener de scroll (refs evitan rebind del listener).
+  const latestRef = useRef({ filters, onlyFavorites });
+  useEffect(() => {
+    latestRef.current = { filters, onlyFavorites };
+  }, [filters, onlyFavorites]);
+
+  // Restauración contextual al volver desde un detalle de herramienta.
+  useEffect(() => {
+    const restored = consumeCatalogReturnState();
+    if (restored) {
+      setFilters(restored.filters);
+      setOnlyFavorites(restored.onlyFavorites);
+      // Esperar a que ScrollToTop (efecto de un componente ancestro) corra y
+      // que React pinte el grid filtrado antes de recolocar el scroll.
+      const raf = requestAnimationFrame(() => {
+        window.scrollTo({ top: restored.scrollY, left: 0, behavior: "instant" });
+      });
+      setHasRestored(true);
+      return () => cancelAnimationFrame(raf);
+    }
+    setHasRestored(true);
+    return undefined;
+  }, []);
+
+  // Persistencia: guarda estado en cada cambio relevante, y scrollY cada vez que el
+  // usuario hace scroll dentro del catálogo. Sólo guarda después de que la
+  // restauración inicial corra para no escribir el default sobre el estado restaurado.
+  useEffect(() => {
+    if (!hasRestored) return;
+    const state: CatalogPersistedState = {
+      filters,
+      onlyFavorites,
+      scrollY: typeof window === "undefined" ? 0 : window.scrollY,
+    };
+    saveCatalogState(state);
+  }, [filters, onlyFavorites, hasRestored]);
+
+  useEffect(() => {
+    if (!hasRestored || typeof window === "undefined") return;
+    let frame = 0;
+    const handleScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        saveCatalogState({
+          filters: latestRef.current.filters,
+          onlyFavorites: latestRef.current.onlyFavorites,
+          scrollY: window.scrollY,
+        });
+      });
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [hasRestored]);
 
   const visibleCategories = useMemo(() => {
     const visibleCategoryIds = getVisibleCategoryIds(tools);
@@ -66,12 +140,7 @@ export function ToolsCatalogPage() {
 
     return orderToolsByFavoriteIds(scopedTools, favoriteIds);
   }, [favoriteIds, filteredTools, onlyFavorites, showFavoritesFilter]);
-  const hasActiveFilters =
-    onlyFavorites ||
-    filters.search !== "" ||
-    filters.category !== "all" ||
-    filters.mode !== "all" ||
-    filters.status !== "all";
+  const hasActiveFilters = hasFiltersOrSearch(filters, onlyFavorites);
 
   const resetFilters = () => {
     setFilters(defaultFilters);
@@ -128,6 +197,18 @@ export function ToolsCatalogPage() {
               />
             </span>
           </label>
+          {hasActiveFilters ? (
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-surface-200/80 bg-surface-50/90 px-3 py-1.5 text-xs font-semibold text-ink-700 shadow-sm transition hover:border-accent-cyan/35 hover:bg-surface-50 hover:text-ink-900 focus:outline-none focus:ring-2 focus:ring-accent-cyan/25"
+              >
+                <X size={14} />
+                {t("catalog.filters.clearAll")}
+              </button>
+            </div>
+          ) : null}
         </div>
 
         {isMobileFiltersOpen ? (

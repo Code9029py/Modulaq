@@ -29,8 +29,52 @@ describe("filterTools", () => {
       createTool("qr", { tags: { es: ["codigo"], en: ["code"] } }),
     ];
 
-    expect(filterTools(tools, { search: "merge", category: "all", mode: "all", status: "all" })).toEqual([tools[0]]);
-    expect(filterTools(tools, { search: "codigo", category: "all", mode: "all", status: "all" })).toEqual([tools[1]]);
+    expect(filterTools(tools, { search: "merge", categories: [], mode: "all", status: "all" })).toEqual([tools[0]]);
+    expect(filterTools(tools, { search: "codigo", categories: [], mode: "all", status: "all" })).toEqual([tools[1]]);
+  });
+
+  it("empty categories means all (Todas)", () => {
+    const tools = [
+      createTool("pdf-a", { category: "pdf" }),
+      createTool("image-a", { category: "image" }),
+      createTool("text-a", { category: "text" }),
+    ];
+
+    expect(filterTools(tools, { search: "", categories: [], mode: "all", status: "all" })).toEqual(tools);
+  });
+
+  it("combines multiple categories with OR", () => {
+    const tools = [
+      createTool("pdf-a", { category: "pdf" }),
+      createTool("image-a", { category: "image" }),
+      createTool("text-a", { category: "text" }),
+    ];
+
+    const result = filterTools(tools, {
+      search: "",
+      categories: ["pdf", "image"],
+      mode: "all",
+      status: "all",
+    });
+
+    expect(result.map((tool) => tool.id)).toEqual(["pdf-a", "image-a"]);
+  });
+
+  it("combines category multiselect with search", () => {
+    const tools = [
+      createTool("merge", { category: "pdf", name: { es: "Unir PDFs", en: "Merge PDFs" } }),
+      createTool("crop", { category: "image", name: { es: "Recortar imagen", en: "Crop image" } }),
+      createTool("split", { category: "pdf", name: { es: "Dividir PDF", en: "Split PDF" } }),
+    ];
+
+    const result = filterTools(tools, {
+      search: "split",
+      categories: ["pdf", "image"],
+      mode: "all",
+      status: "all",
+    });
+
+    expect(result.map((tool) => tool.id)).toEqual(["split"]);
   });
 });
 

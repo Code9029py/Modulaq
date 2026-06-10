@@ -3,7 +3,7 @@ import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { inputClassName } from "../../../shared/styles/inputClassName";
 import { cn } from "../../../shared/utils/cn";
-import type { ToolCategory, ToolFilters as ToolFiltersType, ToolMode, ToolModeId, ToolStatus } from "../types/tool.types";
+import type { ToolCategory, ToolCategoryId, ToolFilters as ToolFiltersType, ToolMode, ToolModeId, ToolStatus } from "../types/tool.types";
 
 const modeLabelKey: Record<ToolModeId, TranslationKey> = {
   online: "toolDetail.tabs.online",
@@ -27,6 +27,12 @@ type ToolFiltersProps = {
 
 const controlClassName = inputClassName;
 
+const chipBaseClass =
+  "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/30";
+const chipIdleClass =
+  "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/30 hover:bg-surface-50 hover:text-ink-900";
+const chipActiveClass = "border-accent-cyan/40 bg-accent-cyan/10 text-accent-teal";
+
 export function ToolFilters({
   categories,
   className,
@@ -45,6 +51,24 @@ export function ToolFilters({
     if (status === "active") return t("catalog.filters.status.active");
     if (status === "planned") return t("catalog.filters.status.planned");
     return t("catalog.filters.status.draft");
+  };
+
+  const selectedCategorySet = new Set<ToolCategoryId>(filters.categories);
+  const allCategoriesActive = selectedCategorySet.size === 0;
+
+  const toggleCategory = (id: ToolCategoryId) => {
+    const next = new Set(selectedCategorySet);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    onChange({ ...filters, categories: Array.from(next) });
+  };
+
+  const clearCategories = () => {
+    if (allCategoriesActive) return;
+    onChange({ ...filters, categories: [] });
   };
 
   return (
@@ -72,21 +96,34 @@ export function ToolFilters({
         </div>
       ) : null}
 
-      <label className="grid gap-2 text-sm font-semibold text-ink-700">
-        {t("catalog.filters.category")}
-        <select
-          className={controlClassName}
-          value={filters.category}
-          onChange={(event) => onChange({ ...filters, category: event.target.value as ToolFiltersType["category"] })}
-        >
-          <option value="all">{t("catalog.filters.categoryAll")}</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {t(`category.${category.id}` as TranslationKey)}
-            </option>
-          ))}
-        </select>
-      </label>
+      <fieldset className="grid gap-2 text-sm font-semibold text-ink-700">
+        <legend className="mb-1">{t("catalog.filters.category")}</legend>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            aria-pressed={allCategoriesActive}
+            aria-label={t("catalog.filters.categoryAllAria")}
+            onClick={clearCategories}
+            className={cn(chipBaseClass, allCategoriesActive ? chipActiveClass : chipIdleClass)}
+          >
+            {t("catalog.filters.categoryAll")}
+          </button>
+          {categories.map((category) => {
+            const isActive = selectedCategorySet.has(category.id);
+            return (
+              <button
+                key={category.id}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => toggleCategory(category.id)}
+                className={cn(chipBaseClass, isActive ? chipActiveClass : chipIdleClass)}
+              >
+                {t(`category.${category.id}` as TranslationKey)}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
 
       {modes.length > 1 ? (
         <label className="grid gap-2 text-sm font-semibold text-ink-700">

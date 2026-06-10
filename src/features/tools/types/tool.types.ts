@@ -149,7 +149,11 @@ export type ToolMetadata = LocalizedTool;
 
 export type ToolFilters = {
   search: string;
-  category: ToolCategoryId | "all";
+  /**
+   * Multiselección de categorías. `[]` equivale a "Todas".
+   * El filtro acepta cualquier categoría incluida; combina en OR.
+   */
+  categories: ToolCategoryId[];
   mode: ToolModeId | "all";
   status: ToolStatus | "all";
 };
