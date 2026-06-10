@@ -1062,6 +1062,74 @@ export const es = {
   "category.development": "Desarrollo",
   "category.ai": "IA",
   "category.productivity": "Productividad",
+
+  // Documents tools (Texto a PDF / Eliminar páginas / Numerar páginas)
+  "tools.errors.textToPdfEmpty": "Ingresá al menos algo de texto para generar el PDF.",
+  "tools.errors.textToPdfTooLong":
+    "El texto supera el límite de {{limit}} caracteres. Dividilo en partes más chicas.",
+  "tools.errors.textToPdfFailed": "No se pudo generar el PDF a partir del texto.",
+  "tools.errors.removeAllPages":
+    "No podés eliminar todas las páginas. Tiene que quedar al menos una.",
+  "tools.errors.removePdfPagesFailed": "No se pudieron eliminar las páginas del PDF.",
+  "tools.errors.addPageNumbersFailed": "No se pudieron agregar números de página al PDF.",
+
+  "tools.text-to-pdf.ui.textSection": "Texto a convertir",
+  "tools.text-to-pdf.ui.textIntro":
+    "Pegá o escribí el contenido. Generamos un PDF simple con paginación automática.",
+  "tools.text-to-pdf.ui.titleLabel": "Título (opcional)",
+  "tools.text-to-pdf.ui.titlePlaceholder": "Mi documento",
+  "tools.text-to-pdf.ui.contentLabel": "Contenido",
+  "tools.text-to-pdf.ui.contentPlaceholder":
+    "Pegá o escribí el texto que querés convertir a PDF.",
+  "tools.text-to-pdf.ui.charCount": "{{count}} / {{limit}} caracteres",
+  "tools.text-to-pdf.ui.charSummary": "{{count}} caracteres",
+  "tools.text-to-pdf.ui.layoutSection": "Diseño",
+  "tools.text-to-pdf.ui.fontSizeLabel": "Tamaño de fuente",
+  "tools.text-to-pdf.ui.marginLabel": "Margen",
+  "tools.text-to-pdf.ui.marginSmall": "Reducido",
+  "tools.text-to-pdf.ui.marginMedium": "Estándar",
+  "tools.text-to-pdf.ui.marginLarge": "Amplio",
+  "tools.text-to-pdf.ui.pageSizeLabel": "Tamaño de página",
+  "tools.text-to-pdf.ui.pageSize.a4": "A4",
+  "tools.text-to-pdf.ui.pageSize.letter": "Carta",
+  "tools.text-to-pdf.ui.outputTitle": "PDF generado",
+  "tools.text-to-pdf.ui.outputIntro": "Configurá el nombre y descargá el archivo.",
+  "tools.text-to-pdf.ui.previewLabel": "Texto listo",
+  "tools.text-to-pdf.ui.previewEmpty": "Sin texto",
+  "tools.text-to-pdf.ui.generating": "Generando PDF...",
+  "tools.text-to-pdf.ui.generateCta": "Generar PDF",
+  "tools.text-to-pdf.ui.localProcessingNote":
+    "El texto y el PDF se procesan en tu navegador. No subimos nada.",
+
+  "tools.remove-pdf-pages.ui.fileSection": "PDF y páginas a eliminar",
+  "tools.remove-pdf-pages.ui.intro":
+    "Cargá un PDF e indicá qué páginas o rangos eliminar. El resto se conserva en el orden original.",
+  "tools.remove-pdf-pages.ui.rangeLabel": "Páginas a eliminar",
+  "tools.remove-pdf-pages.ui.rangePlaceholder": "Ej. 1,3-5,8",
+  "tools.remove-pdf-pages.ui.rangeHelp":
+    "Usá números separados por coma y rangos con guion (ej. 1,3-5,8).",
+  "tools.remove-pdf-pages.ui.outputTitle": "PDF resultante",
+  "tools.remove-pdf-pages.ui.outputIntro": "Configurá el nombre y descargá el archivo sin las páginas indicadas.",
+  "tools.remove-pdf-pages.ui.processing": "Eliminando páginas...",
+  "tools.remove-pdf-pages.ui.cta": "Eliminar y descargar",
+  "tools.remove-pdf-pages.ui.successSummary":
+    "Eliminamos {{removed}} páginas. El PDF descargado tiene {{remaining}} páginas.",
+  "tools.remove-pdf-pages.ui.localProcessingNote":
+    "El procesamiento ocurre en tu navegador.",
+
+  "tools.add-page-numbers.ui.fileSection": "PDF a numerar",
+  "tools.add-page-numbers.ui.intro":
+    "Cargá un PDF y elegí la posición de la numeración al pie.",
+  "tools.add-page-numbers.ui.positionLabel": "Posición de la numeración",
+  "tools.add-page-numbers.ui.position.bottom-left": "Abajo izquierda",
+  "tools.add-page-numbers.ui.position.bottom-center": "Abajo centro",
+  "tools.add-page-numbers.ui.position.bottom-right": "Abajo derecha",
+  "tools.add-page-numbers.ui.outputTitle": "PDF numerado",
+  "tools.add-page-numbers.ui.outputIntro": "Configurá el nombre y descargá el PDF con la numeración aplicada.",
+  "tools.add-page-numbers.ui.processing": "Agregando números...",
+  "tools.add-page-numbers.ui.cta": "Numerar y descargar",
+  "tools.add-page-numbers.ui.localProcessingNote":
+    "El procesamiento ocurre en tu navegador.",
 } as const;
 
 export type TranslationKey = keyof typeof es;
