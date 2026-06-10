@@ -3,8 +3,8 @@ import { siteConfig } from "../constants/site";
 import { useI18n } from "../i18n/I18nProvider";
 import { mapPathToLanguage } from "../i18n/I18nProvider";
 import type { Language } from "../i18n/types";
+import { SITE_URL, toCanonicalUrl } from "./canonical";
 
-const SITE_URL = `https://${siteConfig.domain}`;
 const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 type PageHeadProps = {
@@ -15,13 +15,6 @@ type PageHeadProps = {
   noindex?: boolean;
   bareTitle?: boolean;
 };
-
-function buildCanonical(path: string) {
-  if (path === "/") {
-    return `${SITE_URL}/`;
-  }
-  return `${SITE_URL}${path}`;
-}
 
 const OG_LOCALE: Record<Language, string> = {
   es: "es_ES",
@@ -36,11 +29,11 @@ const HTML_LANG: Record<Language, string> = {
 export function PageHead({ title, description, path, noindex = false, bareTitle = false }: PageHeadProps) {
   const { language } = useI18n();
   const fullTitle = bareTitle ? title : `${title} · ${siteConfig.name}`;
-  const canonical = buildCanonical(path);
+  const canonical = toCanonicalUrl(path);
 
   const otherLang: Language = language === "es" ? "en" : "es";
   const altPath = mapPathToLanguage(path, otherLang);
-  const altUrl = buildCanonical(altPath);
+  const altUrl = toCanonicalUrl(altPath);
 
   return (
     <Head>
@@ -50,7 +43,7 @@ export function PageHead({ title, description, path, noindex = false, bareTitle 
       <link rel="canonical" href={canonical} />
       <link rel="alternate" hrefLang={HTML_LANG[language]} href={canonical} />
       <link rel="alternate" hrefLang={HTML_LANG[otherLang]} href={altUrl} />
-      <link rel="alternate" hrefLang="x-default" href={buildCanonical(mapPathToLanguage(path, "es"))} />
+      <link rel="alternate" hrefLang="x-default" href={toCanonicalUrl(mapPathToLanguage(path, "es"))} />
       {noindex ? <meta name="robots" content="noindex, nofollow" /> : null}
       <meta property="og:type" content="website" />
       <meta property="og:locale" content={OG_LOCALE[language]} />
