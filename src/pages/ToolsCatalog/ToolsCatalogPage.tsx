@@ -70,13 +70,15 @@ export function ToolsCatalogPage() {
     if (restored) {
       setFilters(restored.filters);
       setOnlyFavorites(restored.onlyFavorites);
-      // Esperar a que ScrollToTop (efecto de un componente ancestro) corra y
-      // que React pinte el grid filtrado antes de recolocar el scroll.
-      const raf = requestAnimationFrame(() => {
+      // Recoloca scroll despues de que ScrollToTop (efecto en RootLayout) corra.
+      // Usamos setTimeout en vez de requestAnimationFrame: rAF puede ser
+      // throttleado o no dispararse en tabs en background o entornos headless,
+      // setTimeout(0) garantiza que se ejecute despues del effect ancestro.
+      const timer = window.setTimeout(() => {
         window.scrollTo({ top: restored.scrollY, left: 0, behavior: "instant" });
-      });
+      }, 0);
       setHasRestored(true);
-      return () => cancelAnimationFrame(raf);
+      return () => window.clearTimeout(timer);
     }
     setHasRestored(true);
     return undefined;
