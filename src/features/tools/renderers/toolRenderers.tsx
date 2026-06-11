@@ -91,6 +91,21 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "add-page-numbers": lazy(() =>
     import("../../../tools/pdf/add-page-numbers").then((module) => ({ default: module.AddPageNumbersTool })),
   ),
+  "advanced-word-counter": lazy(() =>
+    import("../../../tools/text/advanced-word-counter").then((module) => ({
+      default: module.AdvancedWordCounterTool,
+    })),
+  ),
+  "markdown-to-html": lazy(() =>
+    import("../../../tools/text/markdown-to-html").then((module) => ({
+      default: module.MarkdownToHtmlTool,
+    })),
+  ),
+  "compare-texts": lazy(() =>
+    import("../../../tools/text/compare-texts").then((module) => ({
+      default: module.CompareTextsTool,
+    })),
+  ),
 };
 
 export function getToolRenderer(toolId: ToolMetadata["id"]) {

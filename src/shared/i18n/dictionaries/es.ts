@@ -1154,6 +1154,89 @@ export const es = {
     "Numeramos {{numbered}} de {{total}} páginas.",
   "tools.add-page-numbers.ui.localProcessingNote":
     "El procesamiento ocurre en tu navegador.",
+
+  "tools.advanced-word-counter.ui.inputTitle": "Texto a analizar",
+  "tools.advanced-word-counter.ui.inputIntro":
+    "Pegá o escribí el texto. Las métricas se actualizan en vivo.",
+  "tools.advanced-word-counter.ui.contentLabel": "Contenido",
+  "tools.advanced-word-counter.ui.contentPlaceholder":
+    "Pegá o escribí acá el texto que querés analizar.",
+  "tools.advanced-word-counter.ui.charCount": "{{count}} / {{limit}} caracteres",
+  "tools.advanced-word-counter.ui.overLimit":
+    "Superaste el límite de {{limit}} caracteres. Recortamos el texto al medir.",
+  "tools.advanced-word-counter.ui.resultsTitle": "Métricas",
+  "tools.advanced-word-counter.ui.resultsIntro":
+    "Resumen en vivo del texto ingresado.",
+  "tools.advanced-word-counter.ui.statsWords": "Palabras",
+  "tools.advanced-word-counter.ui.statsCharsWithSpaces": "Caracteres con espacios",
+  "tools.advanced-word-counter.ui.statsCharsNoSpaces": "Caracteres sin espacios",
+  "tools.advanced-word-counter.ui.statsLines": "Líneas",
+  "tools.advanced-word-counter.ui.statsParagraphs": "Párrafos",
+  "tools.advanced-word-counter.ui.statsSentences": "Frases",
+  "tools.advanced-word-counter.ui.approximateNote": "Aproximado.",
+  "tools.advanced-word-counter.ui.readingTimeLabel": "Tiempo de lectura",
+  "tools.advanced-word-counter.ui.readingTimeEmpty": "—",
+  "tools.advanced-word-counter.ui.readingTimeSeconds": "{{seconds}} s",
+  "tools.advanced-word-counter.ui.readingTimeMinutes": "{{minutes}} min",
+  "tools.advanced-word-counter.ui.readingTimeHelp":
+    "Estimado con {{wpm}} palabras por minuto.",
+  "tools.advanced-word-counter.ui.localProcessingNote":
+    "El procesamiento ocurre en tu navegador.",
+
+  "tools.markdown-to-html.ui.inputTitle": "Editor Markdown",
+  "tools.markdown-to-html.ui.inputIntro":
+    "Escribí o pegá Markdown. Convertimos a HTML en vivo.",
+  "tools.markdown-to-html.ui.markdownLabel": "Markdown",
+  "tools.markdown-to-html.ui.markdownPlaceholder":
+    "# Título\n\nPárrafo con **negrita** e *itálica*.",
+  "tools.markdown-to-html.ui.charCount": "{{count}} / {{limit}} caracteres",
+  "tools.markdown-to-html.ui.overLimit":
+    "Superaste el límite de {{limit}} caracteres. Recortamos al convertir.",
+  "tools.markdown-to-html.ui.modeLabel": "Modo de salida",
+  "tools.markdown-to-html.ui.mode.fragment": "Fragmento HTML",
+  "tools.markdown-to-html.ui.modeDesc.fragment":
+    "Solo el contenido convertido, listo para embeber.",
+  "tools.markdown-to-html.ui.mode.document": "Documento HTML completo",
+  "tools.markdown-to-html.ui.modeDesc.document":
+    "Envuelve la salida con doctype, head y body.",
+  "tools.markdown-to-html.ui.titleLabel": "Título del documento",
+  "tools.markdown-to-html.ui.titlePlaceholder": "Mi documento",
+  "tools.markdown-to-html.ui.outputTitle": "Salida",
+  "tools.markdown-to-html.ui.outputIntro": "Vista previa, código y descarga.",
+  "tools.markdown-to-html.ui.tabPreview": "Vista previa",
+  "tools.markdown-to-html.ui.tabCode": "Código HTML",
+  "tools.markdown-to-html.ui.copyHtml": "Copiar HTML",
+  "tools.markdown-to-html.ui.downloadHtml": "Descargar HTML",
+  "tools.markdown-to-html.ui.copyFailed":
+    "No pudimos copiar al portapapeles. Probá manualmente.",
+  "tools.markdown-to-html.ui.emptyOutput": "Sin contenido para mostrar.",
+  "tools.markdown-to-html.ui.previewNote":
+    "Soporte para headings, énfasis, listas, links, code y blockquotes. Sin tablas ni HTML embebido.",
+
+  "tools.compare-texts.ui.leftLabel": "Texto A",
+  "tools.compare-texts.ui.leftPlaceholder": "Pegá la versión original.",
+  "tools.compare-texts.ui.rightLabel": "Texto B",
+  "tools.compare-texts.ui.rightPlaceholder": "Pegá la versión nueva.",
+  "tools.compare-texts.ui.charCount": "{{count}} / {{limit}} caracteres",
+  "tools.compare-texts.ui.overLimit":
+    "Superaste el límite de {{limit}} caracteres por texto.",
+  "tools.compare-texts.ui.modeLabel": "Comparar por",
+  "tools.compare-texts.ui.mode.lines": "Líneas",
+  "tools.compare-texts.ui.mode.words": "Palabras",
+  "tools.compare-texts.ui.optionsLabel": "Opciones",
+  "tools.compare-texts.ui.ignoreCase": "Ignorar mayúsculas",
+  "tools.compare-texts.ui.ignoreWhitespace": "Ignorar espacios extra",
+  "tools.compare-texts.ui.resultsTitle": "Diferencias",
+  "tools.compare-texts.ui.resultsIntro":
+    "Resumen y detalle visual de los cambios.",
+  "tools.compare-texts.ui.summaryAdded": "Agregados",
+  "tools.compare-texts.ui.summaryRemoved": "Eliminados",
+  "tools.compare-texts.ui.summaryUnchanged": "Sin cambios",
+  "tools.compare-texts.ui.summaryTotal": "Total diferencias",
+  "tools.compare-texts.ui.emptyState": "Pegá texto en A y B para comparar.",
+  "tools.compare-texts.ui.noDifferences": "Los textos son iguales con las opciones actuales.",
+  "tools.compare-texts.ui.localProcessingNote":
+    "El procesamiento ocurre en tu navegador.",
 } as const;
 
 export type TranslationKey = keyof typeof es;
