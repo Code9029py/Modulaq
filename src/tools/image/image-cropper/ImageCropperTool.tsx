@@ -62,11 +62,10 @@ const copy = {
     fullImage: "Imagen completa",
     heightLabel: "Alto del recorte",
     invalidPreview: "Ajusta el recorte para ver la vista previa.",
-    outputIntro: "El resultado se genera desde un canvas local.",
     outputTitle: "Vista previa y salida",
     previewAlt: "Vista previa del recorte",
     processing: "Recortando imagen...",
-    sourceIntro: "Recorta una imagen definiendo el area exacta.",
+    sourceIntro: "Subí una imagen y definí X, Y, ancho y alto.",
     sourceTitle: "Archivo y recorte",
     squareCrop: "Cuadrado centrado",
     widthLabel: "Ancho del recorte",
@@ -86,11 +85,10 @@ const copy = {
     fullImage: "Full image",
     heightLabel: "Crop height",
     invalidPreview: "Adjust the crop to see the preview.",
-    outputIntro: "The result is generated from a local canvas.",
     outputTitle: "Preview and output",
     previewAlt: "Crop preview",
     processing: "Cropping image...",
-    sourceIntro: "Crop an image by defining the exact area.",
+    sourceIntro: "Upload an image and set X, Y, width and height.",
     sourceTitle: "File and crop",
     squareCrop: "Centered square",
     widthLabel: "Crop width",
@@ -514,9 +512,7 @@ export function ImageCropperTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.outputIntro}</p>
-        </div>
+          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>        </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">

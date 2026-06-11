@@ -39,9 +39,8 @@ const copy = {
     downloadReady: "PNG listo",
     externalWarning: "Los SVG con recursos externos pueden no renderizarse igual.",
     height: "Alto",
-    inputHelp: "Convierte SVG simple a PNG desde tu navegador.",
+    inputHelp: "Subí un archivo SVG o pegá el código.",
     invalidFile: "Selecciona un archivo SVG.",
-    outputIntro: "Todo se procesa localmente en tu navegador.",
     outputTitle: "Vista previa y salida",
     pasteIntro: "Tambien podes pegar codigo SVG.",
     previewAlt: "Vista previa del SVG",
@@ -61,9 +60,8 @@ const copy = {
     downloadReady: "PNG ready",
     externalWarning: "SVGs with external resources may not render the same.",
     height: "Height",
-    inputHelp: "Convert simple SVG to PNG from your browser.",
+    inputHelp: "Upload an SVG file or paste the code.",
     invalidFile: "Select an SVG file.",
-    outputIntro: "Everything is processed locally in your browser.",
     outputTitle: "Preview and output",
     pasteIntro: "You can also paste SVG code.",
     previewAlt: "SVG preview",
@@ -479,7 +477,6 @@ export function SvgToPngTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.outputIntro}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
