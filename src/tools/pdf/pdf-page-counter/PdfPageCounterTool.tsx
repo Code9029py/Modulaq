@@ -123,7 +123,6 @@ export function PdfPageCounterTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">{t("tools.pdf-page-counter.ui.resultTitle")}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.pdf-page-counter.ui.resultIntro")}</p>
         </div>
 
         <div className="mt-5 grid min-h-64 place-items-center rounded-xl border border-surface-200/80 bg-surface-50/80 p-5 shadow-sm">

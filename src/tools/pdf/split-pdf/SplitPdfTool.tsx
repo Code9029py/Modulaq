@@ -426,7 +426,6 @@ export function SplitPdfTool() {
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
           <h3 className="text-sm font-semibold text-ink-900">{t("tools.split-pdf.ui.resultTitle")}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{t("tools.split-pdf.ui.resultIntro2")}</p>
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">

@@ -53,11 +53,10 @@ const copy = {
     downloadReady: "Placeholder listo",
     generateCta: "Generar imagen",
     height: "Alto",
-    outputIntro: "Todo se genera localmente.",
     outputTitle: "Vista previa y salida",
     placeholderAlt: "Vista previa del placeholder",
     processing: "Generando placeholder...",
-    sourceIntro: "Genera una imagen placeholder para disenos, pruebas o desarrollo web.",
+    sourceIntro: "Configurá tamaño, texto y colores.",
     sourceTitle: "Configuracion",
     text: "Texto",
     textColor: "Color de texto",
@@ -70,11 +69,10 @@ const copy = {
     downloadReady: "Placeholder ready",
     generateCta: "Generate image",
     height: "Height",
-    outputIntro: "Everything is generated locally.",
     outputTitle: "Preview and output",
     placeholderAlt: "Placeholder preview",
     processing: "Generating placeholder...",
-    sourceIntro: "Generate a placeholder image for layouts, tests or web development.",
+    sourceIntro: "Configure size, text and colors.",
     sourceTitle: "Settings",
     text: "Text",
     textColor: "Text color",
@@ -356,9 +354,7 @@ export function ImagePlaceholderTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.outputIntro}</p>
-        </div>
+          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>        </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">

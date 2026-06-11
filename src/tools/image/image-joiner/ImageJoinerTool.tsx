@@ -84,13 +84,12 @@ const copy = {
     joinCta: "Unir imagenes",
     layoutTitle: "Orden y composicion",
     mode: "Modo de union",
-    outputIntro: "Todo se procesa localmente.",
     outputTitle: "Vista previa y salida",
     padding: "Padding exterior",
     previewAlt: "Vista previa de imagenes unidas",
     processing: "Uniendo imagenes...",
     remove: "Eliminar",
-    sourceIntro: "Une varias imagenes en una sola imagen vertical, horizontal o en cuadricula.",
+    sourceIntro: "Subí dos o más imágenes y elegí cómo unirlas.",
     sourceTitle: "Imagenes",
     spacing: "Separacion",
     vertical: "Vertical",
@@ -107,13 +106,12 @@ const copy = {
     joinCta: "Join images",
     layoutTitle: "Order and composition",
     mode: "Join mode",
-    outputIntro: "Everything is processed locally.",
     outputTitle: "Preview and output",
     padding: "Outer padding",
     previewAlt: "Joined images preview",
     processing: "Joining images...",
     remove: "Remove",
-    sourceIntro: "Join multiple images into one vertical, horizontal or grid image.",
+    sourceIntro: "Upload two or more images and pick how to join them.",
     sourceTitle: "Images",
     spacing: "Spacing",
     vertical: "Vertical",
@@ -615,9 +613,7 @@ export function ImageJoinerTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.outputIntro}</p>
-        </div>
+          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>        </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">

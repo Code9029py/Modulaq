@@ -84,7 +84,6 @@ const copy = {
     flipHorizontal: "Voltear horizontal",
     flipVertical: "Voltear vertical",
     noImage: "Selecciona una imagen para habilitar las acciones.",
-    outputIntro: "El resultado se genera desde un canvas local.",
     outputTitle: "Vista previa y salida",
     previewAlt: "Vista previa de la imagen transformada",
     processing: "Preparando imagen...",
@@ -92,7 +91,7 @@ const copy = {
     rotate180: "Rotar 180",
     rotateLeft: "90 izquierda",
     rotateRight: "90 derecha",
-    sourceIntro: "Rota o voltea una imagen sin perder calidad.",
+    sourceIntro: "Subí una imagen y elegí cómo rotarla o voltearla.",
     sourceTitle: "Archivo y rotacion",
     transformLabel: "Transformacion",
     unchanged: "Sin cambios",
@@ -105,7 +104,6 @@ const copy = {
     flipHorizontal: "Flip horizontal",
     flipVertical: "Flip vertical",
     noImage: "Select an image to enable actions.",
-    outputIntro: "The result is generated from a local canvas.",
     outputTitle: "Preview and output",
     previewAlt: "Preview of the transformed image",
     processing: "Preparing image...",
@@ -113,7 +111,7 @@ const copy = {
     rotate180: "Rotate 180",
     rotateLeft: "90 left",
     rotateRight: "90 right",
-    sourceIntro: "Rotate or flip an image without losing quality.",
+    sourceIntro: "Upload an image and pick how to rotate or flip it.",
     sourceTitle: "File and rotation",
     transformLabel: "Transform",
     unchanged: "No changes",
@@ -486,9 +484,7 @@ export function ImageRotatorTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.outputIntro}</p>
-        </div>
+          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>        </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">

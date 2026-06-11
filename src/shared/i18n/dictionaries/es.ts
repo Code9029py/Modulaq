@@ -348,7 +348,7 @@ export const es = {
   "tools.split-pdf.ui.section": "Archivo y división",
   "tools.split-pdf.ui.intro":
     "Cargá un PDF y elegí cómo dividirlo: extraer un rango, dividir en partes o separar todas las páginas.",
-  "tools.split-pdf.ui.dropHint": "También podés arrastrar un archivo aquí. El procesamiento es local.",
+  "tools.split-pdf.ui.dropHint": "También podés arrastrar un archivo aquí.",
   "tools.split-pdf.ui.modeLabel": "Modo de división",
   "tools.split-pdf.ui.modeRange": "Extraer rango",
   "tools.split-pdf.ui.modeParts": "Dividir en partes",
@@ -410,7 +410,6 @@ export const es = {
   "tools.split-pdf.ui.preparing": "Preparando descarga...",
   "tools.split-pdf.ui.pickFirst": "Seleccioná un PDF para habilitar la división.",
   "tools.split-pdf.ui.intro2": "Seleccioná un PDF y elegí cómo querés separar sus páginas.",
-  "tools.split-pdf.ui.resultIntro2": "Los archivos se procesan localmente.",
   "tools.split-pdf.ui.successOnePartLabel": "parte",
   "tools.split-pdf.ui.successPartsLabel": "partes",
   "tools.split-pdf.ui.successIndividualOne": "PDF individual",
@@ -468,7 +467,7 @@ export const es = {
     "Podés indicar páginas individuales o rangos. Ejemplos: 1,2,3 o 1-3,5,8-10. Los rangos son inclusivos.",
   "tools.pdf-to-images.ui.section2": "Archivo y configuración",
   "tools.pdf-to-images.ui.intro2": "Seleccioná un PDF y elegí qué páginas querés convertir en imágenes.",
-  "tools.pdf-to-images.ui.dropHint": "También podés arrastrar un archivo aquí. No se sube a servidores.",
+  "tools.pdf-to-images.ui.dropHint": "También podés arrastrar un archivo aquí.",
   "tools.pdf-to-images.ui.modeAllTitle": "Todas las páginas",
   "tools.pdf-to-images.ui.modeAllShort": "Convierte el PDF completo.",
   "tools.pdf-to-images.ui.modeRangeTitle": "Elegir páginas",
@@ -510,7 +509,7 @@ export const es = {
   "tools.compress-pdf.ui.delta": "Reducción",
   "tools.compress-pdf.ui.kept": "Se conservó el original (no se logró reducción).",
   "tools.compress-pdf.ui.section": "Archivos PDF",
-  "tools.compress-pdf.ui.intro2": "Seleccioná uno o varios documentos para intentar optimizar su tamaño localmente.",
+  "tools.compress-pdf.ui.intro2": "Seleccioná uno o varios documentos.",
   "tools.compress-pdf.ui.notice":
     "La compresión desde navegador puede variar según el contenido del PDF. Algunos archivos ya vienen optimizados o incluyen imágenes comprimidas, por lo que pueden reducirse poco o nada.",
   "tools.compress-pdf.ui.dropHintMany": "También podés arrastrar varios archivos aquí.",
@@ -569,8 +568,7 @@ export const es = {
   "tools.pdf-page-counter.ui.pickPdf": "Cargá un PDF para empezar.",
   "tools.pdf-page-counter.ui.intro2":
     "Seleccioná o arrastrá un único PDF para contar sus páginas.",
-  "tools.pdf-page-counter.ui.dropHint": "También podés arrastrar el archivo aquí. No se sube a ningún servidor.",
-  "tools.pdf-page-counter.ui.resultIntro": "Conteo local, rápido y sin backend.",
+  "tools.pdf-page-counter.ui.dropHint": "También podés arrastrar el archivo aquí.",
   "tools.pdf-page-counter.ui.readingDetail": "Esto debería tardar solo un momento.",
   "tools.pdf-page-counter.ui.hasLabel": "Este PDF tiene",
   "tools.pdf-page-counter.ui.fileLabel": "Archivo",
@@ -589,12 +587,12 @@ export const es = {
   "tools.reorder-pdf-pages.ui.couldNotReorder": "No se pudo reordenar el PDF.",
   "tools.reorder-pdf-pages.ui.pageLabel": "Página {{number}}",
   "tools.reorder-pdf-pages.ui.intro2": "Seleccioná un PDF y mové sus páginas con los controles de subir y bajar.",
-  "tools.reorder-pdf-pages.ui.dropHint": "También podés arrastrar un archivo aquí. No se sube a servidores.",
+  "tools.reorder-pdf-pages.ui.dropHint": "También podés arrastrar un archivo aquí.",
   "tools.reorder-pdf-pages.ui.orderLabel": "Orden de páginas",
   "tools.reorder-pdf-pages.ui.restore": "Restablecer orden",
   "tools.reorder-pdf-pages.ui.idleTitle": "Sin PDF seleccionado",
   "tools.reorder-pdf-pages.ui.idleBody": "Cargá un archivo para ver su lista de páginas y cambiar el orden.",
-  "tools.reorder-pdf-pages.ui.outputIntro2": "El PDF se genera localmente con el orden visible en la lista.",
+  "tools.reorder-pdf-pages.ui.outputIntro2": "El PDF se genera con el orden visible en la lista.",
   "tools.reorder-pdf-pages.ui.pagesDetected": "Páginas detectadas",
   "tools.reorder-pdf-pages.ui.currentOrder": "Orden actual",
   "tools.reorder-pdf-pages.ui.original": "Orden original",
@@ -769,7 +767,7 @@ export const es = {
 
   // ---------- image-converter renderer ----------
   "tools.image-converter.ui.sourceTitle": "Imagen de origen",
-  "tools.image-converter.ui.intro": "Convierte imágenes entre formatos compatibles con tu navegador.",
+  "tools.image-converter.ui.intro": "Convierte imágenes entre formatos compatibles.",
   "tools.image-converter.ui.outputTitle": "Formato de salida",
   "tools.image-converter.ui.outputIntro":
     "Elegí el formato y descargá una nueva imagen.",
@@ -782,8 +780,7 @@ export const es = {
   "tools.image-compressor.ui.sourceTitle": "Imagen original",
   "tools.image-compressor.ui.intro": "Intenta reducir el peso de una imagen ajustando formato y calidad.",
   "tools.image-compressor.ui.outputTitle": "Compresión",
-  "tools.image-compressor.ui.outputIntro":
-    "La reducción depende del formato original, el contenido y el navegador.",
+  "tools.image-compressor.ui.outputIntro": "La reducción depende del formato y el contenido.",
   "tools.image-compressor.ui.compressCta": "Comprimir imagen",
   "tools.image-compressor.ui.compressing": "Comprimiendo imagen...",
   "tools.image-compressor.ui.resultReady": "Resultado preparado",
@@ -819,13 +816,11 @@ export const es = {
 
   // ---------- image-base64 renderer ----------
   "tools.image-base64.ui.title": "Imagen ↔ Base64",
-  "tools.image-base64.ui.imageToBase64Intro":
-    "Convierte una imagen en texto Base64 o Data URL.",
+  "tools.image-base64.ui.imageToBase64Intro": "Subí una imagen para obtener Base64 o Data URL.",
   "tools.image-base64.ui.base64ToImageIntro":
     "Pegá un texto Base64 o una Data URL para reconstruir la imagen.",
   "tools.image-base64.ui.localProcessing": "Todo se procesa localmente.",
-  "tools.image-base64.ui.base64ToImageHeadIntro":
-    "Reconstruye una imagen desde Base64 o Data URL.",
+  "tools.image-base64.ui.base64ToImageHeadIntro": "Pegá Base64 o Data URL para reconstruir la imagen.",
   "tools.image-base64.ui.base64ToImageWarning":
     "Una cadena Base64 válida no siempre representa una imagen.",
   "tools.image-base64.ui.intro":
@@ -1072,8 +1067,7 @@ export const es = {
   "tools.errors.addPageNumbersFailed": "No se pudieron agregar números de página al PDF.",
 
   "tools.text-to-pdf.ui.textSection": "Texto a convertir",
-  "tools.text-to-pdf.ui.textIntro":
-    "Pegá o escribí el contenido. Generamos un PDF simple con paginación automática.",
+  "tools.text-to-pdf.ui.textIntro": "Pegá o escribí el texto que querés convertir.",
   "tools.text-to-pdf.ui.titleLabel": "Título (opcional)",
   "tools.text-to-pdf.ui.titlePlaceholder": "Mi documento",
   "tools.text-to-pdf.ui.contentLabel": "Contenido",
@@ -1098,15 +1092,14 @@ export const es = {
   "tools.text-to-pdf.ui.generateCta": "Generar PDF",
   "tools.text-to-pdf.ui.localProcessingNote": "El procesamiento ocurre en tu navegador.",
 
-  "tools.remove-pdf-pages.ui.fileSection": "PDF y páginas a eliminar",
-  "tools.remove-pdf-pages.ui.intro":
-    "Cargá un PDF e indicá qué páginas o rangos eliminar. El resto se conserva en el orden original.",
+  "tools.remove-pdf-pages.ui.fileSection": "Archivo y rango",
+  "tools.remove-pdf-pages.ui.intro": "El resto se conserva en el orden original.",
   "tools.remove-pdf-pages.ui.rangeLabel": "Páginas a eliminar",
   "tools.remove-pdf-pages.ui.rangePlaceholder": "Ej. 1,3-5,8",
   "tools.remove-pdf-pages.ui.rangeHelp":
     "Usá números separados por coma y rangos con guion (ej. 1,3-5,8).",
   "tools.remove-pdf-pages.ui.outputTitle": "PDF resultante",
-  "tools.remove-pdf-pages.ui.outputIntro": "Configurá el nombre y descargá el archivo sin las páginas indicadas.",
+  "tools.remove-pdf-pages.ui.outputIntro": "Configurá el nombre de descarga.",
   "tools.remove-pdf-pages.ui.processing": "Eliminando páginas...",
   "tools.remove-pdf-pages.ui.cta": "Eliminar y descargar",
   "tools.remove-pdf-pages.ui.successSummary":
@@ -1114,15 +1107,14 @@ export const es = {
   "tools.remove-pdf-pages.ui.localProcessingNote":
     "El procesamiento ocurre en tu navegador.",
 
-  "tools.add-page-numbers.ui.fileSection": "PDF a numerar",
-  "tools.add-page-numbers.ui.intro":
-    "Cargá un PDF y elegí la posición de la numeración al pie.",
-  "tools.add-page-numbers.ui.positionLabel": "Posición de la numeración",
+  "tools.add-page-numbers.ui.fileSection": "Archivo y posición",
+  "tools.add-page-numbers.ui.intro": "Elegí la posición de la numeración al pie.",
+  "tools.add-page-numbers.ui.positionLabel": "Posición",
   "tools.add-page-numbers.ui.position.bottom-left": "Abajo izquierda",
   "tools.add-page-numbers.ui.position.bottom-center": "Abajo centro",
   "tools.add-page-numbers.ui.position.bottom-right": "Abajo derecha",
   "tools.add-page-numbers.ui.outputTitle": "PDF numerado",
-  "tools.add-page-numbers.ui.outputIntro": "Configurá el nombre y descargá el PDF con la numeración aplicada.",
+  "tools.add-page-numbers.ui.outputIntro": "Configurá el nombre de descarga.",
   "tools.add-page-numbers.ui.processing": "Agregando números...",
   "tools.add-page-numbers.ui.cta": "Numerar y descargar",
   "tools.add-page-numbers.ui.localProcessingNote":

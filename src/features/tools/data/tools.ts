@@ -472,8 +472,8 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
     slugEn: "convert-image",
     name: { es: "Convertir imagen", en: "Convert image" },
     description: {
-      es: "Convierte una imagen entre formatos compatibles con tu navegador.",
-      en: "Convert an image between formats supported by your browser.",
+      es: "Convierte una imagen entre formatos compatibles.",
+      en: "Convert an image between supported formats.",
     },
     category: "image",
     tags: {
