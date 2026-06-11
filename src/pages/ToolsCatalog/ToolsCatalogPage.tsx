@@ -8,6 +8,8 @@ import { useFavorites } from "../../features/tools/context/ToolPrefsProvider";
 import { tools } from "../../features/tools/data/tools";
 import type { ToolFilters as ToolFiltersType } from "../../features/tools/types/tool.types";
 import {
+  CATALOG_INITIAL_VISIBLE_COUNT,
+  CATALOG_LOAD_MORE_COUNT,
   consumeCatalogReturnState,
   saveCatalogState,
   type CatalogPersistedState,
@@ -55,14 +57,15 @@ export function ToolsCatalogPage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(CATALOG_INITIAL_VISIBLE_COUNT);
   const [hasRestored, setHasRestored] = useState(false);
   const { hydrated, favoriteIds } = useFavorites();
 
   // Estado más reciente expuesto al listener de scroll (refs evitan rebind del listener).
-  const latestRef = useRef({ filters, onlyFavorites });
+  const latestRef = useRef({ filters, onlyFavorites, visibleCount });
   useEffect(() => {
-    latestRef.current = { filters, onlyFavorites };
-  }, [filters, onlyFavorites]);
+    latestRef.current = { filters, onlyFavorites, visibleCount };
+  }, [filters, onlyFavorites, visibleCount]);
 
   // Restauración contextual al volver desde un detalle de herramienta.
   useEffect(() => {
@@ -70,6 +73,7 @@ export function ToolsCatalogPage() {
     if (restored) {
       setFilters(restored.filters);
       setOnlyFavorites(restored.onlyFavorites);
+      setVisibleCount(restored.visibleCount);
       // Recoloca scroll despues de que ScrollToTop (efecto en RootLayout) corra.
       // Usamos setTimeout en vez de requestAnimationFrame: rAF puede ser
       // throttleado o no dispararse en tabs en background o entornos headless,
@@ -92,10 +96,11 @@ export function ToolsCatalogPage() {
     const state: CatalogPersistedState = {
       filters,
       onlyFavorites,
+      visibleCount,
       scrollY: typeof window === "undefined" ? 0 : window.scrollY,
     };
     saveCatalogState(state);
-  }, [filters, onlyFavorites, hasRestored]);
+  }, [filters, onlyFavorites, visibleCount, hasRestored]);
 
   useEffect(() => {
     if (!hasRestored || typeof window === "undefined") return;
@@ -107,6 +112,7 @@ export function ToolsCatalogPage() {
         saveCatalogState({
           filters: latestRef.current.filters,
           onlyFavorites: latestRef.current.onlyFavorites,
+          visibleCount: latestRef.current.visibleCount,
           scrollY: window.scrollY,
         });
       });
@@ -130,7 +136,6 @@ export function ToolsCatalogPage() {
 
   const visibleStatuses = useMemo(() => getVisibleStatuses(tools), []);
   const filteredTools = useMemo(() => filterTools(tools, filters), [filters]);
-  const totalToolsCount = tools.length;
   const showFavoritesFilter = hydrated;
   const displayedTools = useMemo(() => {
     if (!showFavoritesFilter) {
@@ -142,11 +147,28 @@ export function ToolsCatalogPage() {
 
     return orderToolsByFavoriteIds(scopedTools, favoriteIds);
   }, [favoriteIds, filteredTools, onlyFavorites, showFavoritesFilter]);
+  const visibleTools = useMemo(() => displayedTools.slice(0, visibleCount), [displayedTools, visibleCount]);
+  const canLoadMore = visibleTools.length < displayedTools.length;
   const hasActiveFilters = hasFiltersOrSearch(filters, onlyFavorites);
+
+  const updateFilters = (nextFilters: ToolFiltersType) => {
+    setFilters(nextFilters);
+    setVisibleCount(CATALOG_INITIAL_VISIBLE_COUNT);
+  };
+
+  const updateOnlyFavorites = (nextOnlyFavorites: boolean) => {
+    setOnlyFavorites(nextOnlyFavorites);
+    setVisibleCount(CATALOG_INITIAL_VISIBLE_COUNT);
+  };
 
   const resetFilters = () => {
     setFilters(defaultFilters);
     setOnlyFavorites(false);
+    setVisibleCount(CATALOG_INITIAL_VISIBLE_COUNT);
+  };
+
+  const loadMore = () => {
+    setVisibleCount((current) => Math.min(current + CATALOG_LOAD_MORE_COUNT, displayedTools.length));
   };
 
   return (
@@ -180,7 +202,7 @@ export function ToolsCatalogPage() {
                 {t("catalog.filters.button")}
               </Button>
               <span className="text-sm font-medium text-ink-500">
-                {t("catalog.filters.countShort", { count: displayedTools.length })}
+                {t("catalog.filters.countShort", { count: visibleTools.length })}
               </span>
             </div>
           </div>
@@ -195,7 +217,7 @@ export function ToolsCatalogPage() {
                 className={cn(inputClassName, "min-h-12 w-full py-2 pl-10 pr-3 text-base")}
                 placeholder={t("catalog.search.placeholder")}
                 value={filters.search}
-                onChange={(event) => setFilters({ ...filters, search: event.target.value })}
+                onChange={(event) => updateFilters({ ...filters, search: event.target.value })}
               />
             </span>
           </label>
@@ -228,8 +250,8 @@ export function ToolsCatalogPage() {
               favoriteCount={favoriteIds.length}
               filters={filters}
               modes={visibleModes}
-              onChange={setFilters}
-              onOnlyFavoritesChange={setOnlyFavorites}
+              onChange={updateFilters}
+              onOnlyFavoritesChange={updateOnlyFavorites}
               onlyFavorites={onlyFavorites}
               showFavoritesFilter={showFavoritesFilter}
               statuses={visibleStatuses}
@@ -267,8 +289,8 @@ export function ToolsCatalogPage() {
                     favoriteCount={favoriteIds.length}
                     filters={filters}
                     modes={visibleModes}
-                    onChange={setFilters}
-                    onOnlyFavoritesChange={setOnlyFavorites}
+                    onChange={updateFilters}
+                    onOnlyFavoritesChange={updateOnlyFavorites}
                     onlyFavorites={onlyFavorites}
                     showFavoritesFilter={showFavoritesFilter}
                     statuses={visibleStatuses}
@@ -288,13 +310,13 @@ export function ToolsCatalogPage() {
                   </Button>
                 ) : null}
                 <p className="text-sm font-medium text-ink-500">
-                  {t("catalog.filters.countLong", { shown: displayedTools.length, total: totalToolsCount })}
+                  {t("catalog.filters.countLong", { shown: visibleTools.length, total: displayedTools.length })}
                 </p>
               </div>
             </div>
 
             <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-              {displayedTools.map((tool) => (
+              {visibleTools.map((tool) => (
                 <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
@@ -305,6 +327,14 @@ export function ToolsCatalogPage() {
                   title={onlyFavorites ? t("catalog.empty.favTitle") : t("catalog.empty.title")}
                   description={onlyFavorites ? t("catalog.empty.favDescription") : t("catalog.empty.description")}
                 />
+              </div>
+            ) : null}
+
+            {canLoadMore ? (
+              <div className="mt-6 flex justify-center">
+                <Button type="button" variant="secondary" onClick={loadMore}>
+                  {t("catalog.loadMore")}
+                </Button>
               </div>
             ) : null}
           </section>

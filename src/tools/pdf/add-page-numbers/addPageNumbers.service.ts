@@ -21,8 +21,16 @@ import type {
 export { formatFileSize, isPdfFile };
 
 export const defaultOutputBaseName = "pdf-numerado";
+const defaultOutputBaseNames: Record<Language, string> = {
+  es: defaultOutputBaseName,
+  en: "numbered-pdf",
+};
 
 export const STARTING_NUMBER_MAX = ADD_PAGE_NUMBERS_STARTING_NUMBER_MAX;
+
+export function getDefaultOutputBaseName(language: Language): string {
+  return defaultOutputBaseNames[language];
+}
 
 /** Templates por preset/idioma. {n} = número visible, {total} = numerated total. */
 const FORMAT_TEMPLATES: Record<PageNumberFormatPreset, Record<Language, string>> = {
@@ -48,8 +56,8 @@ export function previewPageNumberLabel(
   return formatPageNumberLabel(getFormatTemplate(format, language), visibleNumber, total);
 }
 
-export function getSuggestedOutputBaseName(fileName: string) {
-  return getSuggestedDownloadBaseName(fileName, defaultOutputBaseName);
+export function getSuggestedOutputBaseName(fileName: string, fallbackBaseName = defaultOutputBaseName) {
+  return getSuggestedDownloadBaseName(fileName, fallbackBaseName);
 }
 
 export function getOutputFileName(outputBaseName: string, fallbackBaseName = defaultOutputBaseName) {
@@ -101,6 +109,7 @@ export async function addPageNumbersToFile(
   options: AddPageNumbersFormOptions,
   outputBaseName: string,
   language: Language,
+  fallbackBaseName: string = defaultOutputBaseName,
 ): Promise<AddPageNumbersResult> {
   if (!isPdfFile(file)) {
     throw new ToolError("tools.errors.invalidPdf");
@@ -129,7 +138,7 @@ export async function addPageNumbersToFile(
 
   return {
     bytes: toArrayBuffer(bytes),
-    fileName: getOutputFileName(outputBaseName, getSuggestedOutputBaseName(file.name)),
+    fileName: getOutputFileName(outputBaseName, getSuggestedOutputBaseName(file.name, fallbackBaseName)),
     pageCount,
     numberedPages,
   };
