@@ -1,0 +1,1 @@
+export { AdvancedWordCounterTool } from "./AdvancedWordCounterTool";

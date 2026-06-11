@@ -3209,4 +3209,288 @@ export async function generateQrDataUrl(
       },
     },
   },
+  {
+    id: "advanced-word-counter",
+    slug: "contador-palabras-avanzado",
+    slugEn: "advanced-word-counter",
+    name: { es: "Contador de palabras avanzado", en: "Advanced word counter" },
+    description: {
+      es: "Contá palabras, caracteres, líneas, párrafos, frases y tiempo de lectura en vivo.",
+      en: "Count words, characters, lines, paragraphs, sentences and reading time as you type.",
+    },
+    category: "documents",
+    tags: {
+      es: ["texto", "documentos", "productividad", "contador"],
+      en: ["text", "documents", "productivity", "counter"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Contador de palabras avanzado online gratis",
+        description:
+          "Contá palabras, caracteres, líneas, párrafos, frases y tiempo de lectura en vivo.",
+      },
+      en: {
+        title: "Advanced word counter online free",
+        description:
+          "Count words, characters, lines, paragraphs, sentences and reading time live.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Contador de palabras avanzado calcula métricas comunes de texto en vivo: palabras, caracteres con y sin espacios, líneas, párrafos, frases aproximadas y tiempo de lectura.",
+        howTo: [
+          "Pegá o escribí el texto.",
+          "Mirá las métricas que se actualizan en vivo.",
+          "Usá el botón Limpiar para reiniciar.",
+        ],
+        useCases: [
+          "Validar límites de palabras o caracteres antes de publicar.",
+          "Estimar tiempo de lectura de un artículo o post.",
+          "Revisar estructura: líneas, párrafos y frases aproximadas.",
+        ],
+        limits: [
+          "Hasta 200 000 caracteres por análisis.",
+          "Frases y párrafos son aproximaciones por puntuación común y líneas vacías.",
+          "Tiempo de lectura calculado con 200 palabras por minuto por defecto.",
+        ],
+        privacy:
+          "El procesamiento ocurre en tu navegador; no subimos el texto.",
+        commonErrors: [
+          "Texto vacío: todas las métricas marcan cero.",
+          "Frases con abreviaturas o ellipsis pueden contarse distinto a lo esperado.",
+        ],
+        technicalNotes: [
+          "Frases se aproximan con terminadores . ! ? …",
+          "Párrafos se detectan por una o más líneas vacías.",
+        ],
+      },
+      en: {
+        summary:
+          "Advanced word counter computes common text metrics live: words, characters with and without spaces, lines, paragraphs, approximate sentences and reading time.",
+        howTo: [
+          "Paste or type your text.",
+          "Watch the metrics update live.",
+          "Use Clear to reset.",
+        ],
+        useCases: [
+          "Validate word or character limits before publishing.",
+          "Estimate the reading time of an article or post.",
+          "Review structure: lines, paragraphs and approximate sentences.",
+        ],
+        limits: [
+          "Up to 200,000 characters per analysis.",
+          "Sentences and paragraphs are approximations from common punctuation and blank lines.",
+          "Reading time uses 200 words per minute by default.",
+        ],
+        privacy:
+          "Processing happens in your browser — we don't upload the text.",
+        commonErrors: [
+          "Empty text: every metric shows zero.",
+          "Sentences with abbreviations or ellipsis can be counted slightly differently than expected.",
+        ],
+        technicalNotes: [
+          "Sentences are approximated with terminators . ! ? …",
+          "Paragraphs are detected from one or more empty lines.",
+        ],
+      },
+    },
+  },
+  {
+    id: "markdown-to-html",
+    slug: "markdown-a-html",
+    slugEn: "markdown-to-html",
+    name: { es: "Markdown a HTML", en: "Markdown to HTML" },
+    description: {
+      es: "Convertí Markdown a HTML con vista previa, opción de fragmento o documento completo.",
+      en: "Convert Markdown to HTML with a live preview and fragment or full-document output.",
+    },
+    category: "documents",
+    tags: {
+      es: ["markdown", "texto", "documentos", "html"],
+      en: ["markdown", "text", "documents", "html"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Markdown a HTML online gratis",
+        description:
+          "Convertí Markdown a HTML con vista previa y descarga local.",
+      },
+      en: {
+        title: "Markdown to HTML online free",
+        description:
+          "Convert Markdown to HTML with a live preview and local download.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Markdown a HTML toma texto en Markdown común (headings, énfasis, listas, links, code inline, code blocks y blockquotes) y genera HTML como fragmento o documento completo.",
+        howTo: [
+          "Pegá el Markdown en el editor.",
+          "Elegí salida como fragmento o documento HTML completo.",
+          "Mirá la vista previa, copiá el HTML o descargá un .html.",
+        ],
+        useCases: [
+          "Publicar un README como página HTML simple.",
+          "Generar un fragmento listo para embeber en un CMS.",
+          "Previsualizar Markdown rápido sin abrir un editor dedicado.",
+        ],
+        limits: [
+          "Hasta 200 000 caracteres por documento.",
+          "Soporte para Markdown común: headings, bold/italic, listas, links, code inline, code blocks y blockquotes.",
+          "Sin soporte para tablas, footnotes, listas anidadas profundas ni HTML embebido (se escapa).",
+        ],
+        privacy:
+          "El procesamiento ocurre en tu navegador; no subimos el texto.",
+        commonErrors: [
+          "Sintaxis no soportada: aparece como texto plano.",
+          "Links con esquemas peligrosos (javascript:, data:) se neutralizan a #.",
+        ],
+        technicalNotes: [
+          "Parser propio para no inflar el bundle eager: viaja en el chunk lazy de la herramienta.",
+          "URLs sanitizadas: sólo http, https, mailto, anclas internas o rutas relativas.",
+        ],
+      },
+      en: {
+        summary:
+          "Markdown to HTML takes common Markdown (headings, emphasis, lists, links, inline code, code blocks and blockquotes) and outputs HTML as a fragment or full document.",
+        howTo: [
+          "Paste your Markdown in the editor.",
+          "Pick fragment or full HTML document output.",
+          "See the preview, copy the HTML or download a .html file.",
+        ],
+        useCases: [
+          "Publish a README as a simple HTML page.",
+          "Generate a fragment ready to embed in a CMS.",
+          "Quickly preview Markdown without a dedicated editor.",
+        ],
+        limits: [
+          "Up to 200,000 characters per document.",
+          "Supports common Markdown: headings, bold/italic, lists, links, inline code, code blocks and blockquotes.",
+          "No tables, footnotes, deeply nested lists or raw HTML (it gets escaped).",
+        ],
+        privacy:
+          "Processing happens in your browser — we don't upload the text.",
+        commonErrors: [
+          "Unsupported syntax appears as plain text.",
+          "Links with dangerous schemes (javascript:, data:) are neutralized to #.",
+        ],
+        technicalNotes: [
+          "In-house parser to avoid bloating the eager bundle: ships in the tool's lazy chunk.",
+          "Sanitized URLs: only http, https, mailto, hash anchors or relative paths.",
+        ],
+      },
+    },
+  },
+  {
+    id: "compare-texts",
+    slug: "comparar-textos",
+    slugEn: "compare-texts",
+    name: { es: "Comparar textos", en: "Compare texts" },
+    description: {
+      es: "Compará dos textos por línea o palabra y resaltá las diferencias.",
+      en: "Compare two texts by line or word and highlight the differences.",
+    },
+    category: "documents",
+    tags: {
+      es: ["texto", "documentos", "productividad", "comparar", "diff"],
+      en: ["text", "documents", "productivity", "compare", "diff"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Comparar textos online gratis",
+        description:
+          "Compará dos textos por línea o palabra y resaltá las diferencias.",
+      },
+      en: {
+        title: "Compare texts online free",
+        description:
+          "Compare two texts by line or word and highlight the differences.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Comparar textos muestra qué cambió entre dos textos a nivel de línea o de palabra, con conteo de agregados, eliminados y sin cambios.",
+        howTo: [
+          "Pegá el texto A y el texto B.",
+          "Elegí comparar por líneas o por palabras.",
+          "Opcional: ignorar mayúsculas o espacios extra.",
+          "Revisá el resumen y el detalle resaltado.",
+        ],
+        useCases: [
+          "Detectar cambios entre dos versiones de un texto.",
+          "Comparar configuraciones, listas o párrafos editados.",
+          "Verificar antes de publicar que las correcciones están aplicadas.",
+        ],
+        limits: [
+          "Hasta 100 000 caracteres por texto.",
+          "Comparación textual simple basada en LCS (mejor secuencia común).",
+          "No detecta movimientos de bloques; eso aparece como eliminar + agregar.",
+        ],
+        privacy:
+          "El procesamiento ocurre en tu navegador; no subimos los textos.",
+        commonErrors: [
+          "Textos muy largos pueden tardar: la complejidad es O(n × m).",
+          "Diferencias sutiles de espacios o mayúsculas se ven como cambios reales si las opciones no están activas.",
+        ],
+        technicalNotes: [
+          "Diff por programación dinámica usando LCS.",
+          "Tokens por línea o por palabra; preserva valores originales en la salida.",
+        ],
+      },
+      en: {
+        summary:
+          "Compare texts shows what changed between two texts at the line or word level, with counts of added, removed and unchanged.",
+        howTo: [
+          "Paste text A and text B.",
+          "Pick comparison by lines or by words.",
+          "Optional: ignore case or extra whitespace.",
+          "Review the summary and highlighted diff.",
+        ],
+        useCases: [
+          "Detect changes between two versions of a text.",
+          "Compare configs, lists or edited paragraphs.",
+          "Verify that fixes have been applied before publishing.",
+        ],
+        limits: [
+          "Up to 100,000 characters per text.",
+          "Simple textual comparison based on LCS (longest common subsequence).",
+          "Doesn't detect block moves; those show up as remove + add.",
+        ],
+        privacy:
+          "Processing happens in your browser — we don't upload the texts.",
+        commonErrors: [
+          "Very long texts can be slow: complexity is O(n × m).",
+          "Subtle whitespace or case differences look like real changes if those options are off.",
+        ],
+        technicalNotes: [
+          "Diff via dynamic programming using LCS.",
+          "Tokens by line or by word; original values are preserved in the output.",
+        ],
+      },
+    },
+  },
 ];

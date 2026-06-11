@@ -1,1 +1,1 @@
-export type DownloadExtension = "pdf" | "png" | "txt" | "zip";
+export type DownloadExtension = "pdf" | "png" | "txt" | "zip" | "html";

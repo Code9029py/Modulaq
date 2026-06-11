@@ -61,6 +61,9 @@ const relatedToolIds: Record<string, string[]> = {
   "text-to-pdf": ["image-to-pdf", "add-page-numbers"],
   "remove-pdf-pages": ["reorder-pdf-pages", "split-pdf", "add-page-numbers"],
   "add-page-numbers": ["merge-pdf", "reorder-pdf-pages", "remove-pdf-pages"],
+  "advanced-word-counter": ["compare-texts", "markdown-to-html"],
+  "markdown-to-html": ["text-to-pdf", "advanced-word-counter"],
+  "compare-texts": ["advanced-word-counter", "markdown-to-html"],
 };
 
 function isDefinition(tool: ToolDefinition | undefined): tool is ToolDefinition {
