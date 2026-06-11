@@ -7,10 +7,10 @@ import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import {
   buildOutputFileName,
-  defaultOutputBaseName,
   FONT_SIZE_MAX,
   FONT_SIZE_MIN,
   generateTextPdf,
+  getDefaultOutputBaseName,
   MAX_TEXT_LENGTH,
   validateFontSize,
 } from "./textToPdf.service";
@@ -41,11 +41,12 @@ const pageSizes: readonly TextToPdfPageSize[] = ["a4", "letter", "legal"];
 const fontFamilies: readonly TextToPdfFontFamily[] = ["helvetica", "times-roman", "courier"];
 
 export function TextToPdfTool() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
+  const localizedDefaultOutputBaseName = getDefaultOutputBaseName(language);
   const [text, setText] = useState("");
   const [options, setOptions] = useState<TextToPdfFormOptions>(defaultFormOptions);
   const [fontSizeInput, setFontSizeInput] = useState(String(defaultFormOptions.fontSize));
-  const [outputBaseName, setOutputBaseName] = useState(defaultOutputBaseName);
+  const [outputBaseName, setOutputBaseName] = useState(localizedDefaultOutputBaseName);
   const [status, setStatus] = useState<TextToPdfStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [lastResultPages, setLastResultPages] = useState<number | null>(null);
@@ -65,7 +66,10 @@ export function TextToPdfTool() {
   const canGenerate =
     trimmedTextLength > 0 && !overLimit && status !== "processing" && fontSizeErrorCode === null;
 
-  const sanitizedOutputFileName = useMemo(() => buildOutputFileName(outputBaseName), [outputBaseName]);
+  const sanitizedOutputFileName = useMemo(
+    () => buildOutputFileName(outputBaseName, localizedDefaultOutputBaseName),
+    [localizedDefaultOutputBaseName, outputBaseName],
+  );
 
   const resetFeedback = () => {
     setError(null);
@@ -96,6 +100,7 @@ export function TextToPdfTool() {
         text,
         { ...options, fontSize: parsedFontSize },
         outputBaseName,
+        localizedDefaultOutputBaseName,
       );
       downloadPdf(result.bytes, result.fileName);
       setLastResultPages(result.pageCount);
@@ -110,7 +115,7 @@ export function TextToPdfTool() {
     setText("");
     setOptions(defaultFormOptions);
     setFontSizeInput(String(defaultFormOptions.fontSize));
-    setOutputBaseName(defaultOutputBaseName);
+    setOutputBaseName(localizedDefaultOutputBaseName);
     setStatus("idle");
     setError(null);
     setLastResultPages(null);
@@ -261,7 +266,7 @@ export function TextToPdfTool() {
             <input
               className={inputClassName}
               value={outputBaseName}
-              placeholder={defaultOutputBaseName}
+              placeholder={localizedDefaultOutputBaseName}
               onChange={(event) => {
                 setOutputBaseName(event.target.value);
                 resetFeedback();

@@ -6,11 +6,20 @@ import {
   textToPdf as coreTextToPdf,
 } from "@modulaq/core/pdf";
 import { ToolError } from "../../../shared/errors/ToolError";
+import type { Language } from "../../../shared/i18n/types";
 import { buildDownloadFileName } from "../../../shared/utils/downloadFileName";
 import { toArrayBuffer } from "../../../shared/utils/file";
 import type { TextToPdfFormOptions, TextToPdfResult } from "./textToPdf.types";
 
 export const defaultOutputBaseName = "texto-a-pdf";
+const defaultOutputBaseNames: Record<Language, string> = {
+  es: defaultOutputBaseName,
+  en: "text-to-pdf",
+};
+
+export function getDefaultOutputBaseName(language: Language): string {
+  return defaultOutputBaseNames[language];
+}
 
 /** Caracteres máximos de texto. Generoso pero finito para evitar OOM. */
 export const MAX_TEXT_LENGTH = 200_000;
@@ -18,8 +27,8 @@ export const MAX_TEXT_LENGTH = 200_000;
 export const FONT_SIZE_MIN = TEXT_TO_PDF_FONT_SIZE_MIN;
 export const FONT_SIZE_MAX = TEXT_TO_PDF_FONT_SIZE_MAX;
 
-export function buildOutputFileName(baseName: string): string {
-  return buildDownloadFileName(baseName, "pdf", defaultOutputBaseName);
+export function buildOutputFileName(baseName: string, fallbackBaseName = defaultOutputBaseName): string {
+  return buildDownloadFileName(baseName, "pdf", fallbackBaseName);
 }
 
 /** Devuelve `null` si el tamaño es válido o el code i18n del error. */
@@ -37,6 +46,7 @@ export async function generateTextPdf(
   text: string,
   options: TextToPdfFormOptions,
   outputBaseName: string = defaultOutputBaseName,
+  fallbackBaseName: string = defaultOutputBaseName,
 ): Promise<TextToPdfResult> {
   if (text.trim().length === 0) {
     throw new ToolError("tools.errors.textToPdfEmpty");
@@ -67,7 +77,7 @@ export async function generateTextPdf(
 
   return {
     bytes: toArrayBuffer(bytes),
-    fileName: buildOutputFileName(outputBaseName),
+    fileName: buildOutputFileName(outputBaseName, fallbackBaseName),
     pageCount,
   };
 }

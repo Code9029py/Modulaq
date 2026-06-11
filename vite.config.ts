@@ -12,16 +12,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Aísla librerías pesadas en chunks propios para que el chunk "shared"
-        // (eager en cada página) no las arrastre. Cada herramienta lazy que
-        // las use traerá el chunk on-demand.
-        // - pdfjs-dist: ~300 KB. Sólo lo necesitan pdf-to-images y extract-pdf-text.
-        // - pdf-lib: ~430 KB. Sólo lo necesitan las herramientas de PDF.
-        // - jszip: ya está dividido naturalmente; lo dejamos por claridad.
+        // Keep pdfjs in a dedicated lazy chunk so the eager app bundle does
+        // not pull it into home/catalog routes. Let pdf-lib and jszip split
+        // naturally; forcing them captured shared helpers and created preloads.
         manualChunks: (id) => {
           if (id.includes("node_modules/pdfjs-dist")) return "pdfjs";
-          if (id.includes("node_modules/pdf-lib")) return "pdf-lib";
-          if (id.includes("node_modules/jszip")) return "jszip";
           return undefined;
         },
       },
