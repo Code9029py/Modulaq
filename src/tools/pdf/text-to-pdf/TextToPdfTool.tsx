@@ -2,38 +2,49 @@ import { Download, FileText, Loader2, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { cn } from "../../../shared/utils/cn";
 import {
   buildOutputFileName,
   defaultOutputBaseName,
+  FONT_SIZE_MAX,
+  FONT_SIZE_MIN,
   generateTextPdf,
   MAX_TEXT_LENGTH,
+  validateFontSize,
 } from "./textToPdf.service";
-import type { TextToPdfFormOptions, TextToPdfPageSize, TextToPdfStatus } from "./textToPdf.types";
+import type {
+  TextToPdfFontFamily,
+  TextToPdfFormOptions,
+  TextToPdfPageSize,
+  TextToPdfStatus,
+} from "./textToPdf.types";
 
 const inputClassName =
   "min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 const defaultFormOptions: TextToPdfFormOptions = {
   title: "",
-  fontSize: 12,
+  fontSize: 11,
   margin: 56,
   pageSize: "a4",
+  fontFamily: "helvetica",
 };
 
-const fontSizes = [10, 12, 14, 16] as const;
 const margins = [
   { value: 36, labelKey: "tools.text-to-pdf.ui.marginSmall" },
   { value: 56, labelKey: "tools.text-to-pdf.ui.marginMedium" },
   { value: 80, labelKey: "tools.text-to-pdf.ui.marginLarge" },
 ] as const;
-const pageSizes: readonly TextToPdfPageSize[] = ["a4", "letter"];
+const pageSizes: readonly TextToPdfPageSize[] = ["a4", "letter", "legal"];
+const fontFamilies: readonly TextToPdfFontFamily[] = ["helvetica", "times-roman", "courier"];
 
 export function TextToPdfTool() {
   const { t } = useI18n();
   const [text, setText] = useState("");
   const [options, setOptions] = useState<TextToPdfFormOptions>(defaultFormOptions);
+  const [fontSizeInput, setFontSizeInput] = useState(String(defaultFormOptions.fontSize));
   const [outputBaseName, setOutputBaseName] = useState(defaultOutputBaseName);
   const [status, setStatus] = useState<TextToPdfStatus>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +52,18 @@ export function TextToPdfTool() {
 
   const trimmedTextLength = text.trim().length;
   const overLimit = text.length > MAX_TEXT_LENGTH;
-  const canGenerate = trimmedTextLength > 0 && !overLimit && status !== "processing";
+
+  const parsedFontSize = Number(fontSizeInput);
+  const fontSizeErrorCode = useMemo(
+    () => (fontSizeInput.trim().length === 0 ? "tools.errors.textToPdfFontSizeInvalid" : validateFontSize(parsedFontSize)),
+    [fontSizeInput, parsedFontSize],
+  );
+  const fontSizeError = fontSizeErrorCode
+    ? t(fontSizeErrorCode as TranslationKey, { min: FONT_SIZE_MIN, max: FONT_SIZE_MAX })
+    : null;
+
+  const canGenerate =
+    trimmedTextLength > 0 && !overLimit && status !== "processing" && fontSizeErrorCode === null;
 
   const sanitizedOutputFileName = useMemo(() => buildOutputFileName(outputBaseName), [outputBaseName]);
 
@@ -70,7 +92,11 @@ export function TextToPdfTool() {
     setLastResultPages(null);
 
     try {
-      const result = await generateTextPdf(text, options, outputBaseName);
+      const result = await generateTextPdf(
+        text,
+        { ...options, fontSize: parsedFontSize },
+        outputBaseName,
+      );
       downloadPdf(result.bytes, result.fileName);
       setLastResultPages(result.pageCount);
       setStatus("success");
@@ -83,6 +109,7 @@ export function TextToPdfTool() {
   const clearAll = () => {
     setText("");
     setOptions(defaultFormOptions);
+    setFontSizeInput(String(defaultFormOptions.fontSize));
     setOutputBaseName(defaultOutputBaseName);
     setStatus("idle");
     setError(null);
@@ -110,6 +137,7 @@ export function TextToPdfTool() {
                 resetFeedback();
               }}
             />
+            <span className="text-xs font-normal text-ink-500">{t("tools.text-to-pdf.ui.titleHelp")}</span>
           </label>
 
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
@@ -132,25 +160,48 @@ export function TextToPdfTool() {
 
           <fieldset className="grid gap-3">
             <legend className="text-sm font-semibold text-ink-700">{t("tools.text-to-pdf.ui.layoutSection")}</legend>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
-                {t("tools.text-to-pdf.ui.fontSizeLabel")}
+            <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
+                {t("tools.text-to-pdf.ui.fontFamilyLabel")}
                 <select
                   className={inputClassName}
-                  value={options.fontSize}
+                  value={options.fontFamily}
                   onChange={(event) => {
-                    setOptions((prev) => ({ ...prev, fontSize: Number(event.target.value) }));
+                    setOptions((prev) => ({ ...prev, fontFamily: event.target.value as TextToPdfFontFamily }));
                     resetFeedback();
                   }}
                 >
-                  {fontSizes.map((size) => (
-                    <option key={size} value={size}>
-                      {size}pt
+                  {fontFamilies.map((family) => (
+                    <option key={family} value={family}>
+                      {t(`tools.text-to-pdf.ui.fontFamily.${family}` as const)}
                     </option>
                   ))}
                 </select>
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
+                {t("tools.text-to-pdf.ui.fontSizeLabel")}
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  className={cn(
+                    inputClassName,
+                    fontSizeErrorCode ? "border-accent-violet/40 focus:border-accent-violet" : "",
+                  )}
+                  value={fontSizeInput}
+                  min={FONT_SIZE_MIN}
+                  max={FONT_SIZE_MAX}
+                  step={1}
+                  onChange={(event) => {
+                    setFontSizeInput(event.target.value);
+                    resetFeedback();
+                  }}
+                />
+                <span className={cn("text-xs font-normal", fontSizeError ? "text-accent-violet" : "text-ink-500")}>
+                  {fontSizeError ??
+                    t("tools.text-to-pdf.ui.fontSizeHelp" as TranslationKey, { min: FONT_SIZE_MIN, max: FONT_SIZE_MAX })}
+                </span>
+              </label>
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
                 {t("tools.text-to-pdf.ui.marginLabel")}
                 <select
                   className={inputClassName}
@@ -167,7 +218,7 @@ export function TextToPdfTool() {
                   ))}
                 </select>
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
                 {t("tools.text-to-pdf.ui.pageSizeLabel")}
                 <select
                   className={inputClassName}

@@ -1,6 +1,7 @@
 import { Download, FileText, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
 import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
@@ -12,12 +13,16 @@ import {
   getOutputFileName,
   getSuggestedOutputBaseName,
   isPdfFile,
+  previewPageNumberLabel,
   readPdfMetadata,
+  STARTING_NUMBER_MAX,
+  validateAddPageNumbersOptions,
 } from "./addPageNumbers.service";
 import type {
   AddPageNumbersFormOptions,
   AddPageNumbersMetadata,
   AddPageNumbersStatus,
+  PageNumberFormatPreset,
   PageNumberPosition,
 } from "./addPageNumbers.types";
 
@@ -25,33 +30,91 @@ const inputClassName =
   "min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 const positions: readonly PageNumberPosition[] = ["bottom-left", "bottom-center", "bottom-right"];
-const defaultFormOptions: AddPageNumbersFormOptions = { position: "bottom-center" };
+const formats: readonly PageNumberFormatPreset[] = [
+  "n",
+  "n-of-total",
+  "page-n",
+  "page-n-of-total",
+  "pag-n",
+  "pag-n-of-total",
+];
+
+const defaultFormOptions: AddPageNumbersFormOptions = {
+  position: "bottom-center",
+  format: "n-of-total",
+  startPage: 1,
+  startingNumber: 1,
+};
 
 export function AddPageNumbersTool() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const limitLabels = useFileProcessingLimitLabels();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<AddPageNumbersMetadata | null>(null);
   const [options, setOptions] = useState<AddPageNumbersFormOptions>(defaultFormOptions);
+  const [startPageInput, setStartPageInput] = useState(String(defaultFormOptions.startPage));
+  const [startingNumberInput, setStartingNumberInput] = useState(
+    String(defaultFormOptions.startingNumber),
+  );
   const [status, setStatus] = useState<AddPageNumbersStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [outputBaseName, setOutputBaseName] = useState(defaultOutputBaseName);
   const [hasCustomOutputName, setHasCustomOutputName] = useState(false);
-  const [lastPageCount, setLastPageCount] = useState<number | null>(null);
+  const [lastSummary, setLastSummary] = useState<{ numbered: number; total: number } | null>(null);
 
   const isBusy = status === "reading" || status === "processing";
-  const canRun = Boolean(metadata) && !isBusy;
   const fallbackBaseName = metadata ? getSuggestedOutputBaseName(metadata.fileName) : defaultOutputBaseName;
   const finalOutputFileName = useMemo(
     () => getOutputFileName(outputBaseName, fallbackBaseName),
     [outputBaseName, fallbackBaseName],
   );
 
+  const parsedStartPage = Number(startPageInput);
+  const parsedStartingNumber = Number(startingNumberInput);
+  const liveOptions: AddPageNumbersFormOptions = {
+    ...options,
+    startPage: parsedStartPage,
+    startingNumber: parsedStartingNumber,
+  };
+
+  // Validación dinámica solo si ya hay metadata. Sin file, no se grita.
+  const liveValidation = useMemo(() => {
+    if (!metadata) return null;
+    if (startPageInput.trim().length === 0) {
+      return { code: "tools.errors.startPageInvalid" } as const;
+    }
+    if (startingNumberInput.trim().length === 0) {
+      return { code: "tools.errors.startingNumberInvalid" } as const;
+    }
+    return validateAddPageNumbersOptions(liveOptions, metadata.pageCount);
+  }, [metadata, startPageInput, startingNumberInput, liveOptions]);
+
+  const liveError =
+    liveValidation
+      ? t(
+          liveValidation.code as TranslationKey,
+          "vars" in liveValidation ? liveValidation.vars : undefined,
+        )
+      : null;
+
+  const canRun = Boolean(metadata) && !isBusy && !liveValidation;
+
+  // Vista previa del label resuelto para el formato/posición elegidos.
+  const previewLabel = useMemo(() => {
+    const safeTotal = metadata
+      ? Math.max(1, metadata.pageCount - Math.max(1, parsedStartPage) + 1)
+      : 5;
+    const safeNumber = Number.isFinite(parsedStartingNumber) && parsedStartingNumber >= 1
+      ? parsedStartingNumber
+      : 1;
+    return previewPageNumberLabel(options.format, language, safeNumber, safeTotal);
+  }, [language, metadata, options.format, parsedStartPage, parsedStartingNumber]);
+
   const resetFeedback = () => {
     setError(null);
-    setLastPageCount(null);
+    setLastSummary(null);
     if (status === "success" || status === "error") {
       setStatus(metadata ? "ready" : "idle");
     }
@@ -59,7 +122,7 @@ export function AddPageNumbersTool() {
 
   const handleFile = async (selected: File | undefined) => {
     if (!selected) return;
-    setLastPageCount(null);
+    setLastSummary(null);
     setError(null);
 
     if (!isPdfFile(selected)) {
@@ -82,6 +145,10 @@ export function AddPageNumbersTool() {
       if (!hasCustomOutputName) {
         setOutputBaseName(getSuggestedOutputBaseName(meta.fileName));
       }
+      // Si la página inicial actual queda fuera del nuevo PDF, normalizar a 1.
+      if (parsedStartPage > meta.pageCount || parsedStartPage < 1) {
+        setStartPageInput("1");
+      }
       setStatus("ready");
     } catch (nextError) {
       setStatus("error");
@@ -103,12 +170,12 @@ export function AddPageNumbersTool() {
     if (!file || !canRun) return;
     setStatus("processing");
     setError(null);
-    setLastPageCount(null);
+    setLastSummary(null);
 
     try {
-      const result = await addPageNumbersToFile(file, options, outputBaseName);
+      const result = await addPageNumbersToFile(file, liveOptions, outputBaseName, language);
       downloadPdf(result.bytes, result.fileName);
-      setLastPageCount(result.pageCount);
+      setLastSummary({ numbered: result.numberedPages, total: result.pageCount });
       setStatus("success");
     } catch (nextError) {
       setStatus("error");
@@ -120,12 +187,14 @@ export function AddPageNumbersTool() {
     setFile(null);
     setMetadata(null);
     setOptions(defaultFormOptions);
+    setStartPageInput(String(defaultFormOptions.startPage));
+    setStartingNumberInput(String(defaultFormOptions.startingNumber));
     setStatus("idle");
     setError(null);
     setIsDragging(false);
     setOutputBaseName(defaultOutputBaseName);
     setHasCustomOutputName(false);
-    setLastPageCount(null);
+    setLastSummary(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -181,33 +250,97 @@ export function AddPageNumbersTool() {
             </div>
           ) : null}
 
-          <fieldset className="grid gap-2 text-sm font-semibold text-ink-700">
-            <legend className="mb-1">{t("tools.add-page-numbers.ui.positionLabel")}</legend>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {positions.map((position) => {
-                const isActive = options.position === position;
-                return (
-                  <button
-                    key={position}
-                    type="button"
-                    aria-pressed={isActive}
-                    onClick={() => {
-                      setOptions((prev) => ({ ...prev, position }));
-                      resetFeedback();
-                    }}
-                    className={cn(
-                      "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25",
-                      isActive
-                        ? "border-accent-cyan/40 bg-accent-cyan/10 text-accent-teal"
-                        : "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/30 hover:bg-surface-50 hover:text-ink-900",
-                    )}
-                  >
-                    {t(`tools.add-page-numbers.ui.position.${position}` as const)}
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
+          <div className="grid items-start gap-3 sm:grid-cols-2">
+            <fieldset className="grid auto-rows-min gap-2 text-sm font-semibold text-ink-700">
+              <legend className="mb-1">{t("tools.add-page-numbers.ui.positionLabel")}</legend>
+              <div className="grid grid-cols-3 gap-2">
+                {positions.map((position) => {
+                  const isActive = options.position === position;
+                  return (
+                    <button
+                      key={position}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => {
+                        setOptions((prev) => ({ ...prev, position }));
+                        resetFeedback();
+                      }}
+                      className={cn(
+                        "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-2 text-xs font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25 sm:text-sm",
+                        isActive
+                          ? "border-accent-cyan/40 bg-accent-cyan/10 text-accent-teal"
+                          : "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/30 hover:bg-surface-50 hover:text-ink-900",
+                      )}
+                    >
+                      {t(`tools.add-page-numbers.ui.position.${position}` as const)}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <label className="grid auto-rows-min gap-1.5 text-sm font-semibold text-ink-700">
+              {t("tools.add-page-numbers.ui.formatLabel")}
+              <select
+                className={inputClassName}
+                value={options.format}
+                onChange={(event) => {
+                  setOptions((prev) => ({ ...prev, format: event.target.value as PageNumberFormatPreset }));
+                  resetFeedback();
+                }}
+              >
+                {formats.map((format) => (
+                  <option key={format} value={format}>
+                    {t(`tools.add-page-numbers.ui.format.${format}` as const)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="grid items-start gap-3 sm:grid-cols-2">
+            <label className="grid auto-rows-min gap-1.5 text-sm font-semibold text-ink-700">
+              {t("tools.add-page-numbers.ui.startPageLabel")}
+              <input
+                type="number"
+                inputMode="numeric"
+                className={inputClassName}
+                value={startPageInput}
+                min={1}
+                max={metadata?.pageCount ?? undefined}
+                step={1}
+                disabled={!metadata}
+                onChange={(event) => {
+                  setStartPageInput(event.target.value);
+                  resetFeedback();
+                }}
+              />
+            </label>
+            <label className="grid auto-rows-min gap-1.5 text-sm font-semibold text-ink-700">
+              {t("tools.add-page-numbers.ui.startingNumberLabel")}
+              <input
+                type="number"
+                inputMode="numeric"
+                className={inputClassName}
+                value={startingNumberInput}
+                min={1}
+                max={STARTING_NUMBER_MAX}
+                step={1}
+                onChange={(event) => {
+                  setStartingNumberInput(event.target.value);
+                  resetFeedback();
+                }}
+              />
+            </label>
+          </div>
+
+          <p className="text-xs leading-5 text-ink-500">{t("tools.add-page-numbers.ui.rangeHelp")}</p>
+
+          {liveError ? (
+            <p className="rounded-md border border-accent-violet/20 bg-accent-violet/8 px-3 py-2 text-sm text-ink-600">
+              {liveError}
+            </p>
+          ) : null}
         </div>
       </section>
 
@@ -218,6 +351,13 @@ export function AddPageNumbersTool() {
         </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
+          <div className="rounded-lg border border-accent-cyan/25 bg-accent-cyan/10 p-4 text-center">
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-700">
+              {t("tools.add-page-numbers.ui.formatLabel")}
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-ink-900">{previewLabel}</p>
+          </div>
+
           <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
             {t("toolUi.outputNameDownload")}
             <input
@@ -240,9 +380,9 @@ export function AddPageNumbersTool() {
             </p>
           ) : null}
 
-          {status === "success" && lastPageCount !== null ? (
+          {status === "success" && lastSummary ? (
             <p className="rounded-md border border-accent-teal/25 bg-accent-teal/10 px-3 py-2 text-sm text-ink-700">
-              {t("toolUi.outputReadyWithPages", { pages: lastPageCount })}
+              {t("tools.add-page-numbers.ui.successSummary", { numbered: lastSummary.numbered, total: lastSummary.total })}
             </p>
           ) : null}
 
