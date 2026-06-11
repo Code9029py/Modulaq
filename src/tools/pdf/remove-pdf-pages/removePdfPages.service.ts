@@ -3,6 +3,7 @@
 import { countPdfPages as coreCountPdfPages, removePdfPages as coreRemovePdfPages } from "@modulaq/core/pdf";
 import { parsePageSelection } from "@modulaq/core/ranges";
 import { ToolError } from "../../../shared/errors/ToolError";
+import type { Language } from "../../../shared/i18n/types";
 import { buildDownloadFileName, getSuggestedDownloadBaseName } from "../../../shared/utils/downloadFileName";
 import { formatFileSize, isPdfFile, toArrayBuffer } from "../../../shared/utils/file";
 import type { RemovePdfPagesMetadata, RemovePdfPagesResult } from "./removePdfPages.types";
@@ -10,9 +11,17 @@ import type { RemovePdfPagesMetadata, RemovePdfPagesResult } from "./removePdfPa
 export { formatFileSize, isPdfFile };
 
 export const defaultOutputBaseName = "pdf-sin-paginas";
+const defaultOutputBaseNames: Record<Language, string> = {
+  es: defaultOutputBaseName,
+  en: "pdf-pages-removed",
+};
 
-export function getSuggestedOutputBaseName(fileName: string) {
-  return getSuggestedDownloadBaseName(fileName, defaultOutputBaseName);
+export function getDefaultOutputBaseName(language: Language): string {
+  return defaultOutputBaseNames[language];
+}
+
+export function getSuggestedOutputBaseName(fileName: string, fallbackBaseName = defaultOutputBaseName) {
+  return getSuggestedDownloadBaseName(fileName, fallbackBaseName);
 }
 
 export function getOutputFileName(outputBaseName: string, fallbackBaseName = defaultOutputBaseName) {
@@ -87,6 +96,7 @@ export async function removePdfPagesFromFile(
   file: File,
   rangeInput: string,
   outputBaseName: string,
+  fallbackBaseName: string = defaultOutputBaseName,
 ): Promise<RemovePdfPagesResult> {
   if (!isPdfFile(file)) {
     throw new ToolError("tools.errors.invalidPdf");
@@ -104,7 +114,7 @@ export async function removePdfPagesFromFile(
 
   return {
     bytes: toArrayBuffer(bytes),
-    fileName: getOutputFileName(outputBaseName, getSuggestedOutputBaseName(file.name)),
+    fileName: getOutputFileName(outputBaseName, getSuggestedOutputBaseName(file.name, fallbackBaseName)),
     removedCount: pagesToRemove.length,
     remainingCount: totalPages - pagesToRemove.length,
   };

@@ -14,6 +14,32 @@ Este documento consolida el estado final de Modulaq V3. Debe usarse como punto d
 
 ---
 
+## 1.1 Adenda V3.0.1a
+
+V3.0.1a queda cerrada como etapa posterior de estabilizacion: English i18n, filtros de catalogo ES/EN, performance/Core Web Vitals, cleanup UX copy, herramientas Documents/PDF y Documents/Text, simulated pagination/load more y auditoria final.
+
+Documentos de cierre de esta etapa:
+
+- `docs/MODULAQ_V3_0_1A_FINAL_CONTEXT.md`
+- `docs/MODULAQ_V3_0_1A_FINAL_AUDIT.md`
+
+Reglas vigentes despues de V3.0.1a:
+
+- No reabrir tools de imagen ni documents salvo bug real.
+- No hacer DOCX/Word a PDF sin evaluacion tecnica seria.
+- No hacer paginas preset SEO dentro de herramientas principales.
+- No hacer `tools.ts` content split sin metricas reales que lo justifiquen.
+- Mantener frontend-only, privacy-first, catalogo limpio y procesamiento local.
+
+Proximas fases sugeridas:
+
+1. Observar Cloudflare Analytics y Search Console durante 1-2 semanas.
+2. Evaluar `tools.ts` content split solo si los datos lo justifican.
+3. Dejar Growth SEO presets para una fase separada, no para este cierre.
+4. Considerar un nuevo bloque de herramientas solo con scope controlado.
+
+---
+
 ## 2. Resumen ejecutivo
 
 V3 fue la fase de separacion tecnica de Modulaq: la logica reutilizable de las herramientas paso a vivir en un SDK local llamado `@modulaq/core`, consumido por la app mediante adapters delgados.

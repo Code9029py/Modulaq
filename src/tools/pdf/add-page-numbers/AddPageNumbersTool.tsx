@@ -8,8 +8,8 @@ import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProc
 import { cn } from "../../../shared/utils/cn";
 import {
   addPageNumbersToFile,
-  defaultOutputBaseName,
   formatFileSize,
+  getDefaultOutputBaseName,
   getOutputFileName,
   getSuggestedOutputBaseName,
   isPdfFile,
@@ -49,6 +49,7 @@ const defaultFormOptions: AddPageNumbersFormOptions = {
 export function AddPageNumbersTool() {
   const { language, t } = useI18n();
   const limitLabels = useFileProcessingLimitLabels();
+  const localizedDefaultOutputBaseName = getDefaultOutputBaseName(language);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<AddPageNumbersMetadata | null>(null);
@@ -60,12 +61,14 @@ export function AddPageNumbersTool() {
   const [status, setStatus] = useState<AddPageNumbersStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [outputBaseName, setOutputBaseName] = useState(defaultOutputBaseName);
+  const [outputBaseName, setOutputBaseName] = useState(localizedDefaultOutputBaseName);
   const [hasCustomOutputName, setHasCustomOutputName] = useState(false);
   const [lastSummary, setLastSummary] = useState<{ numbered: number; total: number } | null>(null);
 
   const isBusy = status === "reading" || status === "processing";
-  const fallbackBaseName = metadata ? getSuggestedOutputBaseName(metadata.fileName) : defaultOutputBaseName;
+  const fallbackBaseName = metadata
+    ? getSuggestedOutputBaseName(metadata.fileName, localizedDefaultOutputBaseName)
+    : localizedDefaultOutputBaseName;
   const finalOutputFileName = useMemo(
     () => getOutputFileName(outputBaseName, fallbackBaseName),
     [outputBaseName, fallbackBaseName],
@@ -143,7 +146,7 @@ export function AddPageNumbersTool() {
       setFile(selected);
       setMetadata(meta);
       if (!hasCustomOutputName) {
-        setOutputBaseName(getSuggestedOutputBaseName(meta.fileName));
+        setOutputBaseName(getSuggestedOutputBaseName(meta.fileName, localizedDefaultOutputBaseName));
       }
       // Si la página inicial actual queda fuera del nuevo PDF, normalizar a 1.
       if (parsedStartPage > meta.pageCount || parsedStartPage < 1) {
@@ -173,7 +176,13 @@ export function AddPageNumbersTool() {
     setLastSummary(null);
 
     try {
-      const result = await addPageNumbersToFile(file, liveOptions, outputBaseName, language);
+      const result = await addPageNumbersToFile(
+        file,
+        liveOptions,
+        outputBaseName,
+        language,
+        localizedDefaultOutputBaseName,
+      );
       downloadPdf(result.bytes, result.fileName);
       setLastSummary({ numbered: result.numberedPages, total: result.pageCount });
       setStatus("success");
@@ -192,7 +201,7 @@ export function AddPageNumbersTool() {
     setStatus("idle");
     setError(null);
     setIsDragging(false);
-    setOutputBaseName(defaultOutputBaseName);
+    setOutputBaseName(localizedDefaultOutputBaseName);
     setHasCustomOutputName(false);
     setLastSummary(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -363,7 +372,7 @@ export function AddPageNumbersTool() {
             <input
               className={inputClassName}
               value={outputBaseName}
-              placeholder={defaultOutputBaseName}
+              placeholder={localizedDefaultOutputBaseName}
               onChange={(event) => {
                 setOutputBaseName(event.target.value);
                 setHasCustomOutputName(true);
