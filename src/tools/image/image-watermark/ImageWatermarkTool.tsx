@@ -85,14 +85,13 @@ const copy = {
     addWatermarkCta: "Agregar marca de agua",
     margin: "Margen",
     opacity: "Opacidad",
-    outputIntro: "Previsualizá el resultado y descargá la imagen final.",
     outputTitle: "Vista previa y salida",
     previewAlt: "Vista previa de marca de agua",
     previewHelp: "La vista previa aparecerá aquí.",
     previewTitle: "Vista previa",
     processing: "Agregando marca de agua...",
     selectLogo: "Seleccionar logo",
-    sourceIntro: "Agregá una marca de agua de texto o logo sobre una imagen.",
+    sourceIntro: "Subí una imagen para aplicar la marca de agua.",
     sourceTitle: "Imagen y marca",
     text: "Texto",
     textHelp: "Configurá texto, posición, color y opacidad.",
@@ -116,14 +115,13 @@ const copy = {
     addWatermarkCta: "Add watermark",
     margin: "Margin",
     opacity: "Opacity",
-    outputIntro: "Preview the result and download the final image.",
     outputTitle: "Preview and output",
     previewAlt: "Watermark preview",
     previewHelp: "The preview will appear here.",
     previewTitle: "Preview",
     processing: "Adding watermark...",
     selectLogo: "Select logo",
-    sourceIntro: "Add a text or logo watermark over an image.",
+    sourceIntro: "Upload an image to apply the watermark.",
     sourceTitle: "Image and watermark",
     text: "Text",
     textHelp: "Configure text, position, color and opacity.",
@@ -731,9 +729,7 @@ export function ImageWatermarkTool() {
 
       <section className="min-w-0 rounded-2xl border border-surface-200/80 bg-gradient-to-br from-surface-50/95 to-surface-100/50 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>
-          <p className="mt-1 text-xs leading-5 text-ink-500">{labels.outputIntro}</p>
-        </div>
+          <h3 className="text-sm font-semibold text-ink-900">{labels.outputTitle}</h3>        </div>
 
         <div className="mt-5 grid gap-3 rounded-xl border border-surface-200/80 bg-surface-50/80 p-4 shadow-sm">
           <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-surface-200/80 bg-surface-50/90 p-3">

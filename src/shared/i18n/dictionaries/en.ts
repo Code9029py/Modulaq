@@ -22,11 +22,11 @@ export const en: Record<TranslationKey, string> = {
   // Home
   "home.head.title": "Modulaq - PDF, QR and text tools in your browser",
   "home.head.description":
-    "Modulaq offers free PDF, QR and text tools. They run in your browser, with no account and without uploading your files.",
+    "Modulaq offers free PDF, QR and text tools. No account, no install.",
   "home.hero.badge": "Public beta · {{count}} tools available",
   "home.hero.subhead": "Digital tools that run in your browser.",
   "home.hero.description":
-    "Convert, organize, and clean files right in your browser. Every tool does one thing well — fast and with no friction.",
+    "Convert, organize, and clean files fast. Every tool does one thing well — simple and with no friction.",
   "home.hero.ctaPrimary": "Browse tools",
   "home.hero.ctaSecondary": "Send a question or feedback",
   "home.stats.toolsLabel": "active tools",
@@ -52,11 +52,11 @@ export const en: Record<TranslationKey, string> = {
   // Catalog
   "catalog.head.title": "Free PDF, QR and text tools",
   "catalog.head.description":
-    "Browse Modulaq's free tools for PDF, QR and text. Use quick utilities in your browser, with no account and no install.",
+    "Browse Modulaq's free tools for PDF, QR and text. No account, no install.",
   "catalog.hero.badge": "Catalog",
   "catalog.hero.h1": "Free PDF, QR and text tools",
   "catalog.hero.description":
-    "Browse Modulaq's catalog and open the tool you need. Everything runs in your browser.",
+    "Browse Modulaq's catalog and open the tool you need.",
   "catalog.filters.button": "Filters",
   "catalog.filters.countShort": "{{count}} tools",
   "catalog.filters.countLong": "{{shown}} of {{total}} tools",
@@ -278,9 +278,9 @@ export const en: Record<TranslationKey, string> = {
   "toolUi.uploadPdf": "Select PDF",
   "toolUi.uploadPdfs": "Select PDFs",
   "toolUi.uploadImages": "Select images",
-  "toolUi.dropHere": "You can also drop a file here. Processing is local.",
-  "toolUi.dropHereMany": "You can upload two or more files. Everything is processed in your browser.",
-  "toolUi.dropHereImages": "You can also drop the images here. Processing is local.",
+  "toolUi.dropHere": "You can also drop a file here.",
+  "toolUi.dropHereMany": "You can upload two or more files.",
+  "toolUi.dropHereImages": "You can also drop the images here.",
   "toolUi.processingLocal": "Processing is local.",
   "toolUi.clear": "Clear",
   "toolUi.clearAll": "Clear all",
@@ -347,7 +347,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.split-pdf.ui.section": "File and split",
   "tools.split-pdf.ui.intro":
     "Upload a PDF and choose how to split it: extract a range, split into parts, or separate every page.",
-  "tools.split-pdf.ui.dropHint": "You can also drop a file here. Processing is local.",
+  "tools.split-pdf.ui.dropHint": "You can also drop a file here.",
   "tools.split-pdf.ui.modeLabel": "Split mode",
   "tools.split-pdf.ui.modeRange": "Extract range",
   "tools.split-pdf.ui.modeParts": "Split into parts",
@@ -408,8 +408,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.split-pdf.ui.archiveZip": "ZIP file",
   "tools.split-pdf.ui.preparing": "Preparing download...",
   "tools.split-pdf.ui.pickFirst": "Pick a PDF to enable splitting.",
-  "tools.split-pdf.ui.intro2": "Pick a PDF and choose how to separate its pages. Everything happens in your browser.",
-  "tools.split-pdf.ui.resultIntro2": "Files are processed locally. They aren't uploaded to servers.",
+  "tools.split-pdf.ui.intro2": "Pick a PDF and choose how to separate its pages.",
   "tools.split-pdf.ui.successOnePartLabel": "part",
   "tools.split-pdf.ui.successPartsLabel": "parts",
   "tools.split-pdf.ui.successIndividualOne": "individual PDF",
@@ -418,7 +417,7 @@ export const en: Record<TranslationKey, string> = {
   // ---------- image-to-pdf renderer ----------
   "tools.image-to-pdf.ui.intro": "Add images (PNG, JPG/JPEG or WebP) and order them before generating the PDF.",
   "tools.image-to-pdf.ui.uploadImages": "Select images",
-  "tools.image-to-pdf.ui.uploadHint": "You can upload several images. Everything is processed in your browser.",
+  "tools.image-to-pdf.ui.uploadHint": "You can upload several images.",
   "tools.image-to-pdf.ui.skippedNotImageOne": "Skipped one file that isn't a supported image.",
   "tools.image-to-pdf.ui.skippedNotImageMany": "Skipped {{count}} files that aren't supported images.",
   "tools.image-to-pdf.ui.imageLoaded": "image loaded",
@@ -467,7 +466,7 @@ export const en: Record<TranslationKey, string> = {
     "You can list individual pages or ranges. Examples: 1,2,3 or 1-3,5,8-10. Ranges are inclusive.",
   "tools.pdf-to-images.ui.section2": "File and settings",
   "tools.pdf-to-images.ui.intro2": "Pick a PDF and choose which pages to convert to images.",
-  "tools.pdf-to-images.ui.dropHint": "You can also drop a file here. It isn't uploaded to servers.",
+  "tools.pdf-to-images.ui.dropHint": "You can also drop a file here.",
   "tools.pdf-to-images.ui.modeAllTitle": "Every page",
   "tools.pdf-to-images.ui.modeAllShort": "Converts the entire PDF.",
   "tools.pdf-to-images.ui.modeRangeTitle": "Pick pages",
@@ -509,7 +508,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.compress-pdf.ui.delta": "Reduction",
   "tools.compress-pdf.ui.kept": "Original kept (no reduction achieved).",
   "tools.compress-pdf.ui.section": "PDF files",
-  "tools.compress-pdf.ui.intro2": "Pick one or more documents to try optimizing their size locally.",
+  "tools.compress-pdf.ui.intro2": "Pick one or more documents.",
   "tools.compress-pdf.ui.notice":
     "Browser-side compression varies with PDF content. Some files are already optimized or contain compressed images, so they may shrink little or not at all.",
   "tools.compress-pdf.ui.dropHintMany": "You can also drop several files here.",
@@ -567,9 +566,8 @@ export const en: Record<TranslationKey, string> = {
   "tools.pdf-page-counter.ui.pageCount": "Pages",
   "tools.pdf-page-counter.ui.pickPdf": "Upload a PDF to start.",
   "tools.pdf-page-counter.ui.intro2":
-    "Pick or drop a single PDF to count its pages right in your browser.",
-  "tools.pdf-page-counter.ui.dropHint": "You can also drop the file here. It isn't uploaded to any server.",
-  "tools.pdf-page-counter.ui.resultIntro": "Local, fast, no backend.",
+    "Pick or drop a single PDF to count its pages.",
+  "tools.pdf-page-counter.ui.dropHint": "You can also drop the file here.",
   "tools.pdf-page-counter.ui.readingDetail": "This should only take a moment.",
   "tools.pdf-page-counter.ui.hasLabel": "This PDF has",
   "tools.pdf-page-counter.ui.fileLabel": "File",
@@ -588,12 +586,12 @@ export const en: Record<TranslationKey, string> = {
   "tools.reorder-pdf-pages.ui.couldNotReorder": "Couldn't reorder the PDF.",
   "tools.reorder-pdf-pages.ui.pageLabel": "Page {{number}}",
   "tools.reorder-pdf-pages.ui.intro2": "Pick a PDF and move its pages with the up/down controls.",
-  "tools.reorder-pdf-pages.ui.dropHint": "You can also drop a file here. It isn't uploaded to servers.",
+  "tools.reorder-pdf-pages.ui.dropHint": "You can also drop a file here.",
   "tools.reorder-pdf-pages.ui.orderLabel": "Page order",
   "tools.reorder-pdf-pages.ui.restore": "Restore order",
   "tools.reorder-pdf-pages.ui.idleTitle": "No PDF selected",
   "tools.reorder-pdf-pages.ui.idleBody": "Upload a file to see its page list and change the order.",
-  "tools.reorder-pdf-pages.ui.outputIntro2": "The PDF is generated locally in the order shown in the list.",
+  "tools.reorder-pdf-pages.ui.outputIntro2": "The PDF is generated in the order shown in the list.",
   "tools.reorder-pdf-pages.ui.pagesDetected": "Pages detected",
   "tools.reorder-pdf-pages.ui.currentOrder": "Current order",
   "tools.reorder-pdf-pages.ui.original": "Original order",
@@ -768,10 +766,10 @@ export const en: Record<TranslationKey, string> = {
 
   // ---------- image-converter renderer ----------
   "tools.image-converter.ui.sourceTitle": "Source image",
-  "tools.image-converter.ui.intro": "Convert images between formats your browser supports.",
+  "tools.image-converter.ui.intro": "Convert images between supported formats.",
   "tools.image-converter.ui.outputTitle": "Output format",
   "tools.image-converter.ui.outputIntro":
-    "Pick the format and download the new image processed in your browser.",
+    "Pick the format and download the new image.",
   "tools.image-converter.ui.convertCta": "Convert image",
   "tools.image-converter.ui.converting": "Converting image...",
   "tools.image-converter.ui.resultTitle": "Converted image ready",
@@ -781,8 +779,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.image-compressor.ui.sourceTitle": "Original image",
   "tools.image-compressor.ui.intro": "Try to shrink an image's size by tweaking format and quality.",
   "tools.image-compressor.ui.outputTitle": "Compression",
-  "tools.image-compressor.ui.outputIntro":
-    "The reduction depends on the original format, content, and browser.",
+  "tools.image-compressor.ui.outputIntro": "The reduction depends on the format and content.",
   "tools.image-compressor.ui.compressCta": "Compress image",
   "tools.image-compressor.ui.compressing": "Compressing image...",
   "tools.image-compressor.ui.resultReady": "Result ready",
@@ -821,13 +818,11 @@ export const en: Record<TranslationKey, string> = {
 
   // ---------- image-base64 renderer ----------
   "tools.image-base64.ui.title": "Image ↔ Base64",
-  "tools.image-base64.ui.imageToBase64Intro":
-    "Convert an image into Base64 text or a Data URL.",
+  "tools.image-base64.ui.imageToBase64Intro": "Upload an image to get Base64 or a Data URL.",
   "tools.image-base64.ui.base64ToImageIntro":
     "Paste a Base64 string or a Data URL to reconstruct the image.",
-  "tools.image-base64.ui.localProcessing": "Everything is processed locally in your browser.",
-  "tools.image-base64.ui.base64ToImageHeadIntro":
-    "Rebuild an image from Base64 or a Data URL.",
+  "tools.image-base64.ui.localProcessing": "Everything is processed locally.",
+  "tools.image-base64.ui.base64ToImageHeadIntro": "Paste Base64 or a Data URL to reconstruct the image.",
   "tools.image-base64.ui.base64ToImageWarning":
     "A valid Base64 string doesn't always represent an image.",
   "tools.image-base64.ui.intro":
@@ -836,7 +831,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.image-base64.ui.modeBase64ToImage": "Base64 to image",
   "tools.image-base64.ui.sourceTitle": "Source image",
   "tools.image-base64.ui.sourceIntro":
-    "Everything is processed locally in your browser. Base64 usually takes more space than the original file.",
+    "Base64 usually takes more space than the original file.",
   "tools.image-base64.ui.detectedExtension": "Detected extension",
   "tools.image-base64.ui.resultTitle": "Base64 result",
   "tools.image-base64.ui.resultIntro": "Copy the raw text or the full Data URL.",
@@ -850,7 +845,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.image-base64.ui.couldNotCopy": "Couldn't copy text to the clipboard.",
   "tools.image-base64.ui.base64Source": "Source Base64",
   "tools.image-base64.ui.base64SourceIntro":
-    "Paste raw Base64 or a full Data URL. Everything is processed locally in your browser.",
+    "Paste raw Base64 or a full Data URL.",
   "tools.image-base64.ui.base64Placeholder": "data:image/png;base64,...",
   "tools.image-base64.ui.fallbackType": "Type if it's raw Base64",
   "tools.image-base64.ui.imageName": "Image name",
@@ -1074,8 +1069,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.errors.addPageNumbersFailed": "Couldn't add page numbers to the PDF.",
 
   "tools.text-to-pdf.ui.textSection": "Text to convert",
-  "tools.text-to-pdf.ui.textIntro":
-    "Paste or type the content. We generate a simple PDF with automatic pagination.",
+  "tools.text-to-pdf.ui.textIntro": "Paste or type the text you want to convert.",
   "tools.text-to-pdf.ui.titleLabel": "Title (optional)",
   "tools.text-to-pdf.ui.titlePlaceholder": "My document",
   "tools.text-to-pdf.ui.contentLabel": "Content",
@@ -1099,17 +1093,16 @@ export const en: Record<TranslationKey, string> = {
   "tools.text-to-pdf.ui.generating": "Generating PDF...",
   "tools.text-to-pdf.ui.generateCta": "Generate PDF",
   "tools.text-to-pdf.ui.localProcessingNote":
-    "The text and the PDF are processed in your browser. We don't upload anything.",
+    "Processing happens in your browser.",
 
-  "tools.remove-pdf-pages.ui.fileSection": "PDF and pages to remove",
-  "tools.remove-pdf-pages.ui.intro":
-    "Upload a PDF and pick the pages or ranges to drop. The rest is kept in the original order.",
+  "tools.remove-pdf-pages.ui.fileSection": "File and range",
+  "tools.remove-pdf-pages.ui.intro": "The rest is kept in the original order.",
   "tools.remove-pdf-pages.ui.rangeLabel": "Pages to remove",
   "tools.remove-pdf-pages.ui.rangePlaceholder": "e.g. 1,3-5,8",
   "tools.remove-pdf-pages.ui.rangeHelp":
     "Use numbers separated by commas and ranges with dashes (e.g. 1,3-5,8).",
   "tools.remove-pdf-pages.ui.outputTitle": "Resulting PDF",
-  "tools.remove-pdf-pages.ui.outputIntro": "Set the filename and download the PDF without the selected pages.",
+  "tools.remove-pdf-pages.ui.outputIntro": "Set the download filename.",
   "tools.remove-pdf-pages.ui.processing": "Removing pages...",
   "tools.remove-pdf-pages.ui.cta": "Remove and download",
   "tools.remove-pdf-pages.ui.successSummary":
@@ -1117,15 +1110,14 @@ export const en: Record<TranslationKey, string> = {
   "tools.remove-pdf-pages.ui.localProcessingNote":
     "Processing happens in your browser.",
 
-  "tools.add-page-numbers.ui.fileSection": "PDF to number",
-  "tools.add-page-numbers.ui.intro":
-    "Upload a PDF and pick where the numbering goes at the bottom.",
-  "tools.add-page-numbers.ui.positionLabel": "Number position",
+  "tools.add-page-numbers.ui.fileSection": "File and position",
+  "tools.add-page-numbers.ui.intro": "Pick where the numbering goes at the bottom.",
+  "tools.add-page-numbers.ui.positionLabel": "Position",
   "tools.add-page-numbers.ui.position.bottom-left": "Bottom left",
   "tools.add-page-numbers.ui.position.bottom-center": "Bottom center",
   "tools.add-page-numbers.ui.position.bottom-right": "Bottom right",
   "tools.add-page-numbers.ui.outputTitle": "Numbered PDF",
-  "tools.add-page-numbers.ui.outputIntro": "Set the filename and download the PDF with numbering applied.",
+  "tools.add-page-numbers.ui.outputIntro": "Set the download filename.",
   "tools.add-page-numbers.ui.processing": "Adding numbers...",
   "tools.add-page-numbers.ui.cta": "Number and download",
   "tools.add-page-numbers.ui.localProcessingNote":
