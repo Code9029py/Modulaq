@@ -1063,14 +1063,28 @@ export const en: Record<TranslationKey, string> = {
   "tools.errors.textToPdfTooLong":
     "The text exceeds the {{limit}} character limit. Split it into smaller chunks.",
   "tools.errors.textToPdfFailed": "Couldn't generate the PDF from the text.",
+  "tools.errors.textToPdfFontSizeInvalid": "Font size must be a whole number.",
+  "tools.errors.textToPdfFontSizeOutOfRange":
+    "Pick a font size between {{min}} and {{max}}.",
   "tools.errors.removeAllPages":
     "You can't remove every page. At least one must remain.",
   "tools.errors.removePdfPagesFailed": "Couldn't remove the pages from the PDF.",
   "tools.errors.addPageNumbersFailed": "Couldn't add page numbers to the PDF.",
+  "tools.errors.startPageInvalid": "Enter a valid whole number for the start page.",
+  "tools.errors.startPageOutOfRange":
+    "The PDF has {{total}} pages. Start on a page between 1 and {{total}}.",
+  "tools.errors.startingNumberInvalid":
+    "Enter a valid whole number for the starting number.",
+  "tools.errors.startingNumberOutOfRange":
+    "The starting number must be between 1 and {{max}}.",
+  "tools.errors.removePdfPagesNeedFile":
+    "Upload a PDF before choosing pages to remove.",
 
   "tools.text-to-pdf.ui.textSection": "Text to convert",
   "tools.text-to-pdf.ui.textIntro": "Paste or type the text you want to convert.",
   "tools.text-to-pdf.ui.titleLabel": "Title (optional)",
+  "tools.text-to-pdf.ui.titleHelp":
+    "If you leave it blank, no heading is added to the PDF.",
   "tools.text-to-pdf.ui.titlePlaceholder": "My document",
   "tools.text-to-pdf.ui.contentLabel": "Content",
   "tools.text-to-pdf.ui.contentPlaceholder":
@@ -1079,6 +1093,11 @@ export const en: Record<TranslationKey, string> = {
   "tools.text-to-pdf.ui.charSummary": "{{count}} characters",
   "tools.text-to-pdf.ui.layoutSection": "Layout",
   "tools.text-to-pdf.ui.fontSizeLabel": "Font size",
+  "tools.text-to-pdf.ui.fontSizeHelp": "Whole number between {{min}} and {{max}}.",
+  "tools.text-to-pdf.ui.fontFamilyLabel": "Font",
+  "tools.text-to-pdf.ui.fontFamily.helvetica": "Helvetica",
+  "tools.text-to-pdf.ui.fontFamily.times-roman": "Times",
+  "tools.text-to-pdf.ui.fontFamily.courier": "Courier",
   "tools.text-to-pdf.ui.marginLabel": "Margin",
   "tools.text-to-pdf.ui.marginSmall": "Small",
   "tools.text-to-pdf.ui.marginMedium": "Standard",
@@ -1086,6 +1105,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.text-to-pdf.ui.pageSizeLabel": "Page size",
   "tools.text-to-pdf.ui.pageSize.a4": "A4",
   "tools.text-to-pdf.ui.pageSize.letter": "Letter",
+  "tools.text-to-pdf.ui.pageSize.legal": "Legal",
   "tools.text-to-pdf.ui.outputTitle": "Generated PDF",
   "tools.text-to-pdf.ui.outputIntro": "Set the filename and download.",
   "tools.text-to-pdf.ui.previewLabel": "Text ready",
@@ -1116,10 +1136,23 @@ export const en: Record<TranslationKey, string> = {
   "tools.add-page-numbers.ui.position.bottom-left": "Bottom left",
   "tools.add-page-numbers.ui.position.bottom-center": "Bottom center",
   "tools.add-page-numbers.ui.position.bottom-right": "Bottom right",
+  "tools.add-page-numbers.ui.formatLabel": "Format",
+  "tools.add-page-numbers.ui.format.n": "n",
+  "tools.add-page-numbers.ui.format.n-of-total": "n / total",
+  "tools.add-page-numbers.ui.format.page-n": "Page n",
+  "tools.add-page-numbers.ui.format.page-n-of-total": "Page n of total",
+  "tools.add-page-numbers.ui.format.pag-n": "p. n",
+  "tools.add-page-numbers.ui.format.pag-n-of-total": "p. n of total",
+  "tools.add-page-numbers.ui.startPageLabel": "Start on page",
+  "tools.add-page-numbers.ui.startingNumberLabel": "Starting number",
+  "tools.add-page-numbers.ui.rangeHelp":
+    "To leave the cover unnumbered, start on page 2 with starting number 1.",
   "tools.add-page-numbers.ui.outputTitle": "Numbered PDF",
   "tools.add-page-numbers.ui.outputIntro": "Set the download filename.",
   "tools.add-page-numbers.ui.processing": "Adding numbers...",
   "tools.add-page-numbers.ui.cta": "Number and download",
+  "tools.add-page-numbers.ui.successSummary":
+    "Numbered {{numbered}} of {{total}} pages.",
   "tools.add-page-numbers.ui.localProcessingNote":
     "Processing happens in your browser.",
 };
