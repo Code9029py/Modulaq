@@ -1,0 +1,1 @@
+export { CompareTextsTool } from "./CompareTextsTool";
