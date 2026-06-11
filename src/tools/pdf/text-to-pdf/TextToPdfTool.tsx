@@ -160,8 +160,8 @@ export function TextToPdfTool() {
 
           <fieldset className="grid gap-3">
             <legend className="text-sm font-semibold text-ink-700">{t("tools.text-to-pdf.ui.layoutSection")}</legend>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
+            <div className="grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
                 {t("tools.text-to-pdf.ui.fontFamilyLabel")}
                 <select
                   className={inputClassName}
@@ -178,7 +178,7 @@ export function TextToPdfTool() {
                   ))}
                 </select>
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
                 {t("tools.text-to-pdf.ui.fontSizeLabel")}
                 <input
                   type="number"
@@ -201,7 +201,7 @@ export function TextToPdfTool() {
                     t("tools.text-to-pdf.ui.fontSizeHelp" as TranslationKey, { min: FONT_SIZE_MIN, max: FONT_SIZE_MAX })}
                 </span>
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
                 {t("tools.text-to-pdf.ui.marginLabel")}
                 <select
                   className={inputClassName}
@@ -218,7 +218,7 @@ export function TextToPdfTool() {
                   ))}
                 </select>
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-ink-700">
+              <label className="grid auto-rows-min gap-1.5 text-xs font-semibold text-ink-700">
                 {t("tools.text-to-pdf.ui.pageSizeLabel")}
                 <select
                   className={inputClassName}

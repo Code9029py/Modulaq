@@ -250,54 +250,56 @@ export function AddPageNumbersTool() {
             </div>
           ) : null}
 
-          <fieldset className="grid gap-2 text-sm font-semibold text-ink-700">
-            <legend className="mb-1">{t("tools.add-page-numbers.ui.positionLabel")}</legend>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {positions.map((position) => {
-                const isActive = options.position === position;
-                return (
-                  <button
-                    key={position}
-                    type="button"
-                    aria-pressed={isActive}
-                    onClick={() => {
-                      setOptions((prev) => ({ ...prev, position }));
-                      resetFeedback();
-                    }}
-                    className={cn(
-                      "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25",
-                      isActive
-                        ? "border-accent-cyan/40 bg-accent-cyan/10 text-accent-teal"
-                        : "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/30 hover:bg-surface-50 hover:text-ink-900",
-                    )}
-                  >
-                    {t(`tools.add-page-numbers.ui.position.${position}` as const)}
-                  </button>
-                );
-              })}
-            </div>
-          </fieldset>
+          <div className="grid items-start gap-3 sm:grid-cols-2">
+            <fieldset className="grid auto-rows-min gap-2 text-sm font-semibold text-ink-700">
+              <legend className="mb-1">{t("tools.add-page-numbers.ui.positionLabel")}</legend>
+              <div className="grid grid-cols-3 gap-2">
+                {positions.map((position) => {
+                  const isActive = options.position === position;
+                  return (
+                    <button
+                      key={position}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => {
+                        setOptions((prev) => ({ ...prev, position }));
+                        resetFeedback();
+                      }}
+                      className={cn(
+                        "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-2 text-xs font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-accent-cyan/25 sm:text-sm",
+                        isActive
+                          ? "border-accent-cyan/40 bg-accent-cyan/10 text-accent-teal"
+                          : "border-surface-200/80 bg-surface-50/90 text-ink-700 hover:border-accent-cyan/30 hover:bg-surface-50 hover:text-ink-900",
+                      )}
+                    >
+                      {t(`tools.add-page-numbers.ui.position.${position}` as const)}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
 
-          <label className="grid gap-1.5 text-sm font-semibold text-ink-700">
-            {t("tools.add-page-numbers.ui.formatLabel")}
-            <select
-              className={inputClassName}
-              value={options.format}
-              onChange={(event) => {
-                setOptions((prev) => ({ ...prev, format: event.target.value as PageNumberFormatPreset }));
-                resetFeedback();
-              }}
-            >
-              {formats.map((format) => (
-                <option key={format} value={format}>
-                  {t(`tools.add-page-numbers.ui.format.${format}` as const)}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="grid auto-rows-min gap-1.5 text-sm font-semibold text-ink-700">
+              {t("tools.add-page-numbers.ui.formatLabel")}
+              <select
+                className={inputClassName}
+                value={options.format}
+                onChange={(event) => {
+                  setOptions((prev) => ({ ...prev, format: event.target.value as PageNumberFormatPreset }));
+                  resetFeedback();
+                }}
+              >
+                {formats.map((format) => (
+                  <option key={format} value={format}>
+                    {t(`tools.add-page-numbers.ui.format.${format}` as const)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="grid gap-1.5 text-sm font-semibold text-ink-700">
+          <div className="grid items-start gap-3 sm:grid-cols-2">
+            <label className="grid auto-rows-min gap-1.5 text-sm font-semibold text-ink-700">
               {t("tools.add-page-numbers.ui.startPageLabel")}
               <input
                 type="number"
@@ -314,7 +316,7 @@ export function AddPageNumbersTool() {
                 }}
               />
             </label>
-            <label className="grid gap-1.5 text-sm font-semibold text-ink-700">
+            <label className="grid auto-rows-min gap-1.5 text-sm font-semibold text-ink-700">
               {t("tools.add-page-numbers.ui.startingNumberLabel")}
               <input
                 type="number"
