@@ -19,6 +19,7 @@ export type CatalogPersistedState = {
   filters: ToolFilters;
   onlyFavorites: boolean;
   scrollY: number;
+  visibleCount: number;
 };
 
 function isBrowser(): boolean {
@@ -44,7 +45,10 @@ function isPersistedState(value: unknown): value is CatalogPersistedState {
     isToolFilters(candidate.filters) &&
     typeof candidate.onlyFavorites === "boolean" &&
     typeof candidate.scrollY === "number" &&
-    Number.isFinite(candidate.scrollY)
+    Number.isFinite(candidate.scrollY) &&
+    typeof candidate.visibleCount === "number" &&
+    Number.isFinite(candidate.visibleCount) &&
+    candidate.visibleCount >= 0
   );
 }
 

@@ -62,6 +62,8 @@ export const es = {
   "catalog.filters.button": "Filtros",
   "catalog.filters.countShort": "{{count}} herramientas",
   "catalog.filters.countLong": "{{shown}} de {{total}} herramientas",
+  "catalog.pagination.status": "Mostrando {{visible}} de {{total}} herramientas",
+  "catalog.pagination.loadMore": "Cargar más",
   "catalog.search.label": "Buscar herramienta",
   "catalog.search.placeholder": "Buscar por nombre, descripción o etiqueta...",
   "catalog.favorites.toggle": "Solo favoritos",

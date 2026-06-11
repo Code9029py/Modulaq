@@ -38,6 +38,7 @@ const sampleState: CatalogPersistedState = {
   },
   onlyFavorites: true,
   scrollY: 480,
+  visibleCount: 24,
 };
 
 describe("catalogReturn", () => {
@@ -90,5 +91,41 @@ describe("catalogReturn", () => {
     markCameFromToolDetail();
 
     expect(consumeCatalogReturnState()).toBeNull();
+  });
+
+  it("preserves visibleCount on a valid restore", () => {
+    saveCatalogState(sampleState);
+    markCameFromToolDetail();
+
+    const restored = consumeCatalogReturnState();
+    expect(restored?.visibleCount).toBe(24);
+  });
+
+  it("rejects state with malformed visibleCount", () => {
+    storage.setItem(
+      STATE_KEY,
+      JSON.stringify({ ...sampleState, visibleCount: "30" }),
+    );
+    markCameFromToolDetail();
+
+    expect(consumeCatalogReturnState()).toBeNull();
+  });
+
+  it("rejects state with negative visibleCount", () => {
+    storage.setItem(
+      STATE_KEY,
+      JSON.stringify({ ...sampleState, visibleCount: -5 }),
+    );
+    markCameFromToolDetail();
+
+    expect(consumeCatalogReturnState()).toBeNull();
+  });
+
+  it("direct entry without flag clears stored visibleCount", () => {
+    saveCatalogState(sampleState);
+    expect(storage.getItem(STATE_KEY)).not.toBeNull();
+
+    expect(consumeCatalogReturnState()).toBeNull();
+    expect(storage.getItem(STATE_KEY)).toBeNull();
   });
 });

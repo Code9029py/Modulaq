@@ -60,6 +60,8 @@ export const en: Record<TranslationKey, string> = {
   "catalog.filters.button": "Filters",
   "catalog.filters.countShort": "{{count}} tools",
   "catalog.filters.countLong": "{{shown}} of {{total}} tools",
+  "catalog.pagination.status": "Showing {{visible}} of {{total}} tools",
+  "catalog.pagination.loadMore": "Load more",
   "catalog.search.label": "Search tool",
   "catalog.search.placeholder": "Search by name, description or tag...",
   "catalog.favorites.toggle": "Favorites only",

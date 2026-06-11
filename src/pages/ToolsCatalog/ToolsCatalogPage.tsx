@@ -8,6 +8,10 @@ import { useFavorites } from "../../features/tools/context/ToolPrefsProvider";
 import { tools } from "../../features/tools/data/tools";
 import type { ToolFilters as ToolFiltersType } from "../../features/tools/types/tool.types";
 import {
+  INITIAL_VISIBLE_TOOLS,
+  paginateCatalogItems,
+} from "../../features/tools/utils/catalogPagination";
+import {
   consumeCatalogReturnState,
   saveCatalogState,
   type CatalogPersistedState,
@@ -56,13 +60,14 @@ export function ToolsCatalogPage() {
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [hasRestored, setHasRestored] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_TOOLS);
   const { hydrated, favoriteIds } = useFavorites();
 
   // Estado más reciente expuesto al listener de scroll (refs evitan rebind del listener).
-  const latestRef = useRef({ filters, onlyFavorites });
+  const latestRef = useRef({ filters, onlyFavorites, visibleCount });
   useEffect(() => {
-    latestRef.current = { filters, onlyFavorites };
-  }, [filters, onlyFavorites]);
+    latestRef.current = { filters, onlyFavorites, visibleCount };
+  }, [filters, onlyFavorites, visibleCount]);
 
   // Restauración contextual al volver desde un detalle de herramienta.
   useEffect(() => {
@@ -70,6 +75,7 @@ export function ToolsCatalogPage() {
     if (restored) {
       setFilters(restored.filters);
       setOnlyFavorites(restored.onlyFavorites);
+      setVisibleCount(restored.visibleCount);
       // Recoloca scroll despues de que ScrollToTop (efecto en RootLayout) corra.
       // Usamos setTimeout en vez de requestAnimationFrame: rAF puede ser
       // throttleado o no dispararse en tabs en background o entornos headless,
@@ -93,9 +99,10 @@ export function ToolsCatalogPage() {
       filters,
       onlyFavorites,
       scrollY: typeof window === "undefined" ? 0 : window.scrollY,
+      visibleCount,
     };
     saveCatalogState(state);
-  }, [filters, onlyFavorites, hasRestored]);
+  }, [filters, onlyFavorites, hasRestored, visibleCount]);
 
   useEffect(() => {
     if (!hasRestored || typeof window === "undefined") return;
@@ -108,6 +115,7 @@ export function ToolsCatalogPage() {
           filters: latestRef.current.filters,
           onlyFavorites: latestRef.current.onlyFavorites,
           scrollY: window.scrollY,
+          visibleCount: latestRef.current.visibleCount,
         });
       });
     };
@@ -144,9 +152,37 @@ export function ToolsCatalogPage() {
   }, [favoriteIds, filteredTools, onlyFavorites, showFavoritesFilter]);
   const hasActiveFilters = hasFiltersOrSearch(filters, onlyFavorites);
 
+  const paginated = useMemo(
+    () => paginateCatalogItems({ items: displayedTools, visibleCount }),
+    [displayedTools, visibleCount],
+  );
+  const visibleTools = paginated.visibleItems;
+
+  // Reset visibleCount cuando cambian los criterios de filtrado. La paginación
+  // arranca de cero sobre cada nuevo conjunto filtrado; el restore al volver
+  // desde un detalle sigue funcionando porque corre antes en otro effect.
+  const filterSignature = `${filters.search}|${filters.categories.join(",")}|${filters.mode}|${filters.status}|${onlyFavorites ? "1" : "0"}`;
+  const previousSignatureRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!hasRestored) return;
+    if (previousSignatureRef.current === null) {
+      previousSignatureRef.current = filterSignature;
+      return;
+    }
+    if (previousSignatureRef.current !== filterSignature) {
+      previousSignatureRef.current = filterSignature;
+      setVisibleCount(INITIAL_VISIBLE_TOOLS);
+    }
+  }, [filterSignature, hasRestored]);
+
+  const handleLoadMore = () => {
+    setVisibleCount(paginated.nextVisibleCount);
+  };
+
   const resetFilters = () => {
     setFilters(defaultFilters);
     setOnlyFavorites(false);
+    setVisibleCount(INITIAL_VISIBLE_TOOLS);
   };
 
   return (
@@ -294,7 +330,7 @@ export function ToolsCatalogPage() {
             </div>
 
             <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-              {displayedTools.map((tool) => (
+              {visibleTools.map((tool) => (
                 <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
@@ -306,7 +342,21 @@ export function ToolsCatalogPage() {
                   description={onlyFavorites ? t("catalog.empty.favDescription") : t("catalog.empty.description")}
                 />
               </div>
-            ) : null}
+            ) : (
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <p className="text-sm text-ink-500">
+                  {t("catalog.pagination.status", {
+                    visible: paginated.visibleCount,
+                    total: paginated.totalItems,
+                  })}
+                </p>
+                {paginated.hasMore ? (
+                  <Button type="button" variant="secondary" onClick={handleLoadMore}>
+                    {t("catalog.pagination.loadMore")}
+                  </Button>
+                ) : null}
+              </div>
+            )}
           </section>
         </div>
       </Container>
