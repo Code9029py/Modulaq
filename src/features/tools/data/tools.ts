@@ -2986,7 +2986,7 @@ export async function generateQrDataUrl(
         limits: [
           "Solo texto plano: sin imágenes, tablas, markdown ni fuentes custom.",
           "Hasta 200 000 caracteres por documento.",
-          "Helvetica como única fuente, tamaños 10/12/14/16.",
+          "Fuente Helvetica, Times Roman o Courier; tamaño 8 a 32 puntos.",
         ],
         privacy:
           "El procesamiento ocurre en tu navegador; no subimos los archivos.",
@@ -2995,7 +2995,7 @@ export async function generateQrDataUrl(
           "Texto demasiado largo: dividilo en partes más chicas si supera el límite.",
         ],
         technicalNotes: [
-          "Usa pdf-lib con StandardFonts.Helvetica.",
+          "Usa pdf-lib con StandardFonts (Helvetica, Times Roman, Courier).",
           "Word-wrap calculado con la métrica real de la fuente.",
         ],
       },
@@ -3014,7 +3014,7 @@ export async function generateQrDataUrl(
         limits: [
           "Plain text only: no images, tables, markdown, or custom fonts.",
           "Up to 200,000 characters per document.",
-          "Helvetica only, sizes 10/12/14/16.",
+          "Helvetica, Times Roman, or Courier; size 8 to 32 points.",
         ],
         privacy:
           "Processing happens in your browser — we don't upload your files.",
@@ -3023,7 +3023,7 @@ export async function generateQrDataUrl(
           "Text too long: split it into smaller chunks if it exceeds the limit.",
         ],
         technicalNotes: [
-          "Uses pdf-lib in the browser with StandardFonts.Helvetica.",
+          "Uses pdf-lib with StandardFonts (Helvetica, Times Roman, Courier).",
           "Word-wrap computed with the real font metric.",
         ],
       },

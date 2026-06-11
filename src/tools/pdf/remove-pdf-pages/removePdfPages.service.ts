@@ -53,6 +53,36 @@ export function resolvePagesToRemove(rangeInput: string, totalPages: number): nu
   return parsed.pages;
 }
 
+export type RemovePdfPagesValidation =
+  | { state: "empty" }
+  | { state: "ok"; pages: number[] }
+  | { state: "error"; code: string; vars?: Record<string, string | number> };
+
+/**
+ * Variante non-throwing para validación en vivo desde la UI. No tira: devuelve
+ * estado discriminado para que la UI muestre el feedback sin try/catch.
+ *
+ *  - `empty`: input vacío (no es error agresivo).
+ *  - `ok`: parse correcto + reglas funcionales cumplidas; trae las páginas.
+ *  - `error`: code i18n + vars para localizar el mensaje.
+ */
+export function validateRangeInput(rangeInput: string, totalPages: number): RemovePdfPagesValidation {
+  if (rangeInput.trim().length === 0) {
+    return { state: "empty" };
+  }
+  const parsed = parsePageSelection(rangeInput, totalPages);
+  if (parsed.error) {
+    return { state: "error", code: parsed.error.code, vars: parsed.error.vars };
+  }
+  if (parsed.pages.length === 0) {
+    return { state: "error", code: "tools.errors.pageRangeEmpty" };
+  }
+  if (parsed.pages.length >= totalPages) {
+    return { state: "error", code: "tools.errors.removeAllPages" };
+  }
+  return { state: "ok", pages: parsed.pages };
+}
+
 export async function removePdfPagesFromFile(
   file: File,
   rangeInput: string,

@@ -1,6 +1,7 @@
 import { Download, FileText, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
+import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
 import { useI18n } from "../../../shared/i18n/I18nProvider";
 import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolErrorMessage";
 import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
@@ -13,6 +14,7 @@ import {
   isPdfFile,
   readPdfMetadata,
   removePdfPagesFromFile,
+  validateRangeInput,
 } from "./removePdfPages.service";
 import type { RemovePdfPagesMetadata, RemovePdfPagesStatus } from "./removePdfPages.types";
 
@@ -34,12 +36,26 @@ export function RemovePdfPagesTool() {
   const [lastResult, setLastResult] = useState<{ removed: number; remaining: number } | null>(null);
 
   const isBusy = status === "reading" || status === "processing";
-  const canRemove = Boolean(metadata) && rangeInput.trim().length > 0 && !isBusy;
   const fallbackBaseName = metadata ? getSuggestedOutputBaseName(metadata.fileName) : defaultOutputBaseName;
   const finalOutputFileName = useMemo(
     () => getOutputFileName(outputBaseName, fallbackBaseName),
     [outputBaseName, fallbackBaseName],
   );
+
+  // Validación dinámica del rango contra el total real del PDF. La UI muestra
+  // ayuda normal mientras el campo está vacío y no le grita al usuario.
+  const liveValidation = useMemo(() => {
+    if (!metadata) return null;
+    return validateRangeInput(rangeInput, metadata.pageCount);
+  }, [metadata, rangeInput]);
+
+  const liveError =
+    liveValidation && liveValidation.state === "error"
+      ? t(liveValidation.code as TranslationKey, liveValidation.vars)
+      : null;
+
+  const canRemove =
+    Boolean(metadata) && !isBusy && liveValidation?.state === "ok";
 
   const resetFeedback = () => {
     setError(null);
@@ -177,7 +193,10 @@ export function RemovePdfPagesTool() {
           <label className="grid gap-2 text-sm font-semibold text-ink-700">
             {t("tools.remove-pdf-pages.ui.rangeLabel")}
             <input
-              className={inputClassName}
+              className={cn(
+                inputClassName,
+                liveError ? "border-accent-violet/40 focus:border-accent-violet" : "",
+              )}
               value={rangeInput}
               placeholder={t("tools.remove-pdf-pages.ui.rangePlaceholder")}
               disabled={!metadata}
@@ -186,7 +205,11 @@ export function RemovePdfPagesTool() {
                 resetFeedback();
               }}
             />
-            <span className="text-xs font-normal text-ink-500">{t("tools.remove-pdf-pages.ui.rangeHelp")}</span>
+            {liveError ? (
+              <span className="text-xs font-normal text-accent-violet">{liveError}</span>
+            ) : (
+              <span className="text-xs font-normal text-ink-500">{t("tools.remove-pdf-pages.ui.rangeHelp")}</span>
+            )}
           </label>
         </div>
       </section>
