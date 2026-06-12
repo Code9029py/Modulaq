@@ -23,7 +23,6 @@ export type CatalogPersistedState = {
   onlyFavorites: boolean;
   visibleCount: number;
   scrollY: number;
-  visibleCount: number;
 };
 
 function isBrowser(): boolean {
