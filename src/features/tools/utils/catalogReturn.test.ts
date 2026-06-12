@@ -37,8 +37,8 @@ const sampleState: CatalogPersistedState = {
     status: "all",
   },
   onlyFavorites: true,
-  scrollY: 480,
   visibleCount: 24,
+  scrollY: 480,
 };
 
 describe("catalogReturn", () => {
@@ -87,7 +87,10 @@ describe("catalogReturn", () => {
   });
 
   it("rejects state with the wrong shape", () => {
-    storage.setItem(STATE_KEY, JSON.stringify({ filters: { search: 1 }, onlyFavorites: true, scrollY: 0 }));
+    storage.setItem(
+      STATE_KEY,
+      JSON.stringify({ filters: { search: 1 }, onlyFavorites: true, scrollY: 0 }),
+    );
     markCameFromToolDetail();
 
     expect(consumeCatalogReturnState()).toBeNull();
@@ -116,6 +119,15 @@ describe("catalogReturn", () => {
       STATE_KEY,
       JSON.stringify({ ...sampleState, visibleCount: -5 }),
     );
+    markCameFromToolDetail();
+
+    expect(consumeCatalogReturnState()).toBeNull();
+  });
+
+  it("rejects state without visibleCount", () => {
+    const { visibleCount, ...stateWithoutVisibleCount } = sampleState;
+
+    storage.setItem(STATE_KEY, JSON.stringify(stateWithoutVisibleCount));
     markCameFromToolDetail();
 
     expect(consumeCatalogReturnState()).toBeNull();

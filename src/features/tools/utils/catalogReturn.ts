@@ -15,9 +15,13 @@ import type { ToolCategoryId, ToolFilters, ToolModeId, ToolStatus } from "../typ
 const STATE_KEY = "modulaq:catalog:state:v1";
 const RETURN_FLAG_KEY = "modulaq:catalog:returnFromTool:v1";
 
+export const CATALOG_INITIAL_VISIBLE_COUNT = 18;
+export const CATALOG_LOAD_MORE_COUNT = 18;
+
 export type CatalogPersistedState = {
   filters: ToolFilters;
   onlyFavorites: boolean;
+  visibleCount: number;
   scrollY: number;
   visibleCount: number;
 };
@@ -44,6 +48,9 @@ function isPersistedState(value: unknown): value is CatalogPersistedState {
   return (
     isToolFilters(candidate.filters) &&
     typeof candidate.onlyFavorites === "boolean" &&
+    typeof candidate.visibleCount === "number" &&
+    Number.isInteger(candidate.visibleCount) &&
+    candidate.visibleCount >= CATALOG_INITIAL_VISIBLE_COUNT &&
     typeof candidate.scrollY === "number" &&
     Number.isFinite(candidate.scrollY) &&
     typeof candidate.visibleCount === "number" &&

@@ -7,8 +7,8 @@ import { resolveToolErrorMessage } from "../../../shared/errors/resolveToolError
 import { useFileProcessingLimitLabels } from "../../../shared/errors/useFileProcessingLimitLabels";
 import { cn } from "../../../shared/utils/cn";
 import {
-  defaultOutputBaseName,
   formatFileSize,
+  getDefaultOutputBaseName,
   getOutputFileName,
   getSuggestedOutputBaseName,
   isPdfFile,
@@ -22,8 +22,9 @@ const inputClassName =
   "min-h-11 w-full rounded-lg border border-surface-200/90 bg-surface-50/95 px-3 text-sm font-normal text-ink-900 shadow-sm outline-none transition placeholder:text-ink-500/70 focus:border-accent-cyan focus:bg-surface-50 focus:ring-2 focus:ring-accent-cyan/25";
 
 export function RemovePdfPagesTool() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const limitLabels = useFileProcessingLimitLabels();
+  const localizedDefaultOutputBaseName = getDefaultOutputBaseName(language);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<RemovePdfPagesMetadata | null>(null);
@@ -31,12 +32,14 @@ export function RemovePdfPagesTool() {
   const [status, setStatus] = useState<RemovePdfPagesStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [outputBaseName, setOutputBaseName] = useState(defaultOutputBaseName);
+  const [outputBaseName, setOutputBaseName] = useState(localizedDefaultOutputBaseName);
   const [hasCustomOutputName, setHasCustomOutputName] = useState(false);
   const [lastResult, setLastResult] = useState<{ removed: number; remaining: number } | null>(null);
 
   const isBusy = status === "reading" || status === "processing";
-  const fallbackBaseName = metadata ? getSuggestedOutputBaseName(metadata.fileName) : defaultOutputBaseName;
+  const fallbackBaseName = metadata
+    ? getSuggestedOutputBaseName(metadata.fileName, localizedDefaultOutputBaseName)
+    : localizedDefaultOutputBaseName;
   const finalOutputFileName = useMemo(
     () => getOutputFileName(outputBaseName, fallbackBaseName),
     [outputBaseName, fallbackBaseName],
@@ -89,7 +92,7 @@ export function RemovePdfPagesTool() {
       setMetadata(meta);
       setRangeInput("");
       if (!hasCustomOutputName) {
-        setOutputBaseName(getSuggestedOutputBaseName(meta.fileName));
+        setOutputBaseName(getSuggestedOutputBaseName(meta.fileName, localizedDefaultOutputBaseName));
       }
       setStatus("ready");
     } catch (nextError) {
@@ -115,7 +118,7 @@ export function RemovePdfPagesTool() {
     setLastResult(null);
 
     try {
-      const result = await removePdfPagesFromFile(file, rangeInput, outputBaseName);
+      const result = await removePdfPagesFromFile(file, rangeInput, outputBaseName, localizedDefaultOutputBaseName);
       downloadPdf(result.bytes, result.fileName);
       setLastResult({ removed: result.removedCount, remaining: result.remainingCount });
       setStatus("success");
@@ -132,7 +135,7 @@ export function RemovePdfPagesTool() {
     setStatus("idle");
     setError(null);
     setIsDragging(false);
-    setOutputBaseName(defaultOutputBaseName);
+    setOutputBaseName(localizedDefaultOutputBaseName);
     setHasCustomOutputName(false);
     setLastResult(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -226,7 +229,7 @@ export function RemovePdfPagesTool() {
             <input
               className={inputClassName}
               value={outputBaseName}
-              placeholder={defaultOutputBaseName}
+              placeholder={localizedDefaultOutputBaseName}
               onChange={(event) => {
                 setOutputBaseName(event.target.value);
                 setHasCustomOutputName(true);

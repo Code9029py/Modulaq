@@ -59,8 +59,8 @@ export function ToolsCatalogPage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
-  const [hasRestored, setHasRestored] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_TOOLS);
+  const [hasRestored, setHasRestored] = useState(false);
   const { hydrated, favoriteIds } = useFavorites();
 
   // Estado más reciente expuesto al listener de scroll (refs evitan rebind del listener).
@@ -98,11 +98,11 @@ export function ToolsCatalogPage() {
     const state: CatalogPersistedState = {
       filters,
       onlyFavorites,
-      scrollY: typeof window === "undefined" ? 0 : window.scrollY,
       visibleCount,
+      scrollY: typeof window === "undefined" ? 0 : window.scrollY,
     };
     saveCatalogState(state);
-  }, [filters, onlyFavorites, hasRestored, visibleCount]);
+  }, [filters, onlyFavorites, visibleCount, hasRestored]);
 
   useEffect(() => {
     if (!hasRestored || typeof window === "undefined") return;
@@ -114,8 +114,8 @@ export function ToolsCatalogPage() {
         saveCatalogState({
           filters: latestRef.current.filters,
           onlyFavorites: latestRef.current.onlyFavorites,
-          scrollY: window.scrollY,
           visibleCount: latestRef.current.visibleCount,
+          scrollY: window.scrollY,
         });
       });
     };
@@ -138,7 +138,6 @@ export function ToolsCatalogPage() {
 
   const visibleStatuses = useMemo(() => getVisibleStatuses(tools), []);
   const filteredTools = useMemo(() => filterTools(tools, filters), [filters]);
-  const totalToolsCount = tools.length;
   const showFavoritesFilter = hydrated;
   const displayedTools = useMemo(() => {
     if (!showFavoritesFilter) {
@@ -150,13 +149,13 @@ export function ToolsCatalogPage() {
 
     return orderToolsByFavoriteIds(scopedTools, favoriteIds);
   }, [favoriteIds, filteredTools, onlyFavorites, showFavoritesFilter]);
-  const hasActiveFilters = hasFiltersOrSearch(filters, onlyFavorites);
 
   const paginated = useMemo(
     () => paginateCatalogItems({ items: displayedTools, visibleCount }),
     [displayedTools, visibleCount],
   );
   const visibleTools = paginated.visibleItems;
+  const hasActiveFilters = hasFiltersOrSearch(filters, onlyFavorites);
 
   // Reset visibleCount cuando cambian los criterios de filtrado. La paginación
   // arranca de cero sobre cada nuevo conjunto filtrado; el restore al volver
@@ -174,6 +173,14 @@ export function ToolsCatalogPage() {
       setVisibleCount(INITIAL_VISIBLE_TOOLS);
     }
   }, [filterSignature, hasRestored]);
+
+  const updateFilters = (nextFilters: ToolFiltersType) => {
+    setFilters(nextFilters);
+  };
+
+  const updateOnlyFavorites = (nextOnlyFavorites: boolean) => {
+    setOnlyFavorites(nextOnlyFavorites);
+  };
 
   const handleLoadMore = () => {
     setVisibleCount(paginated.nextVisibleCount);
@@ -216,7 +223,7 @@ export function ToolsCatalogPage() {
                 {t("catalog.filters.button")}
               </Button>
               <span className="text-sm font-medium text-ink-500">
-                {t("catalog.filters.countShort", { count: displayedTools.length })}
+                {t("catalog.filters.countShort", { count: paginated.totalItems })}
               </span>
             </div>
           </div>
@@ -231,7 +238,7 @@ export function ToolsCatalogPage() {
                 className={cn(inputClassName, "min-h-12 w-full py-2 pl-10 pr-3 text-base")}
                 placeholder={t("catalog.search.placeholder")}
                 value={filters.search}
-                onChange={(event) => setFilters({ ...filters, search: event.target.value })}
+                onChange={(event) => updateFilters({ ...filters, search: event.target.value })}
               />
             </span>
           </label>
@@ -264,8 +271,8 @@ export function ToolsCatalogPage() {
               favoriteCount={favoriteIds.length}
               filters={filters}
               modes={visibleModes}
-              onChange={setFilters}
-              onOnlyFavoritesChange={setOnlyFavorites}
+              onChange={updateFilters}
+              onOnlyFavoritesChange={updateOnlyFavorites}
               onlyFavorites={onlyFavorites}
               showFavoritesFilter={showFavoritesFilter}
               statuses={visibleStatuses}
@@ -303,8 +310,8 @@ export function ToolsCatalogPage() {
                     favoriteCount={favoriteIds.length}
                     filters={filters}
                     modes={visibleModes}
-                    onChange={setFilters}
-                    onOnlyFavoritesChange={setOnlyFavorites}
+                    onChange={updateFilters}
+                    onOnlyFavoritesChange={updateOnlyFavorites}
                     onlyFavorites={onlyFavorites}
                     showFavoritesFilter={showFavoritesFilter}
                     statuses={visibleStatuses}
@@ -324,7 +331,7 @@ export function ToolsCatalogPage() {
                   </Button>
                 ) : null}
                 <p className="text-sm font-medium text-ink-500">
-                  {t("catalog.filters.countLong", { shown: displayedTools.length, total: totalToolsCount })}
+                  {t("catalog.filters.countLong", { shown: paginated.visibleCount, total: paginated.totalItems })}
                 </p>
               </div>
             </div>

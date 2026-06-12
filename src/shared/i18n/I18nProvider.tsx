@@ -85,8 +85,10 @@ export function mapPathToLanguage(pathname: string, targetLang: Language): strin
 
   // Estáticas
   if (targetLang === "en") {
+    if (EN_TO_ES.has(cleaned)) return cleaned;
     return ES_TO_EN.get(cleaned) ?? "/en";
   }
+  if (ES_TO_EN.has(cleaned)) return cleaned;
   return EN_TO_ES.get(cleaned) ?? "/";
 }
 
