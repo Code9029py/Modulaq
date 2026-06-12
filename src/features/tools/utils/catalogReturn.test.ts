@@ -37,7 +37,7 @@ const sampleState: CatalogPersistedState = {
     status: "all",
   },
   onlyFavorites: true,
-  visibleCount: 36,
+  visibleCount: 24,
   scrollY: 480,
 };
 
@@ -87,16 +87,57 @@ describe("catalogReturn", () => {
   });
 
   it("rejects state with the wrong shape", () => {
-    storage.setItem(STATE_KEY, JSON.stringify({ filters: { search: 1 }, onlyFavorites: true, scrollY: 0 }));
+    storage.setItem(
+      STATE_KEY,
+      JSON.stringify({ filters: { search: 1 }, onlyFavorites: true, scrollY: 0 }),
+    );
     markCameFromToolDetail();
 
     expect(consumeCatalogReturnState()).toBeNull();
   });
 
-  it("rejects state without a valid visible count", () => {
-    storage.setItem(STATE_KEY, JSON.stringify({ ...sampleState, visibleCount: 12 }));
+  it("preserves visibleCount on a valid restore", () => {
+    saveCatalogState(sampleState);
+    markCameFromToolDetail();
+
+    const restored = consumeCatalogReturnState();
+    expect(restored?.visibleCount).toBe(24);
+  });
+
+  it("rejects state with malformed visibleCount", () => {
+    storage.setItem(
+      STATE_KEY,
+      JSON.stringify({ ...sampleState, visibleCount: "30" }),
+    );
     markCameFromToolDetail();
 
     expect(consumeCatalogReturnState()).toBeNull();
+  });
+
+  it("rejects state with negative visibleCount", () => {
+    storage.setItem(
+      STATE_KEY,
+      JSON.stringify({ ...sampleState, visibleCount: -5 }),
+    );
+    markCameFromToolDetail();
+
+    expect(consumeCatalogReturnState()).toBeNull();
+  });
+
+  it("rejects state without visibleCount", () => {
+    const { visibleCount, ...stateWithoutVisibleCount } = sampleState;
+
+    storage.setItem(STATE_KEY, JSON.stringify(stateWithoutVisibleCount));
+    markCameFromToolDetail();
+
+    expect(consumeCatalogReturnState()).toBeNull();
+  });
+
+  it("direct entry without flag clears stored visibleCount", () => {
+    saveCatalogState(sampleState);
+    expect(storage.getItem(STATE_KEY)).not.toBeNull();
+
+    expect(consumeCatalogReturnState()).toBeNull();
+    expect(storage.getItem(STATE_KEY)).toBeNull();
   });
 });
