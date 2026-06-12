@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Braces, FileText, Globe2, Server } from "lucide-react";
+import { ArrowLeft, ArrowRight, Braces, FileText, Globe2, Server, ShieldCheck } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ClientOnly } from "vite-react-ssg";
@@ -30,9 +30,10 @@ type DetailTab = {
   icon: typeof Globe2;
 };
 
+// El tab de documentación se quitó: el contenido de `tool.doc` se renderiza
+// visible debajo de la herramienta (sección "Acerca de esta herramienta").
 const detailTabs: DetailTab[] = [
   { id: "online", icon: Globe2 },
-  { id: "documentation", icon: FileText },
   { id: "integrable-code", icon: Braces },
   { id: "api", icon: Server },
 ];
@@ -54,17 +55,64 @@ const tabPlannedLabelKeys: Record<ToolModeId, TranslationKey> = {
 const relatedToolIds: Record<string, string[]> = {
   "merge-pdf": ["split-pdf", "reorder-pdf-pages", "remove-pdf-pages"],
   "split-pdf": ["merge-pdf", "reorder-pdf-pages", "remove-pdf-pages"],
-  "reorder-pdf-pages": ["merge-pdf", "split-pdf", "add-page-numbers"],
-  "image-to-pdf": ["merge-pdf", "text-to-pdf"],
-  "image-to-base64": ["base64-to-image"],
-  "base64-to-image": ["image-to-base64"],
-  "text-to-pdf": ["image-to-pdf", "add-page-numbers"],
+  "reorder-pdf-pages": ["rotate-pdf", "merge-pdf", "split-pdf"],
+  "rotate-pdf": ["reorder-pdf-pages", "remove-pdf-pages", "merge-pdf"],
+  "image-to-pdf": ["merge-pdf", "text-to-pdf", "image-converter"],
+  "pdf-to-images": ["extract-pdf-text", "image-to-pdf", "split-pdf"],
+  "extract-pdf-text": ["pdf-to-images", "advanced-word-counter", "text-cleaner"],
+  "compress-pdf": ["merge-pdf", "split-pdf", "image-compressor"],
+  "pdf-page-counter": ["split-pdf", "remove-pdf-pages", "add-page-numbers"],
+  "text-to-pdf": ["image-to-pdf", "add-page-numbers", "markdown-to-html"],
   "remove-pdf-pages": ["reorder-pdf-pages", "split-pdf", "add-page-numbers"],
   "add-page-numbers": ["merge-pdf", "reorder-pdf-pages", "remove-pdf-pages"],
+  "image-converter": ["image-resizer", "image-compressor", "svg-to-png"],
+  "image-resizer": ["image-converter", "image-compressor", "image-cropper"],
+  "image-compressor": ["image-resizer", "image-converter", "compress-pdf"],
+  "image-rotator": ["image-cropper", "image-resizer", "rotate-pdf"],
+  "image-cropper": ["image-resizer", "image-rotator", "image-splitter"],
+  "image-to-favicon": ["image-resizer", "svg-to-png", "image-converter"],
+  "svg-to-png": ["image-to-favicon", "image-converter", "image-to-base64"],
+  "image-watermark": ["image-resizer", "image-converter"],
+  "image-joiner": ["image-splitter", "image-resizer"],
+  "image-splitter": ["image-joiner", "image-cropper"],
+  "image-color-extractor": ["image-placeholder", "image-cropper"],
+  "image-placeholder": ["image-color-extractor", "svg-to-png"],
+  "image-to-base64": ["base64-to-image", "svg-to-png"],
+  "base64-to-image": ["image-to-base64", "image-converter"],
+  "text-cleaner": ["advanced-word-counter", "compare-texts"],
   "advanced-word-counter": ["compare-texts", "markdown-to-html"],
   "markdown-to-html": ["text-to-pdf", "advanced-word-counter"],
   "compare-texts": ["advanced-word-counter", "markdown-to-html"],
 };
+
+// Herramientas que reciben archivos del usuario: muestran la nota de
+// procesamiento local junto al encabezado. Las que solo reciben texto pegado
+// (QR, texto, base64-to-image, placeholder) no la necesitan ahí.
+const fileProcessingToolIds = new Set<string>([
+  "merge-pdf",
+  "split-pdf",
+  "reorder-pdf-pages",
+  "rotate-pdf",
+  "image-to-pdf",
+  "pdf-to-images",
+  "compress-pdf",
+  "extract-pdf-text",
+  "pdf-page-counter",
+  "remove-pdf-pages",
+  "add-page-numbers",
+  "image-converter",
+  "image-resizer",
+  "image-compressor",
+  "image-rotator",
+  "image-cropper",
+  "image-to-favicon",
+  "svg-to-png",
+  "image-watermark",
+  "image-joiner",
+  "image-splitter",
+  "image-color-extractor",
+  "image-to-base64",
+]);
 
 function isDefinition(tool: ToolDefinition | undefined): tool is ToolDefinition {
   return Boolean(tool);
@@ -151,7 +199,6 @@ export function ToolDetailPage() {
 
   const tool = localizedTool;
   const ToolRenderer = getToolRenderer(tool.id);
-  const hasDoc = Boolean(tool.doc);
   const hasIntegrableCode = Boolean(tool.integrableCode);
   const relatedTools = (relatedToolIds[tool.id] ?? [])
     .map((relatedId) => getToolById(relatedId))
@@ -179,6 +226,12 @@ export function ToolDetailPage() {
             <div>
               <h1 className="text-2xl font-semibold leading-tight text-ink-900 md:text-3xl">{tool.name}</h1>
               <p className="mt-1.5 max-w-4xl text-sm leading-6 text-ink-500 md:text-base md:leading-7">{tool.description}</p>
+              {fileProcessingToolIds.has(tool.id) ? (
+                <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-ink-700">
+                  <ShieldCheck size={14} className="shrink-0 text-accent-teal" />
+                  {t("toolDetail.localFileNote")}
+                </p>
+              ) : null}
             </div>
             <div className="flex flex-wrap items-center gap-2 lg:justify-end">
               <ToolStatusBadge status={tool.status} />
@@ -196,7 +249,6 @@ export function ToolDetailPage() {
               const isActive = activeTab === tab.id;
               const isAvailable =
                 tool.modes.includes(tab.id) ||
-                (tab.id === "documentation" && hasDoc) ||
                 (tab.id === "integrable-code" && hasIntegrableCode);
               const isPlanned = tool.plannedModes.includes(tab.id) && !isAvailable;
               const isDisabled = !isAvailable && !isPlanned;
@@ -264,16 +316,22 @@ export function ToolDetailPage() {
                 description={t("toolDetail.comingSoon.apiDescription")}
               />
             </div>
-            <div
-              id="tool-panel-documentation"
-              role="tabpanel"
-              aria-labelledby="tool-tab-documentation"
-              hidden={activeTab !== "documentation"}
-            >
-              {tool.doc ? <ToolDocPanel doc={tool.doc} /> : <ComingSoonPanel title={t("toolDetail.comingSoon.docTitle")} />}
-            </div>
           </div>
         </section>
+
+        {tool.doc ? (
+          <section
+            aria-labelledby="tool-about-heading"
+            className="mt-3 rounded-2xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur"
+          >
+            <h2 id="tool-about-heading" className="text-base font-semibold text-ink-900">
+              {t("toolDetail.about.title")}
+            </h2>
+            <div className="mt-3">
+              <ToolDocPanel doc={tool.doc} />
+            </div>
+          </section>
+        ) : null}
 
         {relatedTools.length > 0 ? (
           <section className="mt-3 rounded-2xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur">

@@ -20,9 +20,9 @@ export const en: Record<TranslationKey, string> = {
   "footer.privacy": "Privacy",
 
   // Home
-  "home.head.title": "Modulaq - PDF, QR and text tools in your browser",
+  "home.head.title": "Modulaq - PDF, image, text and QR tools in your browser",
   "home.head.description":
-    "Modulaq offers free PDF, QR and text tools. No account, no install.",
+    "Modulaq offers free PDF, image, text and QR tools. They run in your browser — no account, no uploads.",
   "home.hero.badge": "Public beta · {{count}} tools available",
   "home.hero.subhead": "Digital tools that run in your browser.",
   "home.hero.description":
@@ -50,9 +50,9 @@ export const en: Record<TranslationKey, string> = {
   "home.recent.title": "Recently used",
 
   // Catalog
-  "catalog.head.title": "Free PDF, QR and text tools",
+  "catalog.head.title": "Free PDF, image, text and QR tools",
   "catalog.head.description":
-    "Browse Modulaq's free tools for PDF, QR and text. No account, no install.",
+    "Browse Modulaq's free PDF, image, text and QR tools. Quick utilities in your browser — no account, no install.",
   "catalog.hero.badge": "Catalog",
   "catalog.hero.h1": "Free PDF, QR and text tools",
   "catalog.hero.description":
@@ -246,6 +246,8 @@ export const en: Record<TranslationKey, string> = {
     "Coming soon: this section will be available when the tool moves to its next phase.",
   "toolDetail.loading": "Loading tool...",
   "toolDetail.related": "Related tools",
+  "toolDetail.about.title": "About this tool",
+  "toolDetail.localFileNote": "Processing happens in your browser; we do not upload your file.",
   "toolDetail.doc.howTo": "How to use",
   "toolDetail.doc.useCases": "Use cases",
   "toolDetail.doc.limits": "Limits",
@@ -512,7 +514,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.compress-pdf.ui.section": "PDF files",
   "tools.compress-pdf.ui.intro2": "Pick one or more documents.",
   "tools.compress-pdf.ui.notice":
-    "Browser-side compression varies with PDF content. Some files are already optimized or contain compressed images, so they may shrink little or not at all.",
+    "This tool tries to optimize the PDF structure in your browser. It does not recompress images and does not guarantee a reduction: the result depends on the file's content. If it can't shrink it, the original is kept.",
   "tools.compress-pdf.ui.dropHintMany": "You can also drop several files here.",
   "tools.compress-pdf.ui.readyToCompress": "Ready to compress",
   "tools.compress-pdf.ui.optimizing": "Optimizing...",
@@ -1071,6 +1073,7 @@ export const en: Record<TranslationKey, string> = {
   "tools.errors.removeAllPages":
     "You can't remove every page. At least one must remain.",
   "tools.errors.removePdfPagesFailed": "Couldn't remove the pages from the PDF.",
+  "tools.errors.rotatePdfFailed": "Couldn't rotate the PDF.",
   "tools.errors.addPageNumbersFailed": "Couldn't add page numbers to the PDF.",
   "tools.errors.startPageInvalid": "Enter a valid whole number for the start page.",
   "tools.errors.startPageOutOfRange":
@@ -1130,6 +1133,23 @@ export const en: Record<TranslationKey, string> = {
   "tools.remove-pdf-pages.ui.successSummary":
     "Removed {{removed}} pages. The downloaded PDF has {{remaining}} pages.",
   "tools.remove-pdf-pages.ui.localProcessingNote":
+    "Processing happens in your browser.",
+
+  "tools.rotate-pdf.ui.fileSection": "File and rotation",
+  "tools.rotate-pdf.ui.intro": "The rotation applies to every page in the document.",
+  "tools.rotate-pdf.ui.rotationLabel": "Rotation",
+  "tools.rotate-pdf.ui.rotation90": "90°",
+  "tools.rotate-pdf.ui.rotation180": "180°",
+  "tools.rotate-pdf.ui.rotation270": "270°",
+  "tools.rotate-pdf.ui.rotationHelp":
+    "Clockwise. 270° equals 90° counterclockwise.",
+  "tools.rotate-pdf.ui.outputTitle": "Rotated PDF",
+  "tools.rotate-pdf.ui.outputIntro": "Set the download filename.",
+  "tools.rotate-pdf.ui.processing": "Rotating pages...",
+  "tools.rotate-pdf.ui.cta": "Rotate and download",
+  "tools.rotate-pdf.ui.successSummary":
+    "Rotated {{pages}} pages by {{rotation}}°. Your download has started.",
+  "tools.rotate-pdf.ui.localProcessingNote":
     "Processing happens in your browser.",
 
   "tools.add-page-numbers.ui.fileSection": "File and position",

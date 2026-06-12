@@ -88,6 +88,9 @@ const toolRenderers: Partial<Record<ToolMetadata["id"], ToolRenderer>> = {
   "remove-pdf-pages": lazy(() =>
     import("../../../tools/pdf/remove-pdf-pages").then((module) => ({ default: module.RemovePdfPagesTool })),
   ),
+  "rotate-pdf": lazy(() =>
+    import("../../../tools/pdf/rotate-pdf").then((module) => ({ default: module.RotatePdfTool })),
+  ),
   "add-page-numbers": lazy(() =>
     import("../../../tools/pdf/add-page-numbers").then((module) => ({ default: module.AddPageNumbersTool })),
   ),

@@ -27,14 +27,14 @@ export const tools: ToolDefinition[] = [
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Unir PDFs online gratis",
+        title: "Unir PDFs online gratis sin subir archivos",
         description:
-          "Combiná varios PDFs en un solo documento y ordenalos como quieras.",
+          "Combiná varios PDFs en un solo documento y ordenalos como quieras. El procesamiento ocurre en tu navegador; no subimos tus archivos.",
       },
       en: {
-        title: "Merge PDFs online free",
+        title: "Merge PDFs online free without uploads",
         description:
-          "Combine multiple PDFs into one ordered document.",
+          "Combine multiple PDFs into one ordered document. Processing happens in your browser; we don't upload your files.",
       },
     },
     doc: {
@@ -177,14 +177,14 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Dividir PDF online gratis",
+        title: "Dividir PDF online gratis sin subir archivos",
         description:
-          "Separá un PDF por rangos o páginas individuales y descargá el resultado.",
+          "Separá un PDF por rangos o páginas individuales y descargá el resultado. El procesamiento del archivo ocurre en tu navegador.",
       },
       en: {
-        title: "Split PDF online free",
+        title: "Split PDF online free without uploads",
         description:
-          "Split a PDF by ranges or individual pages and download the result.",
+          "Split a PDF by ranges or individual pages and download the result. The file is processed in your browser.",
       },
     },
     doc: {
@@ -336,14 +336,14 @@ export async function extractPageRange(file: File, from: number, to: number): Pr
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Convertir imágenes a PDF online gratis",
+        title: "Convertir imágenes a PDF sin subir archivos",
         description:
-          "Convertí imágenes PNG, JPG o WebP en un PDF ordenado. Gratis y sin marcas de agua.",
+          "Convertí imágenes PNG, JPG o WebP en un PDF ordenado. Gratis, sin marcas de agua y con procesamiento en tu navegador.",
       },
       en: {
         title: "Convert images to PDF without uploads",
         description:
-          "Turn PNG, JPG or WebP images into an ordered PDF. Free, no watermarks.",
+          "Turn PNG, JPG or WebP images into an ordered PDF. Free, no watermarks, processed in your browser.",
       },
     },
     doc: {
@@ -1919,12 +1919,12 @@ export async function imagesToPdf(files: File[]): Promise<Uint8Array> {
       es: {
         title: "Convertir PDF a imágenes PNG o JPG online",
         description:
-          "Convertí páginas de un PDF en imágenes PNG o JPG descargables.",
+          "Convertí páginas de un PDF en imágenes PNG o JPG descargables. El renderizado ocurre en tu navegador.",
       },
       en: {
         title: "Convert PDF to PNG or JPG images online",
         description:
-          "Turn PDF pages into downloadable PNG or JPG images.",
+          "Turn PDF pages into downloadable PNG or JPG images. Rendering happens in your browser.",
       },
     },
     doc: {
@@ -2080,7 +2080,7 @@ export async function renderPdfPageToImage(
     name: { es: "Comprimir PDF", en: "Compress PDF" },
     description: {
       es: "Intenta optimizar el tamaño de un PDF directamente desde el navegador.",
-      en: "Attempts to optimize a PDF's size right.",
+      en: "Attempts to optimize a PDF's size right in your browser.",
     },
     category: "pdf",
     tags: {
@@ -2098,12 +2098,12 @@ export async function renderPdfPageToImage(
       es: {
         title: "Comprimir PDF online gratis",
         description:
-          "Intenta optimizar un PDF y muestra el resultado real. La reducción depende del contenido del archivo.",
+          "Intenta optimizar un PDF directamente en tu navegador y muestra el resultado real. La reducción depende del contenido del archivo.",
       },
       en: {
         title: "Compress PDF online free",
         description:
-          "Attempts to optimize a PDF and shows the real result. The reduction depends on the file's content.",
+          "Tries to optimize a PDF right in your browser and shows the real result. The reduction depends on the file's content.",
       },
     },
     doc: {
@@ -2190,14 +2190,14 @@ export async function renderPdfPageToImage(
     apiStatus: "planned",
     seo: {
       es: {
-        title: "Extraer texto de PDF online gratis",
+        title: "Extraer texto de PDF online sin subir archivos",
         description:
-          "Extraé texto seleccionable de un PDF para copiarlo o descargarlo como TXT.",
+          "Extraé texto seleccionable de un PDF para copiarlo o descargarlo como TXT. El procesamiento ocurre en tu navegador.",
       },
       en: {
-        title: "Extract text from PDF online free",
+        title: "Extract text from PDF online without uploads",
         description:
-          "Pull selectable text from a PDF to copy or download as TXT.",
+          "Pull selectable text from a PDF to copy or download as TXT. Processing happens in your browser.",
       },
     },
     doc: {
@@ -2357,12 +2357,12 @@ export async function extractPdfText(file: File): Promise<{ pages: string[]; tex
       es: {
         title: "Contar páginas de un PDF online",
         description:
-          "Conocé cuántas páginas tiene un PDF al instante.",
+          "Conocé cuántas páginas tiene un PDF al instante. La lectura del archivo ocurre en tu navegador.",
       },
       en: {
         title: "Count PDF pages online",
         description:
-          "See how many pages a PDF has instantly.",
+          "See how many pages a PDF has instantly. The file is read in your browser.",
       },
     },
     doc: {
@@ -2483,12 +2483,12 @@ export async function countPdfPages(file: File): Promise<number> {
       es: {
         title: "Reordenar páginas PDF online gratis",
         description:
-          "Cambiá el orden de las páginas de un PDF y descargá el documento reorganizado.",
+          "Cambiá el orden de las páginas de un PDF y descargá el documento reorganizado. Funciona directamente en tu navegador.",
       },
       en: {
         title: "Reorder PDF pages online free",
         description:
-          "Change the order of a PDF's pages and download the reorganized document.",
+          "Change the order of a PDF's pages and download the reorganized document. Works right in your browser.",
       },
     },
     doc: {
@@ -2601,6 +2601,96 @@ export async function reorderPdfPages(file: File, order: number[]): Promise<Uint
           },
         },
       ],
+    },
+  },
+  {
+    id: "rotate-pdf",
+    slug: "rotar-pdf",
+    slugEn: "rotate-pdf",
+    name: { es: "Rotar PDF", en: "Rotate PDF" },
+    description: {
+      es: "Girá todas las páginas de un PDF 90°, 180° o 270° y descargá el documento corregido.",
+      en: "Rotate every page of a PDF by 90°, 180°, or 270° and download the corrected document.",
+    },
+    category: "pdf",
+    tags: {
+      es: ["pdf", "rotar", "girar", "paginas"],
+      en: ["pdf", "rotate", "turn", "pages"],
+    },
+    modes: v11AvailableModes,
+    plannedModes: v11PlannedModes,
+    status: "active",
+    pricing: "free",
+    requiresBackend: false,
+    requiresAI: false,
+    apiStatus: "planned",
+    seo: {
+      es: {
+        title: "Rotar PDF online gratis sin subir archivos",
+        description:
+          "Girá las páginas de un PDF 90°, 180° o 270° y descargá el resultado. El procesamiento ocurre en tu navegador.",
+      },
+      en: {
+        title: "Rotate PDF online free without uploads",
+        description:
+          "Turn the pages of a PDF by 90°, 180°, or 270° and download the result. Processing happens in your browser.",
+      },
+    },
+    doc: {
+      es: {
+        summary:
+          "Rotar PDF gira todas las páginas del documento en el ángulo elegido (90°, 180° o 270° en sentido horario) y genera un PDF nuevo listo para descargar.",
+        howTo: [
+          "Cargá el PDF.",
+          "Elegí la rotación: 90°, 180° o 270°.",
+          "Descargá el PDF rotado.",
+        ],
+        useCases: [
+          "Corregir un escaneo que quedó de costado o invertido.",
+          "Enderezar un PDF generado en horizontal para leerlo en vertical.",
+          "Preparar un documento antes de unirlo o numerarlo.",
+        ],
+        limits: [
+          "Tamaño máximo del PDF: 50 MB.",
+          "La rotación se aplica a todas las páginas por igual; no hay rotación por página individual en esta versión.",
+          "La rotación se suma a la orientación que el PDF ya tenga guardada.",
+        ],
+        privacy:
+          "El procesamiento ocurre en tu navegador; no subimos los archivos.",
+        commonErrors: [
+          "Un PDF dañado o protegido con contraseña puede no poder procesarse.",
+        ],
+        technicalNotes: [
+          "Usa pdf-lib: ajusta la rotación de cada página sobre la rotación existente (módulo 360).",
+        ],
+      },
+      en: {
+        summary:
+          "Rotate PDF turns every page of the document by the chosen angle (90°, 180°, or 270° clockwise) and produces a new PDF ready to download.",
+        howTo: [
+          "Upload the PDF.",
+          "Pick the rotation: 90°, 180°, or 270°.",
+          "Download the rotated PDF.",
+        ],
+        useCases: [
+          "Fix a scan that came out sideways or upside down.",
+          "Straighten a landscape PDF so it reads in portrait.",
+          "Prep a document before merging or numbering it.",
+        ],
+        limits: [
+          "Max PDF size: 50 MB.",
+          "The rotation applies to every page equally; per-page rotation isn't available in this version.",
+          "The rotation is added on top of the orientation the PDF already stores.",
+        ],
+        privacy:
+          "Processing happens in your browser — we don't upload your files.",
+        commonErrors: [
+          "A damaged or password-protected PDF may not be processable.",
+        ],
+        technicalNotes: [
+          "Uses pdf-lib: adjusts each page's rotation on top of the existing one (modulo 360).",
+        ],
+      },
     },
   },
   {
