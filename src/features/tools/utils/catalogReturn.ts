@@ -51,7 +51,10 @@ function isPersistedState(value: unknown): value is CatalogPersistedState {
     Number.isInteger(candidate.visibleCount) &&
     candidate.visibleCount >= CATALOG_INITIAL_VISIBLE_COUNT &&
     typeof candidate.scrollY === "number" &&
-    Number.isFinite(candidate.scrollY)
+    Number.isFinite(candidate.scrollY) &&
+    typeof candidate.visibleCount === "number" &&
+    Number.isFinite(candidate.visibleCount) &&
+    candidate.visibleCount >= 0
   );
 }
 

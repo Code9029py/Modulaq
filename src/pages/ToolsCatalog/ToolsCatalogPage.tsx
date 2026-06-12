@@ -8,8 +8,10 @@ import { useFavorites } from "../../features/tools/context/ToolPrefsProvider";
 import { tools } from "../../features/tools/data/tools";
 import type { ToolFilters as ToolFiltersType } from "../../features/tools/types/tool.types";
 import {
-  CATALOG_INITIAL_VISIBLE_COUNT,
-  CATALOG_LOAD_MORE_COUNT,
+  INITIAL_VISIBLE_TOOLS,
+  paginateCatalogItems,
+} from "../../features/tools/utils/catalogPagination";
+import {
   consumeCatalogReturnState,
   saveCatalogState,
   type CatalogPersistedState,
@@ -57,7 +59,7 @@ export function ToolsCatalogPage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(CATALOG_INITIAL_VISIBLE_COUNT);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_TOOLS);
   const [hasRestored, setHasRestored] = useState(false);
   const { hydrated, favoriteIds } = useFavorites();
 
@@ -147,28 +149,47 @@ export function ToolsCatalogPage() {
 
     return orderToolsByFavoriteIds(scopedTools, favoriteIds);
   }, [favoriteIds, filteredTools, onlyFavorites, showFavoritesFilter]);
-  const visibleTools = useMemo(() => displayedTools.slice(0, visibleCount), [displayedTools, visibleCount]);
-  const canLoadMore = visibleTools.length < displayedTools.length;
+
+  const paginated = useMemo(
+    () => paginateCatalogItems({ items: displayedTools, visibleCount }),
+    [displayedTools, visibleCount],
+  );
+  const visibleTools = paginated.visibleItems;
   const hasActiveFilters = hasFiltersOrSearch(filters, onlyFavorites);
+
+  // Reset visibleCount cuando cambian los criterios de filtrado. La paginación
+  // arranca de cero sobre cada nuevo conjunto filtrado; el restore al volver
+  // desde un detalle sigue funcionando porque corre antes en otro effect.
+  const filterSignature = `${filters.search}|${filters.categories.join(",")}|${filters.mode}|${filters.status}|${onlyFavorites ? "1" : "0"}`;
+  const previousSignatureRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!hasRestored) return;
+    if (previousSignatureRef.current === null) {
+      previousSignatureRef.current = filterSignature;
+      return;
+    }
+    if (previousSignatureRef.current !== filterSignature) {
+      previousSignatureRef.current = filterSignature;
+      setVisibleCount(INITIAL_VISIBLE_TOOLS);
+    }
+  }, [filterSignature, hasRestored]);
 
   const updateFilters = (nextFilters: ToolFiltersType) => {
     setFilters(nextFilters);
-    setVisibleCount(CATALOG_INITIAL_VISIBLE_COUNT);
   };
 
   const updateOnlyFavorites = (nextOnlyFavorites: boolean) => {
     setOnlyFavorites(nextOnlyFavorites);
-    setVisibleCount(CATALOG_INITIAL_VISIBLE_COUNT);
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount(paginated.nextVisibleCount);
   };
 
   const resetFilters = () => {
     setFilters(defaultFilters);
     setOnlyFavorites(false);
-    setVisibleCount(CATALOG_INITIAL_VISIBLE_COUNT);
-  };
-
-  const loadMore = () => {
-    setVisibleCount((current) => Math.min(current + CATALOG_LOAD_MORE_COUNT, displayedTools.length));
+    setVisibleCount(INITIAL_VISIBLE_TOOLS);
   };
 
   return (
@@ -202,7 +223,7 @@ export function ToolsCatalogPage() {
                 {t("catalog.filters.button")}
               </Button>
               <span className="text-sm font-medium text-ink-500">
-                {t("catalog.filters.countShort", { count: visibleTools.length })}
+                {t("catalog.filters.countShort", { count: paginated.totalItems })}
               </span>
             </div>
           </div>
@@ -310,7 +331,7 @@ export function ToolsCatalogPage() {
                   </Button>
                 ) : null}
                 <p className="text-sm font-medium text-ink-500">
-                  {t("catalog.filters.countLong", { shown: visibleTools.length, total: displayedTools.length })}
+                  {t("catalog.filters.countLong", { shown: paginated.visibleCount, total: paginated.totalItems })}
                 </p>
               </div>
             </div>
@@ -328,15 +349,21 @@ export function ToolsCatalogPage() {
                   description={onlyFavorites ? t("catalog.empty.favDescription") : t("catalog.empty.description")}
                 />
               </div>
-            ) : null}
-
-            {canLoadMore ? (
-              <div className="mt-6 flex justify-center">
-                <Button type="button" variant="secondary" onClick={loadMore}>
-                  {t("catalog.loadMore")}
-                </Button>
+            ) : (
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <p className="text-sm text-ink-500">
+                  {t("catalog.pagination.status", {
+                    visible: paginated.visibleCount,
+                    total: paginated.totalItems,
+                  })}
+                </p>
+                {paginated.hasMore ? (
+                  <Button type="button" variant="secondary" onClick={handleLoadMore}>
+                    {t("catalog.pagination.loadMore")}
+                  </Button>
+                ) : null}
               </div>
-            ) : null}
+            )}
           </section>
         </div>
       </Container>
