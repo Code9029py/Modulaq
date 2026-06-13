@@ -25,7 +25,7 @@ export function GuidesIndexPage() {
           <h1 className="max-w-4xl text-3xl font-semibold leading-tight text-ink-900 md:text-4xl">
             {t("guides.hero.h1")}
           </h1>
-          <p className="mt-3 max-w-3xl text-base leading-7 text-ink-500">{t("guides.hero.description")}</p>
+          <p className="mt-3 max-w-4xl text-base leading-7 text-ink-500">{t("guides.hero.description")}</p>
         </HeroPanel>
 
         {guides.length === 0 ? (
