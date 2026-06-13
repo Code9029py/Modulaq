@@ -30,7 +30,7 @@ export const es = {
   "guides.hero.badge": "Guías",
   "guides.hero.h1": "Guías prácticas",
   "guides.hero.description":
-    "Explicaciones breves y honestas para resolver tareas concretas con Modulaq, directamente en tu navegador.",
+    "Explicaciones breves y claras para resolver tareas concretas con Modulaq, directamente en tu navegador.",
   "guides.index.empty": "Pronto vamos a publicar guías en este idioma.",
   "guides.index.readGuide": "Leer guía",
   "guides.detail.back": "Volver a las guías",
