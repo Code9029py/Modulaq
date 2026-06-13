@@ -45,9 +45,14 @@ PageSpeed / Lighthouse home `https://modulaq.dev/`:
 
 ## 2. Fecha de revision y umbrales
 
-- Deploy Growth (PR1): fecha `____-__-__`.
-- Revision intermedia: deploy + 30 dias (solo lectura, sin cambios reactivos).
+- Deploy Growth (V3.0.2): fecha `____-__-__`.
+- Revision intermedia: deploy + 30 dias (chequeo de salud/indexacion, sin cambios reactivos de contenido).
 - **Revision de decision: deploy + 90 dias.**
+
+**Compuerta de indexacion — evaluar PRIMERO a +90:** ¿estan indexadas >= 50% de las ~10 URLs prioritarias (§8)?
+
+- NO -> el cuello de botella sigue siendo indexacion, no traccion. Diagnosticar (crawl / robots / thin content) y extender ventana. No aplicar umbrales de ranking ni concluir "no tracciona".
+- SI -> recien ahi aplicar los umbrales de abajo.
 
 Continuar (al menos 2 de 3):
 
@@ -87,9 +92,9 @@ Validacion: `npm run test:run` + `npm run build` + revision visual de 3 paginas 
 
 Sin plantillas repetidas. Cada guia: intencion propia, contenido propio, link a la herramienta. No mas de 6 en esta tanda.
 
-## 5. Canal externo (despues del deploy del PR1+PR2)
+## 5. Canal externo (despues del deploy + contenido ya en produccion)
 
-Un post honesto en un canal dev (r/webdev, dev.to o Show HN): "set de herramientas PDF/imagen 100% locales, sin upload, sin cuenta; documento las limitaciones". Objetivo: feedback, primer trafico no-Google, posibles backlinks. No spam, no multiposting.
+1 post principal honesto en un canal dev (r/webdev, dev.to o Show HN) + 2-3 intervenciones legitimas donde la herramienta resuelva algo real. Angulo: "herramientas locales en el navegador, sin upload, sin cuenta, con limites claros" (NO "alternativa a iLovePDF"). Empezar por dev-tools (image/base64, favicon, svg-to-png). Objetivo: feedback, trafico no-Google y backlinks naturales. Regla dura: nada de spam, nada de copiar-pegar, nada de publicar por publicar.
 
 ## 6. Regla de herramientas nuevas (vigente desde ahora)
 
@@ -105,3 +110,27 @@ Una herramienta nueva entra solo si cumple al menos una:
 ## 7. Fuera de alcance de V3.0.2
 
 No auditoria general, no documentacion de cierre larga, no refactor `tools.ts` (se hace como precondicion del proximo bloque de herramientas, no antes), no performance, no presets masivos, no backend/API/login/monetizacion/npm publish, no DOCX a PDF, no V4.
+
+## 8. Post-deploy operativo (cuando salga V3.0.2 a produccion)
+
+Principio: **activo en indexacion, activo en distribucion honesta, pasivo en contenido, sin scope nuevo.** Acciones manuales; nada de codigo salvo bug. El baseline (2 indexadas de ~78) dice que el cuello de botella es INDEXACION, no ranking.
+
+**Dia 0 (mismo dia del deploy):**
+
+1. Confirmar deploy OK en Cloudflare; smoke test de rutas principales.
+2. Verificar `https://modulaq.dev/robots.txt`: status 200, contenido valido, linea `Sitemap:` (cabo suelto del baseline, §1).
+3. Verificar `sitemap.xml` = 78 URLs.
+4. Reenviar sitemap en Search Console; confirmar que la property es de tipo **Dominio** (no un prefijo) para cubrir ES+EN y apex/www.
+5. Activar **IndexNow** en Cloudflare (1 click) y dar de alta el sitemap en **Bing Webmaster Tools** — indexacion en Bing/Yandex en paralelo, gratis.
+6. URL Inspection + **Request Indexing** de las ~10 URLs prioritarias (slugs reales):
+   `/herramientas/rotar-pdf`, `/herramientas/unir-pdfs`, `/herramientas/eliminar-paginas-pdf`, `/herramientas/numerar-paginas-pdf`, `/guias/unir-pdf-sin-subir-archivos`, `/guias/eliminar-paginas-pdf-online`, `/guias/numerar-paginas-pdf`, `/guias/procesamiento-local-herramientas-online`, `/en/guides/image-base64`, `/en/guides/create-favicon-from-image`.
+7. Verificar canonical/hreflang en produccion: 2 ES + 2 EN.
+8. Registrar fecha real de deploy, +30 y +90 (§2).
+
+**Semana 1 — solo salud, no contenido:** sitemap leido, URLs descubiertas/indexadas, errores de cobertura, robots.txt, 404 propios, 5xx, GoogleBot/BingBot en Cloudflare. Solo se corrige bloqueo tecnico; "Descubierta: actualmente sin indexar" se observa.
+
+**Semanas 1-3 — distribucion honesta:** ver §5.
+
+**+30 — chequeo de salud, no de exito:** % de URLs indexadas, URLs Growth descubiertas, rutas con impresiones, requests de bots, 4xx/5xx. **Agrupar las "descubiertas no indexadas" por patron (categoria/idioma)** para detectar causa comun. No reescribir copy por ruido.
+
+**+90:** aplicar la compuerta de indexacion de §2.
