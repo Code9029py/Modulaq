@@ -1,7 +1,8 @@
 import { PDFDocument } from "pdf-lib";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { countPdfPages } from "./countPdfPages";
 import { rotatePdfPages, type PdfRotation } from "./rotatePdfPages";
+import { GeneratedPdfValidationError } from "./shared";
 import { garbageBytes, loadPdfFixture } from "../../test-fixtures/load";
 
 async function getPageAngles(bytes: Uint8Array): Promise<number[]> {
@@ -43,5 +44,37 @@ describe("rotatePdfPages", () => {
 
   it("lanza error con bytes que no son un PDF", async () => {
     await expect(rotatePdfPages(garbageBytes(), 90)).rejects.toThrow();
+  });
+
+  it("valida que el PDF generado pueda recargarse antes de devolverlo", async () => {
+    const source = loadPdfFixture("text-simple-1p.pdf");
+    const originalLoad = PDFDocument.load.bind(PDFDocument);
+    const loadSpy = vi.spyOn(PDFDocument, "load");
+    loadSpy
+      .mockImplementationOnce((pdf, options) => originalLoad(pdf, options))
+      .mockRejectedValueOnce(new Error("reload failed"));
+
+    try {
+      await expect(rotatePdfPages(source, 90)).rejects.toBeInstanceOf(GeneratedPdfValidationError);
+      expect(loadSpy).toHaveBeenCalledTimes(2);
+    } finally {
+      loadSpy.mockRestore();
+    }
+  });
+
+  it("rechaza una salida generada sin paginas", async () => {
+    const source = loadPdfFixture("text-simple-1p.pdf");
+    const originalLoad = PDFDocument.load.bind(PDFDocument);
+    const loadSpy = vi.spyOn(PDFDocument, "load");
+    loadSpy
+      .mockImplementationOnce((pdf, options) => originalLoad(pdf, options))
+      .mockResolvedValueOnce({ getPageCount: () => 0 } as PDFDocument);
+
+    try {
+      await expect(rotatePdfPages(source, 90)).rejects.toBeInstanceOf(GeneratedPdfValidationError);
+      expect(loadSpy).toHaveBeenCalledTimes(2);
+    } finally {
+      loadSpy.mockRestore();
+    }
   });
 });

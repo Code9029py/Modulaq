@@ -2,6 +2,10 @@ import type { ToolDefinition, ToolModeId } from "../types/tool.types";
 
 const v11AvailableModes = ["online"] as const satisfies readonly ToolModeId[];
 const v11PlannedModes = ["integrable-code", "api", "documentation"] as const satisfies readonly ToolModeId[];
+const complexPdfModificationLimit = {
+  es: "Algunos PDFs con estructuras internas complejas pueden verse correctamente en el navegador, pero fallar al modificarse. Si el resultado queda en blanco, recortado o desplazado, probá primero reexportar/imprimir el PDF como PDF y volvé a intentarlo.",
+  en: "Some PDFs with complex internal structures may display correctly in the browser but fail when modified. If the output is blank, cropped, or shifted, try re-exporting/printing the file as PDF and then try again.",
+} as const;
 
 export const tools: ToolDefinition[] = [
   {
@@ -55,6 +59,7 @@ export const tools: ToolDefinition[] = [
         limits: [
           "Se necesitan al menos dos PDF para unir.",
           "Cada archivo admite hasta 50 MB y el conjunto, hasta 100 MB en total.",
+          complexPdfModificationLimit.es,
         ],
         privacy:
           "El procesamiento ocurre en tu navegador; no subimos los archivos.",
@@ -84,6 +89,7 @@ export const tools: ToolDefinition[] = [
         limits: [
           "At least two PDFs are required to merge.",
           "Each file can be up to 50 MB and the whole batch up to 100 MB.",
+          complexPdfModificationLimit.en,
         ],
         privacy:
           "Processing happens in your browser — we don't upload your files.",
@@ -208,6 +214,7 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
           "Tamaño máximo del PDF: 50 MB.",
           "El modo \"separar todas las páginas\" admite hasta 50 páginas por operación.",
           "Las páginas se numeran desde 1 y los rangos incluyen los extremos.",
+          complexPdfModificationLimit.es,
         ],
         privacy:
           "El procesamiento ocurre en tu navegador; no subimos los archivos.",
@@ -241,6 +248,7 @@ export async function mergePdfs(files: File[]): Promise<Uint8Array> {
           "Max PDF size: 50 MB.",
           'The "separate every page" mode supports up to 50 pages per run.',
           "Pages are numbered from 1 and ranges include both ends.",
+          complexPdfModificationLimit.en,
         ],
         privacy:
           "Processing happens in your browser — we don't upload your files.",
@@ -2509,6 +2517,7 @@ export async function countPdfPages(file: File): Promise<number> {
         limits: [
           "Tamaño máximo del PDF: 50 MB.",
           "En esta versión el reordenamiento se hace con botones de subir/bajar (sin miniaturas ni arrastrar y soltar).",
+          complexPdfModificationLimit.es,
         ],
         privacy:
           "El procesamiento ocurre en tu navegador; no subimos los archivos.",
@@ -2538,6 +2547,7 @@ export async function countPdfPages(file: File): Promise<number> {
         limits: [
           "Max PDF size: 50 MB.",
           "In this version reordering is done with up/down buttons (no thumbnails or drag-and-drop).",
+          complexPdfModificationLimit.en,
         ],
         privacy:
           "Processing happens in your browser — we don't upload your files.",
@@ -2654,6 +2664,7 @@ export async function reorderPdfPages(file: File, order: number[]): Promise<Uint
           "Tamaño máximo del PDF: 50 MB.",
           "La rotación se aplica a todas las páginas por igual; no hay rotación por página individual en esta versión.",
           "La rotación se suma a la orientación que el PDF ya tenga guardada.",
+          complexPdfModificationLimit.es,
         ],
         privacy:
           "El procesamiento ocurre en tu navegador; no subimos los archivos.",
@@ -2681,6 +2692,7 @@ export async function reorderPdfPages(file: File, order: number[]): Promise<Uint
           "Max PDF size: 50 MB.",
           "The rotation applies to every page equally; per-page rotation isn't available in this version.",
           "The rotation is added on top of the orientation the PDF already stores.",
+          complexPdfModificationLimit.en,
         ],
         privacy:
           "Processing happens in your browser — we don't upload your files.",
@@ -3169,6 +3181,7 @@ export async function generateQrDataUrl(
           "Tamaño máximo del PDF: 50 MB.",
           "No se permite eliminar todas las páginas: el resultado siempre tiene al menos una página.",
           "Páginas fuera de rango se validan y avisan antes de procesar.",
+          complexPdfModificationLimit.es,
         ],
         privacy:
           "El procesamiento ocurre en tu navegador; no subimos los archivos.",
@@ -3196,6 +3209,7 @@ export async function generateQrDataUrl(
           "Max PDF size: 50 MB.",
           "You can't remove every page: the result always has at least one page.",
           "Out-of-range pages are validated and flagged before processing.",
+          complexPdfModificationLimit.en,
         ],
         privacy:
           "Processing happens in your browser — we don't upload your files.",
@@ -3259,6 +3273,7 @@ export async function generateQrDataUrl(
           "Numeración simple con fuente Helvetica embebida.",
           "Sin opciones de fuente, color, prefijo custom ni rangos parciales en esta versión.",
           "No promete preservar firmas digitales, formularios interactivos o anotaciones complejas: pdf-lib re-serializa el documento.",
+          complexPdfModificationLimit.es,
         ],
         privacy:
           "El procesamiento ocurre en tu navegador; no subimos los archivos.",
@@ -3286,6 +3301,7 @@ export async function generateQrDataUrl(
           "Simple numbering with embedded Helvetica.",
           "No font, color, custom prefix, or partial-range options in this version.",
           "Doesn't promise to preserve digital signatures, interactive forms, or complex annotations: pdf-lib re-serializes the document.",
+          complexPdfModificationLimit.en,
         ],
         privacy:
           "Processing happens in your browser — we don't upload your files.",

@@ -33,6 +33,10 @@ export function getOutputFileName(outputBaseName: string, fallbackBaseName = def
   return buildDownloadFileName(outputBaseName, "pdf", fallbackBaseName);
 }
 
+function isGeneratedPdfValidationError(error: unknown): boolean {
+  return error instanceof Error && error.name === "GeneratedPdfValidationError";
+}
+
 async function readPageCount(file: File): Promise<number> {
   try {
     return await coreCountPdfPages(file);
@@ -64,7 +68,10 @@ export async function rotatePdfFromFile(
   let bytes: Uint8Array;
   try {
     bytes = await coreRotatePdfPages(file, rotation);
-  } catch {
+  } catch (error) {
+    if (isGeneratedPdfValidationError(error)) {
+      throw new ToolError("tools.errors.rotatePdfOutputInvalid");
+    }
     throw new ToolError("tools.errors.rotatePdfFailed");
   }
 

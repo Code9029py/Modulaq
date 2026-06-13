@@ -1074,6 +1074,8 @@ export const en: Record<TranslationKey, string> = {
     "You can't remove every page. At least one must remain.",
   "tools.errors.removePdfPagesFailed": "Couldn't remove the pages from the PDF.",
   "tools.errors.rotatePdfFailed": "Couldn't rotate the PDF.",
+  "tools.errors.rotatePdfOutputInvalid":
+    "Couldn't validate the rotated PDF. It may have a complex internal structure; try re-exporting or printing it as PDF and then try again.",
   "tools.errors.addPageNumbersFailed": "Couldn't add page numbers to the PDF.",
   "tools.errors.startPageInvalid": "Enter a valid whole number for the start page.",
   "tools.errors.startPageOutOfRange":
@@ -1151,6 +1153,8 @@ export const en: Record<TranslationKey, string> = {
     "Rotated {{pages}} pages by {{rotation}}°. Your download has started.",
   "tools.rotate-pdf.ui.localProcessingNote":
     "Processing happens in your browser.",
+  "tools.rotate-pdf.ui.complexPdfWarning":
+    "Some PDFs with complex internal structures may display correctly in the browser but fail when modified. If the output is blank, cropped, or shifted, try re-exporting/printing the file as PDF and then try again.",
 
   "tools.add-page-numbers.ui.fileSection": "File and position",
   "tools.add-page-numbers.ui.intro": "Pick where the numbering goes at the bottom.",

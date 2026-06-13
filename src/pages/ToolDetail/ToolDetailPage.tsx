@@ -320,17 +320,17 @@ export function ToolDetailPage() {
         </section>
 
         {tool.doc ? (
-          <section
-            aria-labelledby="tool-about-heading"
+          <details
+            open
             className="mt-3 rounded-2xl border border-surface-200/80 bg-surface-50/90 p-4 shadow-panel ring-1 ring-surface-50/80 backdrop-blur"
           >
-            <h2 id="tool-about-heading" className="text-base font-semibold text-ink-900">
-              {t("toolDetail.about.title")}
-            </h2>
+            <summary className="cursor-pointer text-base font-semibold text-ink-900 marker:text-accent-teal">
+              <h2 className="inline text-base font-semibold text-ink-900">{t("toolDetail.about.title")}</h2>
+            </summary>
             <div className="mt-3">
               <ToolDocPanel doc={tool.doc} />
             </div>
-          </section>
+          </details>
         ) : null}
 
         {relatedTools.length > 0 ? (

@@ -5,28 +5,43 @@
 
 ---
 
-## 1. Baseline (pegar numeros reales antes del deploy Growth)
+## 1. Baseline (numeros reales antes del deploy Growth)
 
-Fecha de registro: `____-__-__` | Rango: ultimos 28 dias (o desde launch si es menor).
+Fecha de registro: `2026-06-12`.
 
 Search Console:
 
-- Impresiones totales: `___`
-- Clics totales: `___`
-- CTR promedio: `___%`
-- URLs indexadas / enviadas en sitemap: `___ / 68`
-- Top 10 consultas (query, impresiones, posicion): `___`
-- Paginas con impresiones (cuantas y cuales): `___`
-- Errores de indexacion/cobertura: `___`
+- Rango del export de rendimiento: `Ultimos 3 meses`.
+- Clics totales: `0`.
+- Impresiones totales: `2`.
+- CTR promedio: `0%`.
+- Posicion media: `1`.
+- URLs indexadas / enviadas en sitemap: `2 indexadas / 68 descubiertas en sitemap`.
+- Top consultas: `sin consultas principales registradas en el export`.
+- Paginas con impresiones: `https://modulaq.dev/` con `0 clics`, `2 impresiones`, `0% CTR`, `posicion 1`.
+- Cobertura: `2 paginas indexadas`, `13 paginas sin indexar`; validacion iniciada para `Pagina con redireccion` y `Descubierta: actualmente sin indexar`.
+
+Sitemap:
+
+- Sitemap enviado: `https://modulaq.dev/sitemap.xml`.
+- Enviado: `2026-06-09`; ultima lectura: `2026-06-12`; estado: `Correcto`.
+- Baseline pre-PR1: `68` URLs descubiertas.
+- Esperado post-PR1: `70` URLs por las rutas ES/EN de Rotar PDF.
 
 Cloudflare Analytics:
 
-- Visitas: `___` | Page views: `___`
-- Page load P50: `___ ms` (captura previa: ~1146 ms)
-- LCP / CLS / INP: `___` (captura previa: LCP y CLS verdes)
-- Top paths de entrada: `___`
-- Top paises: `___`
-- 4xx / 5xx: `___`
+- Traffic overview, ultimas 24h: `881` requests, `314` visits, `11.80%` cache hit rate, `9.94 MB` bandwidth.
+- Status codes: `2xx 701 / 3xx 158 / 4xx 22 / 5xx 0`.
+- Top paths por requests: `/ 202`, `/favicon.svg 77`, `/robots.txt 58`, `/sitemap.xml 41`.
+- Web Analytics, ultimas 2 semanas: `190` visits, `200` page views, Page load P50 `~1146 ms`.
+- Core Web Vitals: `LCP verde / CLS verde / INP sin dato suficiente`.
+- Top paths web: `/ 160`, `/herramientas 10`, `/herramientas/reordenar-paginas-pdf 10`, `/about 10`.
+
+PageSpeed / Lighthouse home `https://modulaq.dev/`:
+
+- Mobile: Performance `94`, Accessibility `100`, Best Practices `100`, SEO `100`, LCP `2.1 s`, CLS `0`.
+- Desktop: Performance `100`, Accessibility `100`, Best Practices `100`, SEO `92`, LCP `0.5 s`, CLS `0`.
+- Revalidar despues del deploy PR1: una corrida desktop reporto `robots.txt` no valido/no descargable, aunque Search Console ya lee el sitemap y Cloudflare registra trafico a `/robots.txt`.
 
 ## 2. Fecha de revision y umbrales
 

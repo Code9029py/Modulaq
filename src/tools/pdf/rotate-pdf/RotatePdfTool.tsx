@@ -1,4 +1,4 @@
-import { Download, FileText, Loader2, RotateCcw, RotateCw, Upload } from "lucide-react";
+import { Download, FileText, Info, Loader2, RotateCcw, RotateCw, Upload } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { Button } from "../../../shared/components/Button";
 import type { TranslationKey } from "../../../shared/i18n/dictionaries/es";
@@ -168,6 +168,10 @@ export function RotatePdfTool() {
             </span>
           </button>
           <p className="text-xs leading-5 text-ink-600">{limitLabels.pdfSingle}</p>
+          <p className="flex items-start gap-2 rounded-lg border border-surface-200/80 bg-surface-50/80 px-3 py-2 text-xs leading-5 text-ink-600">
+            <Info className="mt-0.5 shrink-0 text-accent-teal" size={14} />
+            <span>{t("tools.rotate-pdf.ui.complexPdfWarning")}</span>
+          </p>
 
           <input
             ref={fileInputRef}

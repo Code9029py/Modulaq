@@ -1,5 +1,5 @@
 import { degrees } from "pdf-lib";
-import { loadPdfDocument } from "./shared";
+import { assertGeneratedPdfHasPages, loadPdfDocument } from "./shared";
 import type { PdfInput } from "./types";
 
 export type PdfRotation = 90 | 180 | 270;
@@ -27,5 +27,7 @@ export async function rotatePdfPages(input: PdfInput, rotation: PdfRotation): Pr
     const nextAngle = ((currentAngle + rotation) % 360 + 360) % 360;
     page.setRotation(degrees(nextAngle));
   }
-  return document.save();
+  const bytes = await document.save();
+  await assertGeneratedPdfHasPages(bytes);
+  return bytes;
 }

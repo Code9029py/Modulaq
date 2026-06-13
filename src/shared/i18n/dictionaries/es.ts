@@ -1073,6 +1073,8 @@ export const es = {
     "No podés eliminar todas las páginas. Tiene que quedar al menos una.",
   "tools.errors.removePdfPagesFailed": "No se pudieron eliminar las páginas del PDF.",
   "tools.errors.rotatePdfFailed": "No se pudo rotar el PDF.",
+  "tools.errors.rotatePdfOutputInvalid":
+    "No se pudo validar el PDF rotado. Puede tener una estructura interna compleja; probá reexportarlo o imprimirlo como PDF y volvé a intentarlo.",
   "tools.errors.addPageNumbersFailed": "No se pudieron agregar números de página al PDF.",
   "tools.errors.startPageInvalid":
     "Ingresá un número entero válido para la página inicial.",
@@ -1150,6 +1152,8 @@ export const es = {
     "Rotamos {{pages}} páginas {{rotation}}°. La descarga ya comenzó.",
   "tools.rotate-pdf.ui.localProcessingNote":
     "El procesamiento ocurre en tu navegador.",
+  "tools.rotate-pdf.ui.complexPdfWarning":
+    "Algunos PDFs con estructuras internas complejas pueden verse correctamente en el navegador, pero fallar al modificarse. Si el resultado queda en blanco, recortado o desplazado, probá primero reexportar/imprimir el PDF como PDF y volvé a intentarlo.",
 
   "tools.add-page-numbers.ui.fileSection": "Archivo y posición",
   "tools.add-page-numbers.ui.intro": "Elegí la posición de la numeración al pie.",
