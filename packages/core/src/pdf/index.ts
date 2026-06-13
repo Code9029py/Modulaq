@@ -13,6 +13,7 @@ export {
   TEXT_TO_PDF_FONT_SIZE_MAX,
 } from "./textToPdf";
 export { removePdfPages } from "./removePdfPages";
+export { rotatePdfPages, type PdfRotation } from "./rotatePdfPages";
 export {
   addPageNumbers,
   formatPageNumberLabel,

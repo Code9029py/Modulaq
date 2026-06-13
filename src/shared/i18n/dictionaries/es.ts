@@ -22,9 +22,9 @@ export const es = {
   "footer.privacy": "Privacidad",
 
   // Home
-  "home.head.title": "Modulaq - Herramientas PDF, QR y texto en tu navegador",
+  "home.head.title": "Modulaq - Herramientas PDF, imagen, texto y QR en tu navegador",
   "home.head.description":
-    "Modulaq ofrece herramientas gratuitas para PDF, QR y texto. Sin cuenta y sin instalar nada.",
+    "Modulaq ofrece herramientas gratuitas para PDF, imagen, texto y QR. Funcionan en tu navegador, sin cuenta y sin subir tus archivos.",
   "home.hero.badge": "Beta pública · {{count}} herramientas",
   "home.hero.subhead": "Microherramientas digitales que funcionan en tu navegador.",
   "home.hero.description":
@@ -52,9 +52,9 @@ export const es = {
   "home.recent.title": "Usadas recientemente",
 
   // Catálogo
-  "catalog.head.title": "Herramientas PDF, QR y texto gratis",
+  "catalog.head.title": "Herramientas PDF, imagen, texto y QR gratis",
   "catalog.head.description":
-    "Explora herramientas gratuitas de Modulaq para PDF, QR y texto. Sin cuenta y sin instalar nada.",
+    "Explorá herramientas gratuitas de Modulaq para PDF, imagen, texto y QR. Utilidades rápidas en tu navegador, sin cuenta y sin instalar nada.",
   "catalog.hero.badge": "Catálogo",
   "catalog.hero.h1": "Herramientas PDF, QR y texto gratis",
   "catalog.hero.description":
@@ -247,6 +247,8 @@ export const es = {
     "Próximamente: este apartado quedará disponible cuando la herramienta avance de fase.",
   "toolDetail.loading": "Cargando herramienta...",
   "toolDetail.related": "Herramientas relacionadas",
+  "toolDetail.about.title": "Acerca de esta herramienta",
+  "toolDetail.localFileNote": "El procesamiento ocurre en tu navegador; no subimos tu archivo.",
   "toolDetail.doc.howTo": "Cómo usarla",
   "toolDetail.doc.useCases": "Casos de uso",
   "toolDetail.doc.limits": "Límites",
@@ -513,7 +515,7 @@ export const es = {
   "tools.compress-pdf.ui.section": "Archivos PDF",
   "tools.compress-pdf.ui.intro2": "Seleccioná uno o varios documentos.",
   "tools.compress-pdf.ui.notice":
-    "La compresión desde navegador puede variar según el contenido del PDF. Algunos archivos ya vienen optimizados o incluyen imágenes comprimidas, por lo que pueden reducirse poco o nada.",
+    "Esta herramienta intenta optimizar la estructura del PDF en tu navegador. No recomprime imágenes ni garantiza reducción: el resultado depende del contenido del archivo. Si no logra reducirlo, se conserva el original.",
   "tools.compress-pdf.ui.dropHintMany": "También podés arrastrar varios archivos aquí.",
   "tools.compress-pdf.ui.readyToCompress": "Listo para comprimir",
   "tools.compress-pdf.ui.optimizing": "Optimizando...",
@@ -1070,6 +1072,9 @@ export const es = {
   "tools.errors.removeAllPages":
     "No podés eliminar todas las páginas. Tiene que quedar al menos una.",
   "tools.errors.removePdfPagesFailed": "No se pudieron eliminar las páginas del PDF.",
+  "tools.errors.rotatePdfFailed": "No se pudo rotar el PDF.",
+  "tools.errors.rotatePdfOutputInvalid":
+    "No se pudo validar el PDF rotado. Puede tener una estructura interna compleja; probá reexportarlo o imprimirlo como PDF y volvé a intentarlo.",
   "tools.errors.addPageNumbersFailed": "No se pudieron agregar números de página al PDF.",
   "tools.errors.startPageInvalid":
     "Ingresá un número entero válido para la página inicial.",
@@ -1130,6 +1135,25 @@ export const es = {
     "Eliminamos {{removed}} páginas. El PDF descargado tiene {{remaining}} páginas.",
   "tools.remove-pdf-pages.ui.localProcessingNote":
     "El procesamiento ocurre en tu navegador.",
+
+  "tools.rotate-pdf.ui.fileSection": "Archivo y rotación",
+  "tools.rotate-pdf.ui.intro": "La rotación se aplica a todas las páginas del documento.",
+  "tools.rotate-pdf.ui.rotationLabel": "Rotación",
+  "tools.rotate-pdf.ui.rotation90": "90°",
+  "tools.rotate-pdf.ui.rotation180": "180°",
+  "tools.rotate-pdf.ui.rotation270": "270°",
+  "tools.rotate-pdf.ui.rotationHelp":
+    "En sentido horario. 270° equivale a 90° en sentido antihorario.",
+  "tools.rotate-pdf.ui.outputTitle": "PDF rotado",
+  "tools.rotate-pdf.ui.outputIntro": "Configurá el nombre de descarga.",
+  "tools.rotate-pdf.ui.processing": "Rotando páginas...",
+  "tools.rotate-pdf.ui.cta": "Rotar y descargar",
+  "tools.rotate-pdf.ui.successSummary":
+    "Rotamos {{pages}} páginas {{rotation}}°. La descarga ya comenzó.",
+  "tools.rotate-pdf.ui.localProcessingNote":
+    "El procesamiento ocurre en tu navegador.",
+  "tools.rotate-pdf.ui.complexPdfWarning":
+    "Algunos PDFs con estructuras internas complejas pueden verse correctamente en el navegador, pero fallar al modificarse. Si el resultado queda en blanco, recortado o desplazado, probá primero reexportar/imprimir el PDF como PDF y volvé a intentarlo.",
 
   "tools.add-page-numbers.ui.fileSection": "Archivo y posición",
   "tools.add-page-numbers.ui.intro": "Elegí la posición de la numeración al pie.",
