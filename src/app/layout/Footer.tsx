@@ -7,6 +7,7 @@ import { localizedPath } from "../../shared/i18n/paths";
 
 export function Footer() {
   const { language, t } = useI18n();
+  const guidesPath = localizedPath("guides", language);
   const privacyPath = localizedPath("privacy", language);
 
   return (
@@ -17,6 +18,9 @@ export function Footer() {
           <p className="mt-1">{t("footer.tagline")}</p>
         </div>
         <div className="flex flex-wrap gap-4">
+          <Link to={guidesPath} className="hover:text-ink-900">
+            {t("footer.guides")}
+          </Link>
           <Link to={privacyPath} className="hover:text-ink-900">
             {t("footer.privacy")}
           </Link>

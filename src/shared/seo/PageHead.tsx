@@ -14,6 +14,12 @@ type PageHeadProps = {
   path: string;
   noindex?: boolean;
   bareTitle?: boolean;
+  /**
+   * Página disponible en un solo idioma (ej: una guía ES sin equivalente EN).
+   * Suprime el alternate cross-language y `og:locale:alternate`; solo declara
+   * su propio idioma + `x-default` apuntando a sí misma.
+   */
+  singleLanguage?: boolean;
 };
 
 const OG_LOCALE: Record<Language, string> = {
@@ -26,7 +32,14 @@ const HTML_LANG: Record<Language, string> = {
   en: "en",
 };
 
-export function PageHead({ title, description, path, noindex = false, bareTitle = false }: PageHeadProps) {
+export function PageHead({
+  title,
+  description,
+  path,
+  noindex = false,
+  bareTitle = false,
+  singleLanguage = false,
+}: PageHeadProps) {
   const { language } = useI18n();
   const fullTitle = bareTitle ? title : `${title} · ${siteConfig.name}`;
   const canonical = toCanonicalUrl(path);
@@ -42,12 +55,18 @@ export function PageHead({ title, description, path, noindex = false, bareTitle 
       <meta name="description" content={description} />
       <link rel="canonical" href={canonical} />
       <link rel="alternate" hrefLang={HTML_LANG[language]} href={canonical} />
-      <link rel="alternate" hrefLang={HTML_LANG[otherLang]} href={altUrl} />
-      <link rel="alternate" hrefLang="x-default" href={toCanonicalUrl(mapPathToLanguage(path, "es"))} />
+      {singleLanguage ? null : (
+        <link rel="alternate" hrefLang={HTML_LANG[otherLang]} href={altUrl} />
+      )}
+      <link
+        rel="alternate"
+        hrefLang="x-default"
+        href={singleLanguage ? canonical : toCanonicalUrl(mapPathToLanguage(path, "es"))}
+      />
       {noindex ? <meta name="robots" content="noindex, nofollow" /> : null}
       <meta property="og:type" content="website" />
       <meta property="og:locale" content={OG_LOCALE[language]} />
-      <meta property="og:locale:alternate" content={OG_LOCALE[otherLang]} />
+      {singleLanguage ? null : <meta property="og:locale:alternate" content={OG_LOCALE[otherLang]} />}
       <meta property="og:site_name" content={siteConfig.name} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />

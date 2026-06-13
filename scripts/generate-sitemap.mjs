@@ -37,6 +37,7 @@ const excludedRoutes = new Set([
 const STATIC_ROUTE_MAP = new Map([
   ["/", "/en"],
   ["/herramientas", "/en/tools"],
+  ["/guias", "/en/guides"],
   ["/consultas", "/en/contact"],
   ["/privacidad", "/en/privacy"],
 ]);
@@ -142,6 +143,8 @@ const urlsXml = allRoutes
       const xDefault = lang === "es" ? loc : altLoc;
       lines.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${xDefault}" />`);
     } else {
+      // Página single-language (ej. una guía sin equivalente en el otro idioma):
+      // se auto-referencia. Coincide con PageHead singleLanguage.
       lines.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${loc}" />`);
     }
     lines.push("  </url>");
