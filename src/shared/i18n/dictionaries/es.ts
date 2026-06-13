@@ -12,6 +12,7 @@ export const es = {
   // Navegación / Header / Footer
   "nav.tagline": "microherramientas modulares",
   "nav.tools": "Herramientas",
+  "nav.guides": "Guías",
   "nav.consultations": "Consultas",
   "nav.openMenu": "Abrir navegación",
   "nav.closeMenu": "Cerrar navegación",
@@ -19,7 +20,22 @@ export const es = {
   "nav.lang.es": "Español",
   "nav.lang.en": "English",
   "footer.tagline": "Herramientas PDF, QR y texto para usar en el navegador.",
+  "footer.guides": "Guías",
   "footer.privacy": "Privacidad",
+
+  // Guías
+  "guides.head.title": "Guías de Modulaq",
+  "guides.head.description":
+    "Guías cortas y prácticas para trabajar con PDF, imágenes y texto en tu navegador, con procesamiento local y sin subir archivos.",
+  "guides.hero.badge": "Guías",
+  "guides.hero.h1": "Guías prácticas",
+  "guides.hero.description":
+    "Explicaciones breves y honestas para resolver tareas concretas con las herramientas de Modulaq, directamente en tu navegador.",
+  "guides.index.empty": "Pronto vamos a publicar guías en este idioma.",
+  "guides.index.readGuide": "Leer guía",
+  "guides.detail.back": "Volver a las guías",
+  "guides.detail.useTool": "Usar {{tool}}",
+  "guides.detail.related": "Herramientas relacionadas",
 
   // Home
   "home.head.title": "Modulaq - Herramientas PDF, imagen, texto y QR en tu navegador",

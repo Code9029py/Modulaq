@@ -12,6 +12,7 @@ type NavigationItem = {
 
 export const navigationItems: NavigationItem[] = [
   { labelKey: "nav.tools", routeKey: "tools" },
+  { labelKey: "nav.guides", routeKey: "guides" },
   { labelKey: "nav.consultations", routeKey: "consultations" },
 ];
 
