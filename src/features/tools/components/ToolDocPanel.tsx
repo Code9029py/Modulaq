@@ -48,8 +48,8 @@ export function ToolDocPanel({ doc }: ToolDocPanelProps) {
   const { t } = useI18n();
 
   return (
-    <div className="grid gap-4">
-      <p className="text-sm leading-6 text-ink-700">{doc.summary}</p>
+    <div className="grid gap-4 md:grid-cols-2">
+      <p className="text-sm leading-6 text-ink-700 md:col-span-2">{doc.summary}</p>
 
       <DocSection icon={ListChecks} title={t("toolDetail.doc.howTo")}>
         <OrderedList items={doc.howTo} />
