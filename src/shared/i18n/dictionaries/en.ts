@@ -28,7 +28,7 @@ export const en: Record<TranslationKey, string> = {
   "guides.hero.badge": "Guides",
   "guides.hero.h1": "Practical guides",
   "guides.hero.description":
-    "Brief, honest walkthroughs for getting concrete tasks done with Modulaq's tools, right in your browser.",
+    "Brief, clear walkthroughs for getting concrete tasks done with Modulaq's tools, right in your browser.",
   "guides.index.empty": "We'll publish guides in this language soon.",
   "guides.index.readGuide": "Read guide",
   "guides.detail.back": "Back to guides",
