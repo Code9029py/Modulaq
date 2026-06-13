@@ -52,6 +52,7 @@ export function detectLanguageFromPath(pathname: string): Language {
 const STATIC_ROUTE_MAP: Array<[string, string]> = [
   ["/", "/en"],
   ["/herramientas", "/en/tools"],
+  ["/guias", "/en/guides"],
   ["/consultas", "/en/contact"],
   ["/contacto", "/en/contact"],
   ["/solicitar-herramienta", "/en/request-tool"],
@@ -81,6 +82,16 @@ export function mapPathToLanguage(pathname: string, targetLang: Language): strin
     if (targetLang === "en") return cleaned;
     const tool = tools.find((t) => (t.slugEn ?? t.slug) === enToolMatch[1]);
     return tool ? `/herramientas/${tool.slug}` : "/herramientas";
+  }
+
+  // Guías: el detalle es single-language (no hay equivalente 1:1). Para el
+  // toggle de idioma se cae al índice de guías del idioma destino. El hreflang
+  // de estas páginas NO usa este mapeo (PageHead las marca singleLanguage).
+  if (/^\/guias\/[^/]+$/.test(cleaned)) {
+    return targetLang === "es" ? cleaned : "/en/guides";
+  }
+  if (/^\/en\/guides\/[^/]+$/.test(cleaned)) {
+    return targetLang === "en" ? cleaned : "/guias";
   }
 
   // Estáticas

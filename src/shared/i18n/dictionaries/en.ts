@@ -10,6 +10,7 @@ export const en: Record<TranslationKey, string> = {
   // Navigation / Header / Footer
   "nav.tagline": "modular browser tools",
   "nav.tools": "Tools",
+  "nav.guides": "Guides",
   "nav.consultations": "Contact",
   "nav.openMenu": "Open navigation",
   "nav.closeMenu": "Close navigation",
@@ -17,7 +18,22 @@ export const en: Record<TranslationKey, string> = {
   "nav.lang.es": "Español",
   "nav.lang.en": "English",
   "footer.tagline": "PDF, QR, and text tools that run in your browser.",
+  "footer.guides": "Guides",
   "footer.privacy": "Privacy",
+
+  // Guides
+  "guides.head.title": "Modulaq guides",
+  "guides.head.description":
+    "Short, practical guides for working with PDFs, images, and text in your browser — processed locally, with no uploads.",
+  "guides.hero.badge": "Guides",
+  "guides.hero.h1": "Practical guides",
+  "guides.hero.description":
+    "Brief, honest walkthroughs for getting concrete tasks done with Modulaq's tools, right in your browser.",
+  "guides.index.empty": "We'll publish guides in this language soon.",
+  "guides.index.readGuide": "Read guide",
+  "guides.detail.back": "Back to guides",
+  "guides.detail.useTool": "Use {{tool}}",
+  "guides.detail.related": "Related tools",
 
   // Home
   "home.head.title": "Modulaq - PDF, image, text and QR tools in your browser",

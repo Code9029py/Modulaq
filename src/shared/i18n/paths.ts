@@ -10,6 +10,7 @@ const PATHS = {
   es: {
     home: "/",
     tools: "/herramientas",
+    guides: "/guias",
     consultations: "/consultas",
     contact: "/contacto",
     requestTool: "/solicitar-herramienta",
@@ -18,6 +19,7 @@ const PATHS = {
   en: {
     home: "/en",
     tools: "/en/tools",
+    guides: "/en/guides",
     consultations: "/en/contact",
     contact: "/en/contact",
     requestTool: "/en/request-tool",
@@ -50,6 +52,7 @@ export function buildToolPath(slug: string, language: Language = "es"): string {
 export const STATIC_ROUTE_KEYS: StaticRouteKey[] = [
   "home",
   "tools",
+  "guides",
   "consultations",
   "contact",
   "requestTool",

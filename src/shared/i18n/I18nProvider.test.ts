@@ -18,4 +18,21 @@ describe("mapPathToLanguage", () => {
     expect(mapPathToLanguage("/herramientas", "en")).toBe("/en/tools");
     expect(mapPathToLanguage("/en/tools", "es")).toBe("/herramientas");
   });
+
+  it("maps the guides index between languages", () => {
+    expect(mapPathToLanguage("/guias", "en")).toBe("/en/guides");
+    expect(mapPathToLanguage("/en/guides", "es")).toBe("/guias");
+  });
+
+  it("falls back single-language guide details to the other language's index", () => {
+    expect(mapPathToLanguage("/guias/unir-pdf-sin-subir-archivos", "en")).toBe("/en/guides");
+    expect(mapPathToLanguage("/en/guides/image-base64", "es")).toBe("/guias");
+  });
+
+  it("keeps a guide detail path when targeting its own language", () => {
+    expect(mapPathToLanguage("/guias/unir-pdf-sin-subir-archivos", "es")).toBe(
+      "/guias/unir-pdf-sin-subir-archivos",
+    );
+    expect(mapPathToLanguage("/en/guides/image-base64", "en")).toBe("/en/guides/image-base64");
+  });
 });
